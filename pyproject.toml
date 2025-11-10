@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "veriflow"
+version = "0.1.0"
+description = "Verify LLM-generated low-code workflows (n8n)"
+requires-python = ">=3.10"
+
+dependencies = [
+  "pandas",
+  "networkx",
+  "pyyaml",
+  "requests",
+  "jsonschema",
+  "typer",
+  "rich",
+  "matplotlib",
+  "pytest",
+  "tqdm",
+  "scipy",
+  "openai",
+  "tiktoken",
+]
+
+[project.scripts]
+veriflow = "veriflow.cli:app"

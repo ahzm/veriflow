@@ -1,0 +1,22 @@
+name: veriflow
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pandas
+  - networkx
+  - pyyaml
+  - requests
+  - jsonschema
+  - scipy
+  - pip
+  - pip:
+      - typer
+      - rich
+      - openai
+      - tiktoken
+      - matplotlib
+      - seaborn
+      - pytest
+      - tqdm
