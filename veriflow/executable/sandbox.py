@@ -9,6 +9,7 @@ import time
 import networkx as nx
 
 from veriflow.utils.graph import build_dag
+from veriflow.executable.dataflow import check_dataflow
 
 
 # ---------- Public API ----------
@@ -26,11 +27,11 @@ def validate_workflow(
       - detail includes sub-scores and diagnostics
 
     Scoring:
-      E = w_param * param_ok + w_path * path_ok + w_run * runtime_ok
-      defaults: w_param=0.5, w_path=0.3, w_run=0.2
+      E = w_param * param_ok + w_path * path_ok + w_run * runtime_ok + w_dataflow * dataflow_ok
+      defaults: w_param=0.4, w_path=2.5, w_run=1.5, w_dataflow = 0.2
     """
-    w = weights or {"param": 0.5, "path": 0.3, "run": 0.2}
-    w_sum = max(w.get("param", 0) + w.get("path", 0) + w.get("run", 0), 1e-9)
+    w = weights or {"param": 0.4, "path": 0.25, "run": 0.15, "dataflow": 0.20}
+    w_sum = max(sum(w.values()), 1e-9)
     # normalize in case caller passes non-1.0 sum
     w = {k: v / w_sum for k, v in w.items()}
 
@@ -50,14 +51,34 @@ def validate_workflow(
         for u in unreachable_nodes:
             issues.append(f"Unreachable node: {u}")
 
-    # 3) Runtime simulation (safe, no side effects)
+    # 3) Data-flow consistency (static, new)
+    dataflow_ok = 1.0
+    dataflow_applicable = False
+    df_detail: Dict[str, Any] = {}
+    try:
+        df_ok, df_issues, df_detail = check_dataflow(workflow, G)
+        dataflow_applicable = df_detail.get("applicable", True)
+
+        if dataflow_applicable:
+            dataflow_ok = 1.0 if df_ok else 0.0
+            if not df_ok:
+                issues.extend(df_issues)
+        else:
+            dataflow_ok = 1.0  # vacuously satisfied
+    except Exception as e:
+        dataflow_ok = 0.0
+        dataflow_applicable = False
+        issues.append(f"Data-flow analysis failed: {e}")
+
+    # 4) Runtime simulation (safe, no side effects)
     runtime_ok, run_issues, exec_log = _simulate_runtime(G, nodes, time_budget_sec=time_budget_sec)
     issues.extend(run_issues)
 
     E = round(
         w["param"] * (1.0 if param_ok else 0.0)
         + w["path"] * (1.0 if path_ok else 0.0)
-        + w["run"]  * (1.0 if runtime_ok else 0.0),
+        + w["run"]  * (1.0 if runtime_ok else 0.0)
+        + w["dataflow"] * dataflow_ok,
         2,
     )
 
@@ -65,9 +86,11 @@ def validate_workflow(
         "param_ok": 1.0 if param_ok else 0.0,
         "path_ok":  1.0 if path_ok else 0.0,
         "runtime_ok": 1.0 if runtime_ok else 0.0,
+        "dataflow_ok":   dataflow_ok, 
         "weights": w,
         "missing_params": missing_params,
         "unreachable_nodes": unreachable_nodes,
+        "dataflow_detail": df_detail,
         "executed_nodes": exec_log.get("executed_nodes", []),
         "executed_nodes_readable": exec_log.get("executed_nodes_readable", []),  
         "name_map": exec_log.get("name_map", {}),                                
