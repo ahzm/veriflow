@@ -10,6 +10,7 @@ import networkx as nx
 
 from veriflow.utils.graph import build_dag
 from veriflow.executable.dataflow import check_dataflow
+from veriflow.executable.faults import inject_fault
 
 
 # ---------- Public API ----------
@@ -18,6 +19,8 @@ def validate_workflow(
     workflow: Dict[str, Any],
     weights: Optional[Dict[str, float]] = None,
     time_budget_sec: float = 2.0,
+    enable_faults: bool = False,
+    fault_profile: str = "medium",
 ) -> Tuple[float, List[str], Dict[str, Any]]:
     """
     Validate if a workflow is executable in a sandbox (no real side effects).
@@ -28,7 +31,7 @@ def validate_workflow(
 
     Scoring:
       E = w_param * param_ok + w_path * path_ok + w_run * runtime_ok + w_dataflow * dataflow_ok
-      defaults: w_param=0.4, w_path=2.5, w_run=1.5, w_dataflow = 0.2
+      defaults: w_param=0.4, w_path=0.25, w_run=0.15, w_dataflow = 0.2
     """
     w = weights or {"param": 0.4, "path": 0.25, "run": 0.15, "dataflow": 0.20}
     w_sum = max(sum(w.values()), 1e-9)
@@ -71,7 +74,8 @@ def validate_workflow(
         issues.append(f"Data-flow analysis failed: {e}")
 
     # 4) Runtime simulation (safe, no side effects)
-    runtime_ok, run_issues, exec_log = _simulate_runtime(G, nodes, time_budget_sec=time_budget_sec)
+    runtime_ok, run_issues, exec_log = _simulate_runtime(G, nodes, time_budget_sec=time_budget_sec, enable_faults=enable_faults,
+    fault_profile=fault_profile,)
     issues.extend(run_issues)
 
     E = round(
@@ -96,6 +100,9 @@ def validate_workflow(
         "name_map": exec_log.get("name_map", {}),                                
         "node_results": exec_log.get("node_results", {}),
         "time_budget_sec": time_budget_sec,
+        "faulted_nodes": exec_log.get("faulted_nodes", []),
+        "fault_profile": exec_log.get("fault_profile", None),
+        "faults_enabled": exec_log.get("faults_enabled", False),
     }
     return E, issues, detail
 
@@ -227,11 +234,14 @@ def _simulate_runtime(
     G: nx.DiGraph,
     nodes: List[Dict[str, Any]],
     time_budget_sec: float = 2.0,
+    enable_faults: bool = False,
+    fault_profile: str = "medium",
 ) -> Tuple[bool, List[str], Dict[str, Any]]:
     start = time.time()
     issues: List[str] = []
     results: Dict[str, Dict[str, Any]] = {}
     executed: List[str] = []
+    faulted_nodes: List[str] = [] 
 
     index = _build_node_index(nodes)
 
@@ -274,7 +284,21 @@ def _simulate_runtime(
             results[str(curr)] = {"ok": False, "msg": "Missing node definition"}
             issues.append(f"Node '{curr}' missing definition in nodes[]")
             # still enqueue successors to keep traversal consistent
-        else:
+        else:            
+            # (1) Fault injection before actual execution (optional)
+            if enable_faults:
+                f_ok, f_msg = inject_fault(node, profile_name=fault_profile)
+            else:
+                f_ok, f_msg = True, "faults disabled"
+
+            if not f_ok:
+                executed.append(str(curr))
+                faulted_nodes.append(str(curr))
+                results[str(curr)] = {"ok": False, "msg": f_msg}
+                issues.append(f"Injected fault at '{curr}': {f_msg}")
+                continue  # Do not run the real node
+
+            # (2) Normal execution
             ok, msg = runner.run(node)
             results[str(curr)] = {"ok": ok, "msg": msg}
             executed.append(str(curr))
@@ -297,6 +321,9 @@ def _simulate_runtime(
                                 "executed_nodes": executed, 
                                 "executed_nodes_readable": executed_readable, 
                                 "name_map": name_map,
+                                "faulted_nodes": faulted_nodes,
+                                "fault_profile": fault_profile,
+                                "faults_enabled": enable_faults,
                                 }
 
 # ---------- Mock node runners ----------
