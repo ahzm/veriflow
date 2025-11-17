@@ -1,5 +1,4 @@
 # veriflow/semantic/matcher.py
-# All comments in English.
 
 from typing import Dict, Any, Tuple, List
 import networkx as nx
@@ -69,14 +68,14 @@ def semantic_score(
     workflow: Dict[str, Any],
     prompt: str,
     use_llm: bool = False,
-) -> Tuple[float, List[str], Dict[str, float]]:
+) -> Tuple[float, List[str], Dict[str, Any]]:
     """
     Compute semantic consistency between extracted intent and workflow nodes.
 
     Returns:
         M (float): semantic score in [0,1]
         issues (List[str]): human-readable issue list
-        detail (Dict[str, float]): sub-scores and intent meta, e.g.
+        detail (Dict[str, Any]): sub-scores and intent meta, e.g.
             {
               "trigger": 1.0,
               "action": 1.0,
@@ -136,11 +135,8 @@ def semantic_score(
         "order": float(order_ok),
         "intent_conf": float(intent_res.overall_confidence),
         # storing as float-compatible value is convenient when exporting
-        "source": intent_res.source,            # keep as string
+        "source": intent_res.source,            # Keep the source string separately (not a float)
         "intent": intent,                       
     }
-    # Keep the source string separately (not a float)
-    # Caller can print in verbose mode
-    detail["source"] = intent_res.source  # type: ignore
 
     return M, issues, detail
