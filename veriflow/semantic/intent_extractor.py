@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 import os
 import re
 import json
@@ -22,6 +22,7 @@ class IntentResult:
     confidence: Dict[str, float]
     overall_confidence: float
     source: str  # "rule" | "rule+llm" | "llm-only"
+    meta: Dict[str, Any]
 
 
 # --- Keyword inventory (extend as needed) ---
@@ -98,6 +99,7 @@ def rule_based_intent(prompt: str) -> IntentResult:
     text = _normalize(prompt)
     intent: Dict[str, bool] = {}
     conf: Dict[str, float] = {}
+    intent_chain = []
 
     # need_schedule: keyword OR English-time-pattern
     schedule_hit = _contains_any(text, KEYWORDS["need_schedule"]) or _has_en_schedule_pattern(text)
@@ -110,10 +112,21 @@ def rule_based_intent(prompt: str) -> IntentResult:
         intent[key] = bool(hit)
         conf[key] = _rule_score(hit)
 
+    if schedule_hit:
+        intent_chain.append("rule: matched schedule keywords or English time pattern")
+    if _contains_any(text, KEYWORDS["need_email"]):
+        intent_chain.append("rule: matched email keywords")
+    if _contains_any(text, KEYWORDS["need_http"]):
+        intent_chain.append("rule: matched http/api keywords")
+    if _contains_any(text, KEYWORDS["need_slack"]):
+        intent_chain.append("rule: matched slack keywords")
+    if _contains_any(text, KEYWORDS["need_telegram"]):
+        intent_chain.append("rule: matched telegram keywords")
+
     # Overall confidence: average of active keys, fallback to mean
     active = [conf[k] for k, v in intent.items() if v]
     overall = sum(active) / max(1, len(active)) if active else sum(conf.values()) / max(1, len(conf))
-    return IntentResult(intent=intent, confidence=conf, overall_confidence=overall, source="rule")
+    return IntentResult(intent=intent, confidence=conf, overall_confidence=overall, source="rule", meta={"intent_chain": intent_chain},)
 
 
 def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mini") -> Optional[Dict]:
@@ -136,6 +149,7 @@ def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mi
         "Given a natural-language description, output a strict JSON object with boolean flags: "
         "{need_schedule, need_email, need_http, need_slack, need_telegram}. "
         "Also include a 'confidence' object with float scores in [0,1] per key."
+        "Also include a 'chain' array with short natural-language justifications explaining how each intent was inferred."
     )
     user_msg = (
         "Description: " + prompt + "\n"
@@ -164,6 +178,8 @@ def _merge_rule_and_llm(rule_res: IntentResult, llm_json: Dict) -> IntentResult:
     """Fuse rule-based and LLM outputs into a single IntentResult."""
     llm_intent = llm_json.get("intent", {}) if isinstance(llm_json, dict) else {}
     llm_conf = llm_json.get("confidence", {}) if isinstance(llm_json, dict) else {}
+    llm_chain = llm_json.get("chain", [])
+    merged_chain = rule_res.meta.get("intent_chain", []) + llm_chain
 
     merged_intent: Dict[str, bool] = {}
     merged_conf: Dict[str, float] = {}
@@ -190,7 +206,7 @@ def _merge_rule_and_llm(rule_res: IntentResult, llm_json: Dict) -> IntentResult:
 
     active = [merged_conf[k] for k, v in merged_intent.items() if v]
     overall = sum(active) / max(1, len(active)) if active else sum(merged_conf.values()) / max(1, len(merged_conf))
-    return IntentResult(intent=merged_intent, confidence=merged_conf, overall_confidence=overall, source="rule+llm")
+    return IntentResult(intent=merged_intent, confidence=merged_conf, overall_confidence=overall, source="rule+llm", meta={"intent_chain": merged_chain},)
 
 
 def extract_intent(prompt: str) -> Dict[str, bool]:

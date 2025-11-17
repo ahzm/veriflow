@@ -129,6 +129,20 @@ def semantic_score(
     if intent.get("need_telegram") and not nodes_summary["has_telegram"]:
         issues.append("Missing Telegram node for intent")
 
+    # 8) Irrelevant nodes: nodes that do not implement any requested capability
+    irrelevant_nodes: List[str] = []
+    for n in workflow.get("nodes", []):
+        t = (n.get("type", "") + " " + n.get("name", "")).lower()
+        relevant = (
+            (intent.get("need_schedule") and any(k in t for k in ("schedule", "cron", "trigger", "webhook")))
+            or (intent.get("need_email") and "email" in t)
+            or (intent.get("need_http") and ("http" in t or "request" in t))
+            or (intent.get("need_slack") and "slack" in t)
+            or (intent.get("need_telegram") and "telegram" in t)
+        )
+        if not relevant:
+            irrelevant_nodes.append(n.get("id"))
+
     detail = {
         "trigger": float(trigger_ok),
         "action": float(action_ok),
@@ -136,7 +150,9 @@ def semantic_score(
         "intent_conf": float(intent_res.overall_confidence),
         # storing as float-compatible value is convenient when exporting
         "source": intent_res.source,            # Keep the source string separately (not a float)
-        "intent": intent,                       
+        "intent": intent,
+        "intent_chain": intent_res.meta.get("intent_chain", []),
+        "irrelevant_nodes": irrelevant_nodes,                       
     }
 
     return M, issues, detail
