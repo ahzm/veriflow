@@ -10,9 +10,9 @@ from veriflow.structural.checker import structural_check
 from veriflow.semantic.matcher import semantic_score  # hybrid aware (use_llm flag)
 from veriflow.executable.dryrun import executability_score
 from veriflow.executable.sandbox import validate_workflow
+from veriflow.executable.faults import FAULT_PROFILE_NAMES
 
 app = typer.Typer(help="VeriFlow CLI - Verify LLM-generated (n8n) workflows")
-
 
 @app.command()
 def verify(
@@ -27,16 +27,22 @@ def verify(
     use_llm: bool = typer.Option(False, "--use-llm", help="Enable LLM refinement for intent extraction"),
     report: Optional[Path] = typer.Option(None, "--report", help="Write a JSON report to this path"),
     small_graph_floor: float = typer.Option(0.3, "--small-graph-floor", help="Floor for avg_out_norm when n_nodes<=3"),
-    w_c: float = typer.Option(0.45, "--wC"),
-    w_a: float = typer.Option(0.30, "--wA"),
-    w_o: float = typer.Option(0.20, "--wO"),
-    w_d: float = typer.Option(0.05, "--wD"),
+    w_c: float = typer.Option(0.45, "--wC", help="Weight for Structural Completeness (C): node definitions, required fields, config presence."),
+    w_a: float = typer.Option(0.30, "--wA", help="Weight for Structural Alignment (A): correctness of edges, flow logic, and node connectivity."),
+    w_o: float = typer.Option(0.20, "--wO", help="Weight for Structural Ordering (O): topological order, cycle handling, and trigger ordering."),
+    w_d: float = typer.Option(0.05, "--wD", help="Weight for Structural Density (D): graph out-degree normalization detecting degenerate workflows."),
+    faults: bool = typer.Option(False, "--faults", help="Enable fault injection during sandbox execution"),
+    fault_profile: str = typer.Option("medium", "--fault-profile", help="Fault injection profile: minimal | medium | chaos | llm | prod"),
 ):
     """
     Verify a workflow against structural, semantic, and executability criteria with weighted overall score.
     This version passes `use_llm` to semantic_score (hybrid intent extraction).
     """
     wf = json.load(open(input, "r", encoding="utf-8"))
+    fault_profile = fault_profile.lower()
+    if fault_profile not in FAULT_PROFILE_NAMES:
+        raise typer.BadParameter(f"Invalid fault profile '{fault_profile}'. "
+                                f"Choose one of: {', '.join(FAULT_PROFILE_NAMES)}")
 
     # Structural
     weights = {"C": w_c, "A": w_a, "O": w_o, "D": w_d}
@@ -57,7 +63,7 @@ def verify(
 
     # Executability
     if use_sandbox:
-        e, e_issues, e_detail = validate_workflow(wf)   # sandbox path
+        e, e_issues, e_detail = validate_workflow(wf, enable_faults=faults, fault_profile=fault_profile,) # sandbox path
     else:
         e, e_issues = executability_score(wf)           # existing dry-run
         e_detail = {}                                   # keep shape consistent
@@ -135,10 +141,12 @@ def bench(
     dump_details: bool = typer.Option(False, "--dump-details", help="Dump per-task JSON alongside CSV"),
     use_sandbox: bool = typer.Option(False, "--sandbox", help="Use sandbox runtime instead of dry-run"),
     small_graph_floor: float = typer.Option(0.3, "--small-graph-floor", help="Floor for avg_out_norm when n_nodes<=3"),
-    w_c: float = typer.Option(0.45, "--wC"),
-    w_a: float = typer.Option(0.30, "--wA"),
-    w_o: float = typer.Option(0.20, "--wO"),
-    w_d: float = typer.Option(0.05, "--wD"),
+    w_c: float = typer.Option(0.45, "--wC", help="Weight for Structural Completeness (C): node definitions, required fields, config presence."),
+    w_a: float = typer.Option(0.30, "--wA", help="Weight for Structural Alignment (A): correctness of edges, flow logic, and node connectivity."),
+    w_o: float = typer.Option(0.20, "--wO", help="Weight for Structural Ordering (O): topological order, cycle handling, and trigger ordering."),
+    w_d: float = typer.Option(0.05, "--wD", help="Weight for Structural Density (D): graph out-degree normalization detecting degenerate workflows."),
+    faults: bool = typer.Option(False, "--faults", help="Enable fault injection in sandbox runs"),
+    fault_profile: str = typer.Option("medium", "--fault-profile", help="Fault profile for sandbox runs"),
 ):
     """
     Batch verify workflows and export a CSV report.
@@ -146,6 +154,13 @@ def bench(
     """
     import glob as _glob
     import pandas as pd
+
+    fault_profile = fault_profile.lower()
+    if fault_profile not in FAULT_PROFILE_NAMES:
+        raise typer.BadParameter(
+            f"Invalid fault profile '{fault_profile}'. "
+            f"Choose one of: {', '.join(FAULT_PROFILE_NAMES)}"
+        )
 
     rows = []
     for fp_str in _glob.glob(glob):
@@ -177,8 +192,7 @@ def bench(
 
         # Executability (respect sandbox switch)
         if use_sandbox:
-            from veriflow.executable.sandbox import validate_workflow
-            e, _, e_detail = validate_workflow(wf)
+            e, _, e_detail = validate_workflow(wf, enable_faults=faults, fault_profile=fault_profile, )
         else:
             e, _ = executability_score(wf)
             e_detail = {}

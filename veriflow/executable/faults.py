@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Tuple, Dict, Any
 import random
 
+# Fault profile definitions
 FAULT_PROFILES = {
     "minimal":  {"rate": 0.05, "api": True,  "data": False, "node": False},
     "medium":   {"rate": 0.15, "api": True,  "data": True,  "node": False},
@@ -13,7 +14,7 @@ FAULT_PROFILES = {
 
 DEFAULT_PROFILE = "medium"
 
-
+# Fault injection logic
 def inject_fault(node: Dict[str, Any], profile_name: str | None = None) -> Tuple[bool, str]:
     """
     Possibly inject a runtime fault according to a fault profile.
@@ -68,3 +69,6 @@ def inject_fault(node: Dict[str, Any], profile_name: str | None = None) -> Tuple
 
     # If profile says nothing specific, treat as no fault
     return True, "no fault"
+
+# Exported profile list (for CLI/tools)
+FAULT_PROFILE_NAMES = list(FAULT_PROFILES.keys())
