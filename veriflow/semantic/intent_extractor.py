@@ -49,6 +49,9 @@ KEYWORDS = {
     "need_telegram": ("telegram", "电报", "tg", "Telegram"),
 }
 
+# --- Intent keys inventory ---
+INTENT_KEYS = ["need_schedule", "need_email", "need_http", "need_slack", "need_telegram"]
+
 # --- English time expressions helpers ---
 # Matches: 9, 9am, 9 am, 09:00, 9:00, 9.00, 09h00, etc.
 TIME_REGEX = re.compile(
@@ -94,6 +97,80 @@ def _has_en_schedule_pattern(text: str) -> bool:
     return False
 
 
+def _coerce_bool(v: Any) -> bool:
+    """Best-effort conversion to bool."""
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, (int, float)):
+        return v != 0
+    if isinstance(v, str):
+        t = v.strip().lower()
+        if t in {"true", "yes", "y", "1"}:
+            return True
+        if t in {"false", "no", "n", "0"}:
+            return False
+    # default: False (conservative)
+    return False
+
+def _coerce_float(v: Any, default: float = 0.0) -> float:
+    """Best-effort conversion to float in [0,1]."""
+    try:
+        x = float(v)
+    except Exception:
+        return default
+    if x < 0.0:
+        return 0.0
+    if x > 1.0:
+        return 1.0
+    return x
+
+def _validate_llm_json(raw: Any) -> Optional[Dict[str, Any]]:
+    """
+    Validate and sanitize the LLM JSON response.
+
+    Expected shape:
+      {
+        "intent":     { key: bool-like, ... },
+        "confidence": { key: float-like [0,1], ... },
+        "chain":      [ "explanation step", ... ]   # optional
+      }
+
+    Returns a cleaned dict or None if schema is unusable.
+    """
+    if not isinstance(raw, dict):
+        return None
+
+    intent_raw = raw.get("intent")
+    conf_raw = raw.get("confidence")
+    if not isinstance(intent_raw, dict) or not isinstance(conf_raw, dict):
+        return None
+
+    cleaned_intent: Dict[str, bool] = {}
+    cleaned_conf: Dict[str, float] = {}
+
+    for k in INTENT_KEYS:
+        if k in intent_raw:
+            cleaned_intent[k] = _coerce_bool(intent_raw[k])
+        if k in conf_raw:
+            cleaned_conf[k] = _coerce_float(conf_raw[k], default=0.0)
+
+    # If nothing usable, discard
+    if not cleaned_intent and not cleaned_conf:
+        return None
+
+    chain_raw = raw.get("chain", [])
+    chain: list[str] = []
+    if isinstance(chain_raw, list):
+        for item in chain_raw:
+            if isinstance(item, str):
+                chain.append(item)
+
+    return {
+        "intent": cleaned_intent,
+        "confidence": cleaned_conf,
+        "chain": chain,
+    }
+
 def rule_based_intent(prompt: str) -> IntentResult:
     """Extract intent using keyword heuristics + English time patterns."""
     text = _normalize(prompt)
@@ -128,9 +205,11 @@ def rule_based_intent(prompt: str) -> IntentResult:
     overall = sum(active) / max(1, len(active)) if active else sum(conf.values()) / max(1, len(conf))
     return IntentResult(intent=intent, confidence=conf, overall_confidence=overall, source="rule", meta={"intent_chain": intent_chain},)
 
+def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mini") -> Optional[Dict[str, Any]]:
+    """Call LLM to refine or correct the base intent.
 
-def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mini") -> Optional[Dict]:
-    """Call LLM to refine or correct the base intent. Returns a JSON dict or None on failure."""
+    Returns a cleaned JSON dict (see _validate_llm_json) or None on failure.
+    """
     if openai is None:
         return None
     api_key = os.environ.get("OPENAI_API_KEY")
@@ -151,13 +230,15 @@ def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mi
         "Also include a 'confidence' object with float scores in [0,1] per key. "
         "Also include a 'chain' array with short natural-language justifications explaining how each intent was inferred."
     )
-    user_msg = (
-        "Description: " + prompt + "\n"
-        "Base intent (from rules): " + json.dumps(base_intent, ensure_ascii=False) + "\n"
-        'Respond ONLY with JSON: {"intent": {...}, "confidence": {...}}'
-    )
 
-    try:
+    def _one_call(extra_hint: str = "") -> Optional[Dict[str, Any]]:
+        user_msg = (
+            "Description: " + prompt + "\n"
+            "Base intent (from rules): " + json.dumps(base_intent, ensure_ascii=False) + "\n"
+            'Respond ONLY with JSON of the form {"intent": {...}, "confidence": {...}, "chain": [...]} '
+            "with double quotes and no surrounding explanation. "
+            + extra_hint
+        )
         resp = client.chat.completions.create(
             model=model,
             messages=[
@@ -168,11 +249,25 @@ def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mi
             max_tokens=200,
         )
         content = resp.choices[0].message.content.strip()
-        data = json.loads(content)
-        return data
-    except Exception:
-        return None
+        try:
+            raw = json.loads(content)
+        except Exception:
+            return None
+        return _validate_llm_json(raw)
 
+    # First attempt
+    data = _one_call()
+    if data is not None:
+        return data
+
+    # Second attempt with stronger hint
+    data = _one_call(
+        extra_hint=(
+            " Your previous answer was not valid JSON or did not match the schema. "
+            "Now respond again with STRICTLY valid JSON only, no prose."
+        )
+    )
+    return data
 
 def _merge_rule_and_llm(rule_res: IntentResult, llm_json: Dict) -> IntentResult:
     """Fuse rule-based and LLM outputs into a single IntentResult."""
