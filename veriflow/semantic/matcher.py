@@ -5,6 +5,23 @@ import networkx as nx
 from veriflow.utils.graph import build_dag
 from veriflow.semantic.intent_extractor import extract_intent_hybrid
 
+# --- Helpers for semantic ordering ---
+
+def _node_label(n: dict) -> str:
+    """Return a lowercase label combining type + name."""
+    return (n.get("type", "") + " " + n.get("name", "")).lower()
+
+def _is_action_node(label: str) -> bool:
+    """
+    Return True if this node is a terminal/action node
+    (we should not “pass through” it unless it is the target).
+    """
+    action_keywords = (
+        "email", "slack", "telegram",
+        "sms", "discord", "notification",
+        "http request",
+    )
+    return any(k in label for k in action_keywords)
 
 def _find_nodes(nodes: List[dict], predicate) -> List[str]:
     """Return node ids whose (type + name) satisfies the given predicate."""
@@ -39,23 +56,78 @@ def inspect_nodes(nodes: List[dict]) -> Dict[str, bool]:
             summary["has_telegram"] = True
     return summary
 
-
 def order_ok_by_path(workflow: Dict[str, Any]) -> float:
-    """Check if there exists an HTTP→Email path when both are required."""
+    """
+    Check if there exists a semantically coherent HTTP->Email path.
+
+    We accept multi-hop paths such as:
+      HTTP -> IF -> Router -> Transform -> Email
+
+    but we avoid going through unrelated terminal actions
+    (e.g., HTTP -> Slack -> ... -> Email) when exploring paths.
+    
+    NOTE: currently specialized to HTTP→Email. Future versions may
+    generalize to other (source, sink) pairs.
+    """
     nodes = workflow.get("nodes", [])
+    if not nodes:
+        return 1.0
+
     G = build_dag(workflow)
 
+    # Index nodes by id for quick lookup
+    index: Dict[str, dict] = {n["id"]: n for n in nodes if "id" in n}
+
     http_ids = _find_nodes(nodes, lambda t: ("http" in t) or ("request" in t))
-    email_ids = _find_nodes(nodes, lambda t: ("email" in t))
+    email_ids = set(_find_nodes(nodes, lambda t: ("email" in t)))
 
     # If the pair is not present, we do not penalize ordering.
     if not http_ids or not email_ids:
         return 1.0
 
+    max_depth = 6  # simple safety cut-off to avoid very long / noisy paths
+
+    def _has_semantic_path(src: str) -> bool:
+        """BFS from src with semantic constraints."""
+        if src not in G:
+            return False
+
+        from collections import deque
+
+        visited = {src}
+        queue = deque([(src, 0)])
+
+        while queue:
+            cur, depth = queue.popleft()
+            if depth > max_depth:
+                continue
+
+            # If we reached an Email node, we are happy.
+            if cur in email_ids:
+                return True
+
+            for succ in G.successors(cur):
+                if succ in visited:
+                    continue
+                visited.add(succ)
+
+                node = index.get(succ, {})
+                label = _node_label(node)
+
+                # If successor is another terminal action (Slack, Telegram…): stop this branch
+                if _is_action_node(label):
+                    continue
+
+                # Otherwise treat as passthrough (IF / Router / Transform / unknown node)
+                queue.append((succ, depth + 1))
+
+        return False
+
+    # If any HTTP node has a valid semantic path to an Email node, ordering is OK.
     for h in http_ids:
-        for e in email_ids:
-            if h in G and e in G and nx.has_path(G, h, e):
-                return 1.0
+        if _has_semantic_path(h):
+            return 1.0
+
     return 0.0
 
 
