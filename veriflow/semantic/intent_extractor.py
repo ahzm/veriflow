@@ -49,6 +49,17 @@ KEYWORDS = {
     "need_telegram": ("telegram", "电报", "tg", "Telegram"),
 }
 
+# --- Negative patterns ("no email") ---
+NEG_EMAIL_PATTERNS = (
+    # CN
+    "不要邮件", "不要发邮件", "不要发送邮件",
+    "不发邮件", "不发送邮件",
+    # EN
+    "no email", "no emails",
+    "do not email", "don't email",
+    "do not send email", "don't send email",
+)
+
 # --- Intent keys inventory ---
 INTENT_KEYS = ["need_schedule", "need_email", "need_http", "need_slack", "need_telegram"]
 
@@ -96,6 +107,10 @@ def _has_en_schedule_pattern(text: str) -> bool:
         return True
     return False
 
+def _has_negative_email(text: str) -> bool:
+    """Detect explicit 'no email / 不要邮件' style negation."""
+    t = text.lower()
+    return any(p.lower() in t for p in NEG_EMAIL_PATTERNS)
 
 def _coerce_bool(v: Any) -> bool:
     """Best-effort conversion to bool."""
@@ -172,7 +187,7 @@ def _validate_llm_json(raw: Any) -> Optional[Dict[str, Any]]:
     }
 
 def rule_based_intent(prompt: str) -> IntentResult:
-    """Extract intent using keyword heuristics + English time patterns."""
+    """Extract intent using keyword heuristics, English time patterns and simple negative-email handling."""
     text = _normalize(prompt)
     intent: Dict[str, bool] = {}
     conf: Dict[str, float] = {}
@@ -183,22 +198,32 @@ def rule_based_intent(prompt: str) -> IntentResult:
     intent["need_schedule"] = schedule_hit
     conf["need_schedule"] = _rule_score(schedule_hit)
 
-    # Other booleans via keywords
-    for key in ("need_email", "need_http", "need_slack", "need_telegram"):
+    if schedule_hit:
+        intent_chain.append("rule: matched schedule keywords or English time pattern")
+
+    # --- Email with negative intent handling ---
+    email_hit = _contains_any(text, KEYWORDS["need_email"])
+    email_neg = _has_negative_email(text)
+
+    if email_hit and not email_neg:
+        intent["need_email"] = True
+        conf["need_email"] = _rule_score(True)
+        intent_chain.append("rule: matched email keywords")
+    else:
+        # Either no email mention, or it is explicitly negated
+        intent["need_email"] = False
+        conf["need_email"] = _rule_score(False)
+        if email_hit and email_neg:
+            intent_chain.append("rule: email keywords found but explicitly negated (no email)")
+
+    # --- Other booleans via keywords (http, slack, telegram) ---
+    for key in ("need_http", "need_slack", "need_telegram"):
         hit = _contains_any(text, KEYWORDS[key])
         intent[key] = bool(hit)
         conf[key] = _rule_score(hit)
-
-    if schedule_hit:
-        intent_chain.append("rule: matched schedule keywords or English time pattern")
-    if _contains_any(text, KEYWORDS["need_email"]):
-        intent_chain.append("rule: matched email keywords")
-    if _contains_any(text, KEYWORDS["need_http"]):
-        intent_chain.append("rule: matched http/api keywords")
-    if _contains_any(text, KEYWORDS["need_slack"]):
-        intent_chain.append("rule: matched slack keywords")
-    if _contains_any(text, KEYWORDS["need_telegram"]):
-        intent_chain.append("rule: matched telegram keywords")
+        if hit:
+            # e.g., "rule: matched need_http keywords"
+            intent_chain.append(f"rule: matched {key} keywords")
 
     # Overall confidence: average of active keys, fallback to mean
     active = [conf[k] for k, v in intent.items() if v]
