@@ -1,6 +1,6 @@
 # veriflow/semantic/matcher.py
 
-from typing import Dict, Any, Tuple, List
+from typing import Dict, Any, Tuple, List, Set, Optional
 import networkx as nx
 from veriflow.utils.graph import build_dag
 from veriflow.semantic.intent_extractor import extract_intent_hybrid
@@ -56,45 +56,49 @@ def inspect_nodes(nodes: List[dict]) -> Dict[str, bool]:
             summary["has_telegram"] = True
     return summary
 
-def order_ok_by_path(workflow: Dict[str, Any]) -> float:
+def _capability_relevant_label(label: str, intent: Dict[str, bool]) -> bool:
     """
-    Check if there exists a semantically coherent HTTP->Email path.
-
-    We accept multi-hop paths such as:
-      HTTP -> IF -> Router -> Transform -> Email
-
-    but we avoid going through unrelated terminal actions
-    (e.g., HTTP -> Slack -> ... -> Email) when exploring paths.
-    
-    NOTE: currently specialized to HTTP→Email. Future versions may
-    generalize to other (source, sink) pairs.
+    Check if a node label is directly relevant to at least one requested capability.
+    This is your previous 'local' heuristic, factored out for reuse.
     """
-    nodes = workflow.get("nodes", [])
-    if not nodes:
-        return 1.0
+    return (
+        (intent.get("need_schedule") and any(k in label for k in ("schedule", "cron", "trigger", "webhook")))
+        or (intent.get("need_email") and "email" in label)
+        or (intent.get("need_http") and ("http" in label or "request" in label))
+        or (intent.get("need_slack") and "slack" in label)
+        or (intent.get("need_telegram") and "telegram" in label)
+    )
 
-    G = build_dag(workflow)
+def _collect_semantic_path_nodes(
+    G: nx.DiGraph,
+    index: Dict[str, dict],
+    sources: List[str],
+    targets: Set[str],
+    max_depth: int = 6,
+) -> Tuple[bool, Set[str]]:
+    """
+    BFS from each source to any target, with semantic constraints:
 
-    # Index nodes by id for quick lookup
-    index: Dict[str, dict] = {n["id"]: n for n in nodes if "id" in n}
+      - we can traverse through intermediate nodes (IF / Router / Transform / etc.)
+      - we stop a branch when we hit an unrelated terminal action
+      - when a path to target is found, we record all nodes on that path
 
-    http_ids = _find_nodes(nodes, lambda t: ("http" in t) or ("request" in t))
-    email_ids = set(_find_nodes(nodes, lambda t: ("email" in t)))
+    Returns:
+        (has_path, path_nodes)
+          has_path: True if at least one path exists
+          path_nodes: union of nodes lying on at least one valid path
+    """
+    found_any = False
+    path_nodes: Set[str] = set()
 
-    # If the pair is not present, we do not penalize ordering.
-    if not http_ids or not email_ids:
-        return 1.0
+    from collections import deque
 
-    max_depth = 6  # simple safety cut-off to avoid very long / noisy paths
-
-    def _has_semantic_path(src: str) -> bool:
-        """BFS from src with semantic constraints."""
+    for src in sources:
         if src not in G:
-            return False
-
-        from collections import deque
+            continue
 
         visited = {src}
+        parents: Dict[str, Optional[str]] = {src: None}
         queue = deque([(src, 0)])
 
         while queue:
@@ -102,9 +106,14 @@ def order_ok_by_path(workflow: Dict[str, Any]) -> float:
             if depth > max_depth:
                 continue
 
-            # If we reached an Email node, we are happy.
-            if cur in email_ids:
-                return True
+            if cur in targets:
+                # reconstruct path src -> cur
+                found_any = True
+                p = cur
+                while p is not None:
+                    path_nodes.add(p)
+                    p = parents.get(p)
+                continue
 
             for succ in G.successors(cur):
                 if succ in visited:
@@ -114,22 +123,34 @@ def order_ok_by_path(workflow: Dict[str, Any]) -> float:
                 node = index.get(succ, {})
                 label = _node_label(node)
 
-                # If successor is another terminal action (Slack, Telegram…): stop this branch
-                if _is_action_node(label):
+                # if succ is an unrelated terminal action, cut this branch
+                if succ not in targets and _is_action_node(label):
                     continue
 
-                # Otherwise treat as passthrough (IF / Router / Transform / unknown node)
+                parents[succ] = cur
                 queue.append((succ, depth + 1))
 
-        return False
+    return found_any, path_nodes
 
-    # If any HTTP node has a valid semantic path to an Email node, ordering is OK.
-    for h in http_ids:
-        if _has_semantic_path(h):
-            return 1.0
+def order_ok_by_path(workflow: Dict[str, Any]) -> float:
+    """
+    Check if there exists a semantically coherent HTTP->Email path.
+    """
+    nodes = workflow.get("nodes", [])
+    if not nodes:
+        return 1.0
 
-    return 0.0
+    G = build_dag(workflow)
+    index: Dict[str, dict] = {n["id"]: n for n in nodes if "id" in n}
 
+    http_ids = _find_nodes(nodes, lambda t: ("http" in t) or ("request" in t))
+    email_ids = set(_find_nodes(nodes, lambda t: ("email" in t)))
+
+    if not http_ids or not email_ids:
+        return 1.0
+
+    has_path, _ = _collect_semantic_path_nodes(G, index, http_ids, email_ids)
+    return 1.0 if has_path else 0.0
 
 def _desired_keys(intent: Dict[str, bool]) -> List[str]:
     """Return list of desired capability keys (those starting with 'need_')."""
@@ -174,7 +195,8 @@ def semantic_score(
     intent = intent_res.intent
 
     # 2) Inspect nodes present in the workflow
-    nodes_summary = inspect_nodes(workflow.get("nodes", []))
+    nodes = workflow.get("nodes", []) or []
+    nodes_summary = inspect_nodes(nodes)
 
     # 3) Trigger sub-score
     trigger_ok = 1.0 if (not intent.get("need_schedule", False) or nodes_summary["has_schedule"]) else 0.0
@@ -193,15 +215,76 @@ def semantic_score(
 
     # Do not count schedule in the denominator for action coverage
     denom = len(desired) - (1 if intent.get("need_schedule") else 0)
-    action_ok = matched / max(1, denom)
+    if denom <= 0:
+        action_ok = 1.0
+    else:
+        action_ok = matched / denom
 
+    # ---- Semantic coverage: relevant node set ----
     # 5) Ordering sub-score (HTTP→Email path when both required)
     order_ok = order_ok_by_path(workflow) if (intent.get("need_http") and intent.get("need_email")) else 1.0
 
-    # 6) Aggregate
+    # Build graph + index once for relevance + path collection
+    G = build_dag(workflow) if nodes else nx.DiGraph()
+    index: Dict[str, dict] = {n["id"]: n for n in nodes if "id" in n}
+
+    # Node groups by capability
+    schedule_ids = _find_nodes(nodes, lambda t: any(k in t for k in ("schedule", "cron", "trigger", "webhook")))
+    http_ids = _find_nodes(nodes, lambda t: ("http" in t) or ("request" in t))
+    email_ids = _find_nodes(nodes, lambda t: "email" in t)
+    slack_ids = _find_nodes(nodes, lambda t: "slack" in t)
+    telegram_ids = _find_nodes(nodes, lambda t: "telegram" in t)
+
+    # 6) Compute a semantic relevant node set:
+    #    - direct capability match
+    #    - plus any node on a semantic path between key capabilities
+    relevant_nodes: Set[str] = set()
+
+    # 6.1 Direct capability relevance (local)
+    for n in nodes:
+        node_id = n.get("id")
+        if node_id is None:
+            continue
+        label = _node_label(n)
+        if _capability_relevant_label(label, intent):
+            relevant_nodes.add(node_id)
+
+    # 6.2 Semantic paths relevance (multi-hop)
+    # Helper for adding paths:
+    def _add_paths(sources: List[str], targets: List[str]) -> bool:
+        if not sources or not targets or not G:
+            return False
+        has_path, path_nodes = _collect_semantic_path_nodes(G, index, sources, set(targets))
+        if has_path:
+            relevant_nodes.update(path_nodes)
+        return has_path
+
+    # schedule -> http
+    if intent.get("need_schedule") and intent.get("need_http"):
+        _add_paths(schedule_ids, http_ids)
+
+    # schedule -> email/slack/telegram
+    if intent.get("need_schedule"):
+        if intent.get("need_email"):
+            _add_paths(schedule_ids, email_ids)
+        if intent.get("need_slack"):
+            _add_paths(schedule_ids, slack_ids)
+        if intent.get("need_telegram"):
+            _add_paths(schedule_ids, telegram_ids)
+
+    # http -> email/slack/telegram
+    if intent.get("need_http"):
+        if intent.get("need_email"):
+            _add_paths(http_ids, email_ids)
+        if intent.get("need_slack"):
+            _add_paths(http_ids, slack_ids)
+        if intent.get("need_telegram"):
+            _add_paths(http_ids, telegram_ids)
+
+    # 7) Aggregate
     M = round((trigger_ok + action_ok + order_ok) / 3, 2)
 
-    # 7) Issues
+    # 8) Issues
     issues: List[str] = []
     if trigger_ok < 1.0:
         issues.append("Intent requires scheduling, but no schedule/trigger node")
@@ -214,20 +297,13 @@ def semantic_score(
     if intent.get("need_telegram") and not nodes_summary["has_telegram"]:
         issues.append("Missing Telegram node for intent")
 
-    # 8) Irrelevant nodes: nodes that do not implement any requested capability
+    # 9) Irrelevant nodes: nodes that are not on any capability or semantic path
     irrelevant_nodes: List[str] = []
-    for n in workflow.get("nodes", []):
-        t = (n.get("type", "") + " " + n.get("name", "")).lower()
-        relevant = (
-            (intent.get("need_schedule") and any(k in t for k in ("schedule", "cron", "trigger", "webhook")))
-            or (intent.get("need_email") and "email" in t)
-            or (intent.get("need_http") and ("http" in t or "request" in t))
-            or (intent.get("need_slack") and "slack" in t)
-            or (intent.get("need_telegram") and "telegram" in t)
-        )
-
+    for n in nodes:
         node_id = n.get("id")
-        if not relevant and node_id is not None:
+        if node_id is None:
+            continue
+        if node_id not in relevant_nodes:
             irrelevant_nodes.append(node_id)
 
     detail = {
