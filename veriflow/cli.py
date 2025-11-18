@@ -109,11 +109,36 @@ def verify(
         else:
             print("[debug] structural detail: <none>")
 
-        if m_detail:
+        if m_detail and isinstance(m_detail, dict):
             print("[debug] semantic detail:", m_detail)
-            src = m_detail.get("source") if isinstance(m_detail, dict) else None
+
+            # Subscores
+            print(f"[debug] trigger: {m_detail.get('trigger')}")
+            print(f"[debug] action:  {m_detail.get('action')}")
+            print(f"[debug] order:   {m_detail.get('order')}")
+            print(f"[debug] intent_conf: {m_detail.get('intent_conf')}")
+            
+            # Source
+            src = m_detail.get("source")
             if src:
                 print(f"[debug] intent source: {src}")
+
+            # Flags
+            intent = m_detail.get("intent")
+            if intent:
+                print(f"[debug] intent flags: {intent}")
+
+            # Intent chain
+            chain = m_detail.get("intent_chain")
+            if chain:
+                print("[debug] intent_chain:")
+                for step in chain:
+                    print(f"    - {step}")
+
+            # Irrelevant nodes
+            irr = m_detail.get("irrelevant_nodes")
+            if irr is not None:
+                print(f"[debug] irrelevant_nodes: {irr}")
         else:
             print("[debug] semantic detail: <none>")
 

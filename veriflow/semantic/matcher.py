@@ -81,7 +81,20 @@ def semantic_score(
               "action": 1.0,
               "order": 1.0,
               "intent_conf": 0.92,
-              "source": "rule" | "rule+llm"
+              "source": "rule" | "rule+llm",
+              "intent": {
+                  "need_schedule": true,
+                  "need_email": true,
+                  "need_http": true,
+                  "need_slack": false,
+                  "need_telegram": false
+              },
+              "intent_chain": [
+                  "rule: matched schedule keywords or English time pattern",
+                  "rule: matched email keywords",
+                  "rule: matched http/api keywords"
+              ],
+              "irrelevant_nodes": ["2", "5"]
             }
     """
     # 1) Extract intent (rule-based with optional LLM refinement)
@@ -140,8 +153,10 @@ def semantic_score(
             or (intent.get("need_slack") and "slack" in t)
             or (intent.get("need_telegram") and "telegram" in t)
         )
-        if not relevant:
-            irrelevant_nodes.append(n.get("id"))
+
+        node_id = n.get("id")
+        if not relevant and node_id is not None:
+            irrelevant_nodes.append(node_id)
 
     detail = {
         "trigger": float(trigger_ok),

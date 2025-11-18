@@ -148,7 +148,7 @@ def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mi
         "You are a precise intent extractor for low-code workflow tasks. "
         "Given a natural-language description, output a strict JSON object with boolean flags: "
         "{need_schedule, need_email, need_http, need_slack, need_telegram}. "
-        "Also include a 'confidence' object with float scores in [0,1] per key."
+        "Also include a 'confidence' object with float scores in [0,1] per key. "
         "Also include a 'chain' array with short natural-language justifications explaining how each intent was inferred."
     )
     user_msg = (
