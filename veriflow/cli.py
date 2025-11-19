@@ -287,16 +287,41 @@ def gen_workflows(
         if not prompt_file.exists():
             prompt_file.write_text(prompt + "\n", encoding="utf-8")
 
+        # --- Reuse / stub detection ---
         if wf_file.exists() and not overwrite:
-            print(f"[{case_id}] reuse existing workflow: {wf_file}")
-            continue
+            try:
+                existing = json.loads(wf_file.read_text(encoding="utf-8"))
+            except Exception:
+                existing = None
 
+            # Detect stub workflow (previous failed generation)
+            is_stub = (
+                isinstance(existing, dict)
+                and not existing.get("nodes")  # empty or missing
+                and isinstance(existing.get("meta"), dict)
+                and (
+                    "warning" in existing["meta"]  # no client / no API key
+                    or "error" in existing["meta"]  # non-JSON / truncated output
+                )
+            )
+
+            if not is_stub:
+                print(f"[{case_id}] reuse existing workflow: {wf_file}")
+                continue
+            else:
+                print(f"[{case_id}] existing workflow looks like stub; regenerating...")
+
+        # --- Generate (first time OR stub OR overwrite) ---
         wf = generate_n8n_workflow(prompt, model=model)
-        if wf.get("nodes") == [] and "warning" in wf.get("meta", {}):
-            print(f"[{case_id}] WARNING: generated stub workflow (no OPENAI_API_KEY or client missing)")
+
+        meta = wf.get("meta", {})
+        if not wf.get("nodes") and isinstance(meta, dict) and ("warning" in meta or "error" in meta):
+            # This means even this attempt is still a stub
+            msg = meta.get("warning") or meta.get("error")
+            print(f"[{case_id}] WARNING: generated stub workflow: {msg}")
+
         wf_file.write_text(json.dumps(wf, ensure_ascii=False, indent=2), encoding="utf-8")
         print(f"[{case_id}] generated workflow -> {wf_file}")
-
 
 if __name__ == "__main__":
     app()
