@@ -1,0 +1,42 @@
+{
+  "S": 0.61,
+  "M": 0.89,
+  "E": 1.0,
+  "Overall": 0.83,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 0.2,
+    "acyclic": 1.0,
+    "orphan_ratio": 1.0,
+    "avg_out_norm": 0.0,
+    "exit_coverage": 0.0,
+    "base_structural_score": 0.39,
+    "final_S": 0.61
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 0.6666666666666666,
+    "order": 1.0,
+    "intent_conf": 0.85,
+    "source": "rule",
+    "intent": {
+      "need_schedule": true,
+      "need_email": true,
+      "need_http": true,
+      "need_slack": false,
+      "need_telegram": true
+    },
+    "intent_chain": [
+      "rule: matched schedule keywords or English time pattern",
+      "rule: matched email keywords",
+      "rule: matched need_http keywords",
+      "rule: matched need_telegram keywords"
+    ],
+    "irrelevant_nodes": [
+      "3",
+      "4"
+    ]
+  },
+  "exec_detail": {},
+  "executed_path": []
+}

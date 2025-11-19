@@ -1,0 +1,1 @@
+EWhen a GitHub push webhook is received, parse the JSON payload, extract commit information, and send a notification message to a Slack channel.

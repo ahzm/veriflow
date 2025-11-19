@@ -1,0 +1,53 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "GitHub Trigger",
+      "type": "n8n-nodes-base.githubTrigger",
+      "parameters": {
+        "event": "push"
+      }
+    },
+    {
+      "id": "2",
+      "name": "JSON Parse",
+      "type": "n8n-nodes-base.jsonParse",
+      "parameters": {
+        "json": "={{$json[\"body\"]}}"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Slack Send Message",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "channel": "#your-channel",
+        "text": "New commit pushed: {{$json[\"commits\"][0][\"message\"]}} by {{$json[\"commits\"][0][\"author\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "1": {
+      "main": [
+        [
+          {
+            "node": "2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2": {
+      "main": [
+        [
+          {
+            "node": "3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

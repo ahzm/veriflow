@@ -1,0 +1,72 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "mode": "everyDay",
+        "time": "19:00"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Exchange Rate",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.exchangerate-api.com/v4/latest/EUR",
+        "method": "GET",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Set Previous Rate",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          {
+            "name": "previousRate",
+            "value": "={{$json[\"previousRate\"]}}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "4",
+      "name": "Check Rate Change",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const currentRate = $json['rates']['USD'];\nconst previousRate = parseFloat($json['previousRate']);\n\nif (previousRate) {\n  const change = Math.abs((currentRate - previousRate) / previousRate);\n  return [{ json: { rateChanged: change > 0.01, currentRate, previousRate } }];\n}\nreturn [{ json: { rateChanged: false, currentRate, previousRate } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Telegram Alert",
+      "type": "n8n-nodes-base.telegramSendMessage",
+      "parameters": {
+        "chatId": "YOUR_CHAT_ID",
+        "text": "Alert: The EUR to USD exchange rate has changed significantly! Current Rate: {{$json[\"currentRate\"]}}, Previous Rate: {{$json[\"previousRate\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "1": {
+      "2": {}
+    },
+    "2": {
+      "3": {}
+    },
+    "3": {
+      "4": {}
+    },
+    "4": {
+      "5": {
+        "condition": {
+          "type": "boolean",
+          "value": "={{$json[\"rateChanged\"]}}"
+        }
+      }
+    }
+  }
+}

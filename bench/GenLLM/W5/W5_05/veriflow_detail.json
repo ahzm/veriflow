@@ -1,0 +1,42 @@
+{
+  "S": 0.45,
+  "M": 0.67,
+  "E": 0.33,
+  "Overall": 0.48,
+  "struct_detail": {
+    "schema_ok": 0.0,
+    "connected_ratio": 0.5,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.5,
+    "avg_out_norm": 0.06666666666666667,
+    "exit_coverage": 0.0,
+    "base_structural_score": 0.63,
+    "final_S": 0.45
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "order": 0.0,
+    "intent_conf": 0.9,
+    "source": "rule+llm",
+    "intent": {
+      "need_email": true,
+      "need_http": true,
+      "need_schedule": false,
+      "need_slack": false,
+      "need_telegram": false
+    },
+    "intent_chain": [
+      "rule: matched email keywords",
+      "rule: matched need_http keywords",
+      "The task involves sending an email, indicating the need for email functionality.",
+      "Fetching the exchange rate implies making an HTTP request to an API, indicating the need for HTTP.",
+      "There is no mention of scheduling, Slack, or Telegram in the description."
+    ],
+    "irrelevant_nodes": [
+      "1"
+    ]
+  },
+  "exec_detail": {},
+  "executed_path": []
+}

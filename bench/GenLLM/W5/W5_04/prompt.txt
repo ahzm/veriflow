@@ -1,0 +1,1 @@
+Every day at 7 PM, fetch the latest EUR-to-USD exchange rate. If the rate changes by more than 1%, send an alert message through Telegram. Do not send any email.

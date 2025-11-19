@@ -1,0 +1,44 @@
+{
+  "S": 0.7,
+  "M": 0.83,
+  "E": 0.67,
+  "Overall": 0.73,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 0.5,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.5,
+    "avg_out_norm": 0.06666666666666667,
+    "exit_coverage": 0.0,
+    "base_structural_score": 0.63,
+    "final_S": 0.7
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 0.5,
+    "order": 1.0,
+    "intent_conf": 1.0,
+    "source": "rule+llm",
+    "intent": {
+      "need_email": true,
+      "need_http": true,
+      "need_schedule": true,
+      "need_slack": false,
+      "need_telegram": false
+    },
+    "intent_chain": [
+      "rule: matched schedule keywords or English time pattern",
+      "rule: matched email keywords",
+      "rule: matched need_http keywords",
+      "The task specifies 'Every morning at 8 AM', indicating a need for scheduling.",
+      "The task mentions 'send the result to me by email', confirming the need for email.",
+      "The task requires 'fetch the weather forecast', which implies an HTTP request to a weather service.",
+      "There is no mention of Slack or Telegram, so those intents are false."
+    ],
+    "irrelevant_nodes": [
+      "2"
+    ]
+  },
+  "exec_detail": {},
+  "executed_path": []
+}

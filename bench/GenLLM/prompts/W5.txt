@@ -1,0 +1,14 @@
+W5_01
+Every morning at 8 AM, fetch the weather forecast for my city and send the result to me by email.
+
+W5_02
+When a GitHub push webhook is received, parse the JSON payload, extract commit information, and send a notification message to a Slack channel.
+
+W5_03
+Every weekday at 9 AM, fetch my unresolved Jira issues for the current week, summarize them, and email the summary to me.
+
+W5_04
+Every day at 7 PM, fetch the latest EUR-to-USD exchange rate. If the rate changes by more than 1%, send an alert message through Telegram. Do not send any email.
+
+W5_05
+When a manual webhook is triggered, fetch the current CNY-to-EUR exchange rate and send the result to my email.

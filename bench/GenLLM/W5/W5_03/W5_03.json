@@ -1,0 +1,76 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "mode": "everyWeekday",
+                "time": "09:00"
+            }
+        },
+        {
+            "id": "2",
+            "name": "Jira",
+            "type": "n8n-nodes-base.jira",
+            "parameters": {
+                "resource": "issue",
+                "operation": "getAll",
+                "jql": "status != 'Resolved' AND updated >= startOfWeek() AND updated <= endOfWeek()"
+            }
+        },
+        {
+            "id": "3",
+            "name": "Function",
+            "type": "n8n-nodes-base.function",
+            "parameters": {
+                "functionCode": "const issues = items.map(item => item.json);\nconst summary = issues.map(issue => `${issue.key}: ${issue.fields.summary}`).join('\\n');\nreturn [{ json: { summary } }];"
+            }
+        },
+        {
+            "id": "4",
+            "name": "Email",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {
+                "toEmail": "your-email@example.com",
+                "subject": "Weekly Jira Issues Summary",
+                "text": "Here are your unresolved Jira issues for the week:\\n{{$json[\"summary\"]}}"
+            }
+        }
+    ],
+    "connections": {
+        "1": {
+            "main": [
+                [
+                    {
+                        "node": "2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "2": {
+            "main": [
+                [
+                    {
+                        "node": "3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "3": {
+            "main": [
+                [
+                    {
+                        "node": "4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

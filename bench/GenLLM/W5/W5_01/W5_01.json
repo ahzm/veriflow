@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "mode": "everyDay",
+        "time": "08:00"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Weather API",
+      "type": "n8n-nodes-base.weather",
+      "parameters": {
+        "location": "Your City",
+        "options": {
+          "units": "metric"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "toEmail": "your-email@example.com",
+        "subject": "Daily Weather Forecast",
+        "text": "The weather forecast for today is: {{$json[\"weather\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "1": {
+      "main": [
+        [
+          {
+            "node": "2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2": {
+      "main": [
+        [
+          {
+            "node": "3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

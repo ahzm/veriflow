@@ -1,0 +1,1 @@
+When a manual webhook is triggered, fetch the current CNY-to-EUR exchange rate and send the result to my email.

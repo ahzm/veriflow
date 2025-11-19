@@ -1,0 +1,41 @@
+{
+  "S": 0.7,
+  "M": 1.0,
+  "E": 1.0,
+  "Overall": 0.9,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 0.5,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.5,
+    "avg_out_norm": 0.06666666666666667,
+    "exit_coverage": 0.0,
+    "base_structural_score": 0.63,
+    "final_S": 0.7
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "order": 1.0,
+    "intent_conf": 1.0,
+    "source": "rule+llm",
+    "intent": {
+      "need_email": false,
+      "need_http": false,
+      "need_schedule": false,
+      "need_slack": true,
+      "need_telegram": false
+    },
+    "intent_chain": [
+      "rule: matched need_slack keywords",
+      "The task involves sending a notification message, which indicates a need for Slack.",
+      "There is no mention of scheduling, emailing, HTTP requests, or Telegram."
+    ],
+    "irrelevant_nodes": [
+      "1",
+      "2"
+    ]
+  },
+  "exec_detail": {},
+  "executed_path": []
+}

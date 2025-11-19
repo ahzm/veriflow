@@ -1,0 +1,1 @@
+Every morning at 8 AM, fetch the weather forecast for my city and send the result to me by email.
