@@ -11,6 +11,7 @@ from veriflow.semantic.matcher import semantic_score  # hybrid aware (use_llm fl
 from veriflow.executable.dryrun import executability_score
 from veriflow.executable.sandbox import validate_workflow
 from veriflow.executable.faults import FAULT_PROFILE_NAMES
+from veriflow.generator.genllm import generate_n8n_workflow, load_prompts_file
 
 app = typer.Typer(help="VeriFlow CLI - Verify LLM-generated (n8n) workflows")
 
@@ -192,6 +193,11 @@ def bench(
         fp = Path(fp_str)
         wf = json.load(open(fp, "r", encoding="utf-8"))
 
+        # Skip non-workflow JSON (like veriflow_detail.json)
+        if "nodes" not in wf:
+            print(f"[skip] {fp} does not look like a workflow JSON (missing 'nodes'); skipping")
+            continue
+
         # Structural (pass same knobs as verify)
         weights = {"C": w_c, "A": w_a, "O": w_o, "D": w_d}
         _s = structural_check(wf, small_graph_floor=small_graph_floor, weights=weights)
@@ -251,6 +257,46 @@ def bench(
     out.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame(rows).to_csv(out, index=False)
     print(f"[ok] wrote {out}")
+
+@app.command()
+def gen_workflows(
+    prompts: Path = typer.Option(..., "--prompts", help="Path to prompts file (e.g., bench/GenLLM/prompts/W5.txt)"),
+    out_root: Path = typer.Option(..., "--out", help="Output root directory (e.g., bench/GenLLM/W5)"),
+    model: str = typer.Option("gpt-4o-mini", "--model", help="LLM model for workflow generation"),
+    overwrite: bool = typer.Option(False, "--overwrite", help="Regenerate JSON even if it already exists"),
+):
+    """
+    Generate LLM workflows from a prompts file into bench/GenLLM.
+
+    Layout per case:
+
+      <out_root>/<CASE_ID>/
+          prompt.txt
+          <CASE_ID>.json
+    """
+    pairs = load_prompts_file(prompts)
+    out_root.mkdir(parents=True, exist_ok=True)
+
+    for case_id, prompt in pairs:
+        case_dir = out_root / case_id
+        case_dir.mkdir(parents=True, exist_ok=True)
+
+        prompt_file = case_dir / "prompt.txt"
+        wf_file = case_dir / f"{case_id}.json"
+
+        if not prompt_file.exists():
+            prompt_file.write_text(prompt + "\n", encoding="utf-8")
+
+        if wf_file.exists() and not overwrite:
+            print(f"[{case_id}] reuse existing workflow: {wf_file}")
+            continue
+
+        wf = generate_n8n_workflow(prompt, model=model)
+        if wf.get("nodes") == [] and "warning" in wf.get("meta", {}):
+            print(f"[{case_id}] WARNING: generated stub workflow (no OPENAI_API_KEY or client missing)")
+        wf_file.write_text(json.dumps(wf, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"[{case_id}] generated workflow -> {wf_file}")
+
 
 if __name__ == "__main__":
     app()
