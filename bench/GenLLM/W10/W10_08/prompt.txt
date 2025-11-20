@@ -1,0 +1,1 @@
+Check every 30 minutes whether my company website is online. If the response time is higher than 1 second, trigger a Slack alert, write a log entry, and create an incident ticket in Jira.

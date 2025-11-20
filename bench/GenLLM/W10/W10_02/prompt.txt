@@ -1,0 +1,1 @@
+When a new row is added in my Google Sheet “Sales_2025”, fetch additional product details from an external API, append them to the sheet, notify my Telegram account, and archive the row in another sheet.

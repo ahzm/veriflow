@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Slack Trigger",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New message in #support"
+      }
+    },
+    {
+      "id": "2",
+      "name": "AI Classification",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/classify",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "message": "={{$json[\"text\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Store in Notion",
+      "type": "n8n-nodes-base.notion",
+      "parameters": {
+        "databaseId": "your-database-id",
+        "properties": {
+          "Message": "={{$json[\"text\"]}}",
+          "Category": "={{$json[\"category\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Telegram Notification",
+      "type": "n8n-nodes-base.telegram",
+      "parameters": {
+        "chatId": "your-chat-id",
+        "text": "New classified message: {{$json[\"text\"]}} - Category: {{$json[\"category\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Daily Report Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "support-leader@example.com",
+        "subject": "Daily Report of Classified Messages",
+        "text": "Here are the classified messages for today: {{your_report_content}}"
+      }
+    }
+  ],
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Classification": {
+      "main": [
+        [
+          {
+            "node": "Store in Notion",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Notion": {
+      "main": [
+        [
+          {
+            "node": "Daily Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

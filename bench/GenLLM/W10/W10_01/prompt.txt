@@ -1,0 +1,1 @@
+Every day at 7 AM, fetch the latest currency exchange rate USD→EUR, check if the rate changed by more than 1% compared to yesterday, log the result, and send me both a Slack alert and an email summary.

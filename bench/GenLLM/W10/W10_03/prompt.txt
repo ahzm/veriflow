@@ -1,0 +1,1 @@
+Whenever someone submits a form on my website, validate the fields, store the data in my Airtable base, send a confirmation email to the user, and post a message to my internal Slack channel if the budget field exceeds 5000€.

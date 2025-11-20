@@ -1,0 +1,29 @@
+W10_01
+Every day at 7 AM, fetch the latest currency exchange rate USD→EUR, check if the rate changed by more than 1% compared to yesterday, log the result, and send me both a Slack alert and an email summary.
+
+W10_02
+When a new row is added in my Google Sheet “Sales_2025”, fetch additional product details from an external API, append them to the sheet, notify my Telegram account, and archive the row in another sheet.
+
+W10_03
+Whenever someone submits a form on my website, validate the fields, store the data in my Airtable base, send a confirmation email to the user, and post a message to my internal Slack channel if the budget field exceeds 5000€.
+
+W10_04
+Monitor a GitHub repository for new issues. For each new issue, analyze the text using sentiment analysis, create a label (“positive”, “neutral”, or “negative”), update the issue accordingly, and send a daily report by email.
+
+W10_05
+Every Monday morning, fetch my week’s calendar from Google Calendar, list all events longer than one hour, summarize them using an AI API, store the summary in Notion, and send me a digest by email.
+
+W10_06
+When a new customer order arrives in Shopify, enrich it with shipping data from a REST API, generate an invoice PDF, upload the PDF to Dropbox, and send the customer a confirmation email with the download link.
+
+W10_07
+Whenever I receive an email with the subject containing “invoice”, extract the PDF file, rename it using the date + sender, store it in Google Drive, and log the invoice metadata into a Google Sheet.
+
+W10_08
+Check every 30 minutes whether my company website is online. If the response time is higher than 1 second, trigger a Slack alert, write a log entry, and create an incident ticket in Jira.
+
+W10_09
+When a message is posted in my Slack channel #support, classify its category using an AI API, store the result in Notion, notify the support leader on Telegram, and send a daily report email with all classified messages.
+
+W10_10
+Every day at 23:00, back up my PostgreSQL database via API, compress the file, upload it to AWS S3, clean backups older than 7 days, and send me a nightly report email about backup status.

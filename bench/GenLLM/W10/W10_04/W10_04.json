@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "GitHub Trigger",
+      "type": "n8n-nodes-base.githubTrigger",
+      "parameters": {
+        "event": "issues",
+        "repository": "your-repo-name",
+        "owner": "your-github-username"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Sentiment Analysis",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const sentiment = require('sentiment');\nconst sentimentAnalysis = new sentiment();\nconst result = sentimentAnalysis.analyze($input.item.json.issue.body);\nreturn [{ json: { score: result.score, text: result.text } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Label Issue",
+      "type": "n8n-nodes-base.github",
+      "parameters": {
+        "operation": "addLabel",
+        "repository": "your-repo-name",
+        "owner": "your-github-username",
+        "issueNumber": "={{$json[\"issue\"].number}}",
+        "labels": "={{$json[\"score\"] > 0 ? 'positive' : ($json[\"score\"] < 0 ? 'negative' : 'neutral')}}"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "your-email@example.com",
+        "subject": "Daily GitHub Issues Report",
+        "text": "New issue analyzed with sentiment score: {{$json[\"score\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "GitHub Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Label Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Label Issue": {
+      "main": [
+        [
+          {
+            "node": "Email Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

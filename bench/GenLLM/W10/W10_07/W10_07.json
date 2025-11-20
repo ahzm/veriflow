@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Email Trigger",
+      "type": "n8n-nodes-base.emailReadImap",
+      "parameters": {
+        "criteria": {
+          "subject": "invoice"
+        }
+      }
+    },
+    {
+      "id": "2",
+      "name": "Extract PDF",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  const attachments = item.json.attachments;\n  const pdf = attachments.find(att => att.mimeType === 'application/pdf');\n  return pdf ? { json: { pdf: pdf, sender: item.json.from, date: item.json.date } } : null;\n}).filter(item => item !== null);"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Rename PDF",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  const pdf = item.json.pdf;\n  const sender = item.json.sender;\n  const date = new Date(item.json.date).toISOString().split('T')[0];\n  pdf.fileName = `${date}_${sender}.pdf`;\n  return { json: { pdf: pdf } };\n});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Upload to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "parameters": {
+        "operation": "upload",
+        "fileName": "={{$json[\"pdf\"].fileName}}",
+        "binaryPropertyName": "pdf",
+        "folderId": "your-folder-id"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Metadata to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "operation": "append",
+        "sheetId": "your-sheet-id",
+        "data": [
+          {
+            "date": "={{$json[\"pdf\"].date}}",
+            "sender": "={{$json[\"pdf\"].sender}}",
+            "fileName": "={{$json[\"pdf\"].fileName}}"
+          }
+        ]
+      }
+    }
+  ],
+  "connections": {
+    "Email Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF": {
+      "main": [
+        [
+          {
+            "node": "Rename PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rename PDF": {
+      "main": [
+        [
+          {
+            "node": "Upload to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Log Metadata to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

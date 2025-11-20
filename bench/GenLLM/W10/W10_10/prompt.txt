@@ -1,0 +1,1 @@
+Every day at 23:00, back up my PostgreSQL database via API, compress the file, upload it to AWS S3, clean backups older than 7 days, and send me a nightly report email about backup status.

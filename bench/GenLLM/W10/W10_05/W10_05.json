@@ -1,0 +1,147 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "mode": "everyWeek",
+        "weekDays": [
+          "mon"
+        ],
+        "time": "09:00"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Google Calendar",
+      "type": "n8n-nodes-base.googleCalendar",
+      "parameters": {
+        "resource": "event",
+        "operation": "getAll",
+        "calendarId": "primary",
+        "additionalFields": {
+          "timeMin": "={{$now}}",
+          "timeMax": "={{$now.add(7, 'days')}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Filter Events",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "field": "duration",
+              "operation": "greaterThan",
+              "value": 60
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "AI Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/summarize",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "events": "={{$json[\"events\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notion",
+      "type": "n8n-nodes-base.notion",
+      "parameters": {
+        "operation": "create",
+        "databaseId": "your-database-id",
+        "properties": {
+          "Summary": {
+            "title": [
+              {
+                "text": {
+                  "content": "={{$json[\"summary\"]}}"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "your-email@example.com",
+        "subject": "Weekly Calendar Digest",
+        "text": "={{$json[\"summary\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Google Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "main": [
+        [
+          {
+            "node": "Filter Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Events": {
+      "main": [
+        [
+          {
+            "node": "AI Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Summary": {
+      "main": [
+        [
+          {
+            "node": "Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notion": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

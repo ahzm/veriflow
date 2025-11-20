@@ -1,0 +1,97 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Validate Fields",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const budget = parseFloat($input.item.json.budget);\n\nif (!budget || budget < 0) {\n  throw new Error('Invalid budget field');\n}\n\nreturn $input.item.json;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Store in Airtable",
+      "type": "n8n-nodes-base.airtable",
+      "parameters": {
+        "operation": "create",
+        "baseId": "your_base_id",
+        "table": "your_table_name",
+        "fields": {
+          "Name": "={{$json[\"name\"]}}",
+          "Email": "={{$json[\"email\"]}}",
+          "Budget": "={{$json[\"budget\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Confirmation of Your Submission",
+        "text": "Thank you for your submission!"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new submission has been received with a budget exceeding 5000€."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Fields": {
+      "main": [
+        [
+          {
+            "node": "Post to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Airtable": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "Post to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

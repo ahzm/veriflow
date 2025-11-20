@@ -1,0 +1,1 @@
+Monitor a GitHub repository for new issues. For each new issue, analyze the text using sentiment analysis, create a label (“positive”, “neutral”, or “negative”), update the issue accordingly, and send a daily report by email.

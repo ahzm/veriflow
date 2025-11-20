@@ -1,0 +1,1 @@
+When a new customer order arrives in Shopify, enrich it with shipping data from a REST API, generate an invoice PDF, upload the PDF to Dropbox, and send the customer a confirmation email with the download link.

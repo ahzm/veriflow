@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "parameters": {
+        "sheetId": "Sales_2025",
+        "triggerOn": "newRow"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Product Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/product/details",
+        "method": "GET",
+        "responseFormat": "json",
+        "queryParameters": {
+          "productId": "={{$json[\"productId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Append to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "operation": "append",
+        "sheetId": "Sales_2025",
+        "data": {
+          "productDetails": "={{$json[\"body\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "parameters": {
+        "chatId": "your_telegram_chat_id",
+        "text": "New product details added to Sales_2025."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Archive Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "operation": "append",
+        "sheetId": "Archived_Sales",
+        "data": {
+          "archivedRow": "={{$json}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Product Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Product Details": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Notify Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Archive Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

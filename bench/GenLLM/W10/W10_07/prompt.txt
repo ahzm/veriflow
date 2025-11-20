@@ -1,0 +1,1 @@
+Whenever I receive an email with the subject containing “invoice”, extract the PDF file, rename it using the date + sender, store it in Google Drive, and log the invoice metadata into a Google Sheet.

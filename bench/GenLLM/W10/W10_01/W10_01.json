@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "mode": "everyDay",
+        "time": "07:00"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Exchange Rate",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.exchangerate-api.com/v4/latest/USD",
+        "method": "GET",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check Rate Change",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const yesterdayRate = $getWorkflowStaticData('global').yesterdayRate || 0;\nconst currentRate = items[0].json.rates.EUR;\nconst rateChange = ((currentRate - yesterdayRate) / yesterdayRate) * 100;\n\nif (Math.abs(rateChange) > 1) {\n  return [{ json: { changed: true, currentRate, rateChange } }];\n} else {\n  return [{ json: { changed: false } }];\n}\n"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Result",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const changed = items[0].json.changed;\nconst currentRate = items[0].json.currentRate;\nconst rateChange = items[0].json.rateChange;\n\nif (changed) {\n  console.log(`Exchange rate changed by ${rateChange.toFixed(2)}%. Current rate: ${currentRate}`);\n} else {\n  console.log(`Exchange rate did not change significantly. Current rate: ${currentRate}`);\n}\n"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The exchange rate USD to EUR has changed significantly."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "your-email@example.com",
+        "subject": "Daily Exchange Rate Update",
+        "text": "The exchange rate USD to EUR has changed significantly."
+      }
+    }
+  ],
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "Fetch Exchange Rate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Exchange Rate": {
+      "main": [
+        [
+          {
+            "node": "Check Rate Change",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Rate Change": {
+      "main": [
+        [
+          {
+            "node": "Log Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Result": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "mode": "every",
+        "interval": 30,
+        "unit": "minute"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://yourcompanywebsite.com",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Alert: The website response time is higher than 1 second!"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Entry",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "console.log('Website response time exceeded 1 second');"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Jira Incident Ticket",
+      "type": "n8n-nodes-base.jira",
+      "parameters": {
+        "projectKey": "YOUR_PROJECT_KEY",
+        "summary": "Website Response Time Alert",
+        "description": "The website response time exceeded 1 second.",
+        "issueType": "Incident"
+      }
+    }
+  ],
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Slack Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Entry",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Jira Incident Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

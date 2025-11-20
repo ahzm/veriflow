@@ -1,0 +1,118 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Cron",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "mode": "everyDay",
+        "time": "23:00"
+      }
+    },
+    {
+      "id": "2",
+      "name": "PostgreSQL Backup",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/backup",
+        "method": "POST",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compress Backup",
+      "type": "n8n-nodes-base.executeCommand",
+      "parameters": {
+        "command": "tar -czf backup.tar.gz backup_file"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Upload to S3",
+      "type": "n8n-nodes-base.s3",
+      "parameters": {
+        "bucketName": "my-backup-bucket",
+        "fileName": "backup.tar.gz",
+        "binaryData": true
+      }
+    },
+    {
+      "id": "5",
+      "name": "Clean Old Backups",
+      "type": "n8n-nodes-base.s3",
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "my-backup-bucket",
+        "olderThan": "7d"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "your-email@example.com",
+        "subject": "Nightly Backup Report",
+        "text": "The backup process has completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Cron": {
+      "main": [
+        [
+          {
+            "node": "PostgreSQL Backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PostgreSQL Backup": {
+      "main": [
+        [
+          {
+            "node": "Compress Backup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compress Backup": {
+      "main": [
+        [
+          {
+            "node": "Upload to S3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to S3": {
+      "main": [
+        [
+          {
+            "node": "Clean Old Backups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Old Backups": {
+      "main": [
+        [
+          {
+            "node": "Send Email Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

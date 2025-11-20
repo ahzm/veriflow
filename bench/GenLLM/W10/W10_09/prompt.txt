@@ -1,0 +1,1 @@
+When a message is posted in my Slack channel #support, classify its category using an AI API, store the result in Notion, notify the support leader on Telegram, and send a daily report email with all classified messages.

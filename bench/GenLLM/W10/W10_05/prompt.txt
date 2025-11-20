@@ -1,0 +1,1 @@
+Every Monday morning, fetch my week’s calendar from Google Calendar, list all events longer than one hour, summarize them using an AI API, store the summary in Notion, and send me a digest by email.
