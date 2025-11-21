@@ -86,6 +86,109 @@ def _capability_relevant_label(label: str, intent: Dict[str, bool]) -> bool:
         or (intent.get("need_transform") and any(k in label for k in ("function","set","merge","transform","map","validate","parse","format")))
     )
 
+def flatten_keys(obj: Any, prefix: str = "") -> Set[str]:
+    """
+    Recursively collect JSON keys from dict/list structures.
+    Returned keys are lowercased full paths like:
+        "nodes.parameters.threshold.value"
+    """
+    keys: Set[str] = set()
+
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            k2 = str(k).lower()
+            path = f"{prefix}.{k2}" if prefix else k2
+            keys.add(path)
+            keys.update(flatten_keys(v, path))
+    elif isinstance(obj, list):
+        for item in obj:
+            keys.update(flatten_keys(item, prefix))
+
+    return keys
+
+
+def normalize_field_name(f: str) -> str:
+    """
+    Normalize intent field name to improve matching:
+    - lower
+    - remove spaces/hyphens
+    """
+    return f.strip().lower().replace(" ", "").replace("-", "_")
+
+# Field synonyms for param-sem matching
+# These are static small sets to reduce false negatives in real n8n workflows.
+FIELD_SYNONYMS: Dict[str, Set[str]] = {
+    # Generic identifiers
+    "id": {"id", "uuid", "uid", "identifier", "key"},
+    "user_id": {"user_id", "userid", "user", "userkey", "account_id", "accountid"},
+    "customer_id": {"customer_id", "customerid", "client_id", "clientid", "buyer_id", "buyerid"},
+
+    # Time / schedule
+    "time": {"time", "timestamp", "ts", "datetime", "date", "created_at", "updated_at"},
+    "cron": {"cron", "schedule", "interval", "every", "repeat", "timer"},
+
+    # HTTP / API
+    "url": {"url", "uri", "endpoint", "path", "link"},
+    "method": {"method", "http_method", "verb", "request_method"},
+    "headers": {"headers", "header", "http_headers"},
+    "query": {"query", "querystring", "qs", "params", "query_params"},
+    "body": {"body", "payload", "data", "json", "request_body"},
+    "status": {"status", "code", "status_code", "http_status"},
+
+    # Email / notification
+    "email": {"email", "mail", "address", "recipient", "to", "cc", "bcc"},
+    "subject": {"subject", "title", "headline"},
+    "message": {"message", "text", "content", "body", "msg"},
+    "channel": {"channel", "room", "chat", "slack_channel", "telegram_chat"},
+
+    # DB / storage
+    "db": {"db", "database", "table", "collection", "sheet", "spreadsheet"},
+    "record": {"record", "row", "item", "entry", "document"},
+    "field": {"field", "column", "property", "attribute", "key"},
+
+    # Conditions / thresholds
+    "threshold": {"threshold", "limit", "bound", "min", "max", "target"},
+    "operator": {"operator", "op", "cmp", "compare", "comparison", "rule"},
+    "value": {"value", "val", "amount", "number", "count", "qty"},
+
+    # Transform / mapping
+    "map": {"map", "mapping", "transform", "convert", "parse", "format", "derive"},
+}
+
+def field_aliases(f: str) -> Set[str]:
+    """
+    Generate aliases for an intent field, including:
+      - normalized form (snake-ish)
+      - no-underscore form
+      - camelCase lowered
+      - synonyms expansion (static)
+    """
+    aliases: Set[str] = set()
+
+    f0 = normalize_field_name(f)  # e.g., "customer_id"
+    aliases.add(f0)
+
+    # Remove underscores: customer_id -> customerid
+    no_us = f0.replace("_", "")
+    aliases.add(no_us)
+
+    # Camel case: customer_id -> customerId -> customerid (lowered)
+    parts = f0.split("_")
+    if parts:
+        camel = parts[0] + "".join(p.capitalize() for p in parts[1:])
+        aliases.add(camel.lower())
+
+    # Add static synonyms if known
+    if f0 in FIELD_SYNONYMS:
+        aliases.update(FIELD_SYNONYMS[f0])
+
+    # Heuristic: if field ends with _id, also add generic id synonyms
+    if f0.endswith("_id") and "id" in FIELD_SYNONYMS:
+        aliases.update(FIELD_SYNONYMS["id"])
+
+    return {a for a in aliases if a}
+
+
 def _collect_semantic_path_nodes(
     G: nx.DiGraph,
     index: Dict[str, dict],
@@ -418,8 +521,9 @@ def semantic_score(
     order_ok = order_ok_by_path(workflow, intent)
 
     # Build graph + index once for relevance + path collection
-    G = build_dag(workflow) if nodes else nx.DiGraph()
+    #G = build_dag(workflow) if nodes else nx.DiGraph()
     Gc, G0, comp_of, nodes_of_comp = build_scc_dag(workflow) if nodes else (nx.DiGraph(), nx.DiGraph(), {}, {})
+    G = G0
     index: Dict[str, dict] = {n["id"]: n for n in nodes if "id" in n}
 
     # Node groups by capability
@@ -540,7 +644,7 @@ def semantic_score(
         from_cap, to_cap = _split_rule(rule_name)
 
         # Not applicable
-        if not sources or not targets or not Gc.number_of_nodes() == 0:
+        if not sources or not targets or Gc.number_of_nodes() == 0:
             evidence.append({
                 "rule": rule_name,
                 "from": from_cap,
@@ -755,7 +859,7 @@ def semantic_score(
             node = index.get(cid, {})
             p = node.get("parameters", {}) or {}
             blob_p = json.dumps(p, ensure_ascii=False).lower()
-
+            flat_p_keys = flatten_keys(p)
 
             for key, v in p.items():
                 # check value
@@ -766,7 +870,10 @@ def semantic_score(
                 except Exception:
                     pass
 
-                if wanted_op and any(a in blob_p for a in op_aliases):
+                if wanted_op and (
+                    any(a in blob_p for a in op_aliases) or
+                    any(any(a in k for a in op_aliases) for k in flat_p_keys)
+                ):
                     found_op_match = True
 
             if found_value_match and (not wanted_op or found_op_match):
@@ -779,12 +886,27 @@ def semantic_score(
         elif wanted_op and not found_op_match:
             param_sem_ok = min(param_sem_ok, 0.5)
             issues.append(f"Threshold operator '{wanted_op}' not aligned with workflow parameters")
-
-    # Field alignment (coarse): search field names in workflow json
+    
+    # Field alignment (structured): match requested fields against flattened workflow keys/values
     if params_req.get("fields"):
         fields = params_req["fields"]
-        blob = json.dumps(workflow, ensure_ascii=False).lower()
-        missing_fields = [f for f in fields if f not in blob]
+
+        flat_keys = flatten_keys(workflow)  # all key paths
+        flat_blob = json.dumps(workflow, ensure_ascii=False).lower()  # fallback for value match
+
+        missing_fields = []
+        for f in fields:
+            aliases = field_aliases(f)
+
+            # key-path match: alias appears in some key path
+            key_hit = any(any(a in k for a in aliases) for k in flat_keys)
+
+            # fallback: old value-side substring match
+            val_hit = any(a in flat_blob for a in aliases)
+
+            if not (key_hit or val_hit):
+                missing_fields.append(f)
+
         if missing_fields:
             param_sem_ok = 0.0 # min(param_sem_ok, 0.5)
             #ratio = (len(fields) - len(missing_fields)) / max(1, len(fields))
