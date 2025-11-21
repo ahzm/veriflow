@@ -1,0 +1,40 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "HTTP Request",
+      "name": "Get price",
+      "parameters": {
+        "url": "api://price"
+      }
+    },
+    {
+      "id": "2",
+      "type": "Condition",
+      "name": "Price < 100",
+      "parameters": {
+        "threshold_op": "<",
+        "threshold_value": 100,
+        "field": "price"
+      }
+    },
+    {
+      "id": "3",
+      "type": "Email",
+      "name": "Send alert",
+      "parameters": {
+        "to": "me@example.com"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    },
+    {
+      "source": "2",
+      "target": "3"
+    }
+  ]
+}

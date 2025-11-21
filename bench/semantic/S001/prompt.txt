@@ -1,0 +1,1 @@
+Every day at 9am, fetch new orders from the API and email me a summary.

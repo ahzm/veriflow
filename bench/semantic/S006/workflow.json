@@ -1,0 +1,32 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "Form",
+      "name": "Webhook form"
+    },
+    {
+      "id": "2",
+      "type": "Function",
+      "name": "Validate fields"
+    },
+    {
+      "id": "3",
+      "type": "Database",
+      "name": "Insert row",
+      "parameters": {
+        "table": "submissions"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    },
+    {
+      "source": "2",
+      "target": "3"
+    }
+  ]
+}

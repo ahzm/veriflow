@@ -1,0 +1,46 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "Schedule",
+      "name": "Weekly",
+      "parameters": {
+        "cron": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "type": "HTTP Request",
+      "name": "Get stats",
+      "parameters": {
+        "url": "api://stats"
+      }
+    },
+    {
+      "id": "3",
+      "type": "Slack",
+      "name": "Post stats",
+      "parameters": {
+        "channel": "#stats"
+      }
+    },
+    {
+      "id": "4",
+      "type": "Email",
+      "name": "Unused email",
+      "parameters": {
+        "to": "someone@example.com"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    },
+    {
+      "source": "2",
+      "target": "3"
+    }
+  ]
+}

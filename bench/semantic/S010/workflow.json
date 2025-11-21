@@ -1,0 +1,64 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "Schedule",
+      "name": "Nightly",
+      "parameters": {
+        "cron": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "type": "HTTP Request",
+      "name": "Get sales",
+      "parameters": {
+        "url": "api://sales"
+      }
+    },
+    {
+      "id": "3",
+      "type": "Condition",
+      "name": "Sales < 50",
+      "parameters": {
+        "threshold_op": "<",
+        "threshold_value": 50,
+        "field": "sales"
+      }
+    },
+    {
+      "id": "4",
+      "type": "Email",
+      "name": "Low sales email",
+      "parameters": {
+        "to": "me@example.com"
+      }
+    },
+    {
+      "id": "5",
+      "type": "Slack",
+      "name": "Low sales slack",
+      "parameters": {
+        "channel": "#sales-alerts"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    },
+    {
+      "source": "2",
+      "target": "3"
+    },
+    {
+      "source": "3",
+      "target": "4"
+    },
+    {
+      "source": "3",
+      "target": "5"
+    }
+  ]
+}

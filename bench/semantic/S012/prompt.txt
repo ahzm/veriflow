@@ -1,0 +1,1 @@
+Send an email to support when a new order arrives.

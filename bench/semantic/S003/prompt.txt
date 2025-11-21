@@ -1,0 +1,1 @@
+If temperature exceeds 30, notify me on Slack.

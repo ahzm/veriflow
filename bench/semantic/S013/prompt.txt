@@ -1,0 +1,1 @@
+If humidity is above 70, notify me on Slack.

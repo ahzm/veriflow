@@ -1,0 +1,13 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "Schedule",
+      "name": "Noon daily",
+      "parameters": {
+        "cron": "0 12 * * *"
+      }
+    }
+  ],
+  "edges": []
+}

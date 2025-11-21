@@ -1,0 +1,1 @@
+Every night, check sales; if sales are below 50, send an email and a Slack message.

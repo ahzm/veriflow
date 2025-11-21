@@ -1,0 +1,1 @@
+If temperature is below 5, alert me on Telegram.

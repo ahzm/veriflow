@@ -1,0 +1,23 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "Webhook",
+      "name": "Order created"
+    },
+    {
+      "id": "2",
+      "type": "Email",
+      "name": "Notify support",
+      "parameters": {
+        "to": "support@example.com"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    }
+  ]
+}

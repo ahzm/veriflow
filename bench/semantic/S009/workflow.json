@@ -1,0 +1,38 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "Schedule",
+      "name": "Daily",
+      "parameters": {
+        "cron": "0 8 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "type": "IF",
+      "name": "Some branch",
+      "parameters": {
+        "expr": "x>0"
+      }
+    },
+    {
+      "id": "3",
+      "type": "Email",
+      "name": "Report",
+      "parameters": {
+        "to": "me@example.com"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    },
+    {
+      "source": "2",
+      "target": "3"
+    }
+  ]
+}

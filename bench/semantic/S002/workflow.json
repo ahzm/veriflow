@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "HTTP Request",
+      "name": "Read CPU",
+      "parameters": {
+        "url": "local://cpu"
+      }
+    },
+    {
+      "id": "2",
+      "type": "Slack",
+      "name": "Post message",
+      "parameters": {
+        "channel": "#ops"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    }
+  ]
+}

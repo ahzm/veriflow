@@ -1,0 +1,26 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "HTTP Request",
+      "name": "Get inventory",
+      "parameters": {
+        "url": "api://inventory"
+      }
+    },
+    {
+      "id": "2",
+      "type": "Airtable",
+      "name": "Upsert",
+      "parameters": {
+        "base": "inv"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    }
+  ]
+}

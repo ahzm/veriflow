@@ -1,0 +1,40 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "HTTP Request",
+      "name": "Read humidity",
+      "parameters": {
+        "url": "sensor://hum"
+      }
+    },
+    {
+      "id": "2",
+      "type": "IF",
+      "name": "Check humidity",
+      "parameters": {
+        "threshold_op": ">",
+        "threshold_value": 60,
+        "field": "humidity"
+      }
+    },
+    {
+      "id": "3",
+      "type": "Slack",
+      "name": "Alert",
+      "parameters": {
+        "channel": "#alerts"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "target": "2"
+    },
+    {
+      "source": "2",
+      "target": "3"
+    }
+  ]
+}

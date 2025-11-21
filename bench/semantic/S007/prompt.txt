@@ -1,0 +1,1 @@
+When a form is submitted, validate it and store to database.

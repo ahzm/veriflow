@@ -1,0 +1,1 @@
+Notify me if CPU usage is above 90% on Telegram.
