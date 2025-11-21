@@ -175,16 +175,8 @@ def order_ok_by_path(workflow: Dict[str, Any], intent: Dict[str, bool]) -> float
     }
 
     # ORDER_RULES: (source_cap, target_cap) both must exist to require an ordering path
-    ORDER_RULES = [
-        ("schedule", "http"),
-        ("schedule", "email"),
-        ("schedule", "slack"),
-        ("form", "transform"),
-        ("transform", "db"),
-        ("http", "db"),
-        # ("db", "email"),
-        ("condition", "slack"),  # slack typically after condition when needed
-    ]
+    _, edges_intent = build_intent_graph(intent)
+    ORDER_RULES = [(a, b) for (a, b) in edges_intent if b != "action"]
 
     def _cap_required(cap: str) -> bool:
         return intent.get(f"need_{cap}", False)
@@ -293,6 +285,7 @@ def semantic_score(
     params_req = intent_res.meta.get("params", {}) or {}
 
     issues: List[str] = []
+    evidence: List[Dict[str, Any]] = []
 
     # 2) Inspect nodes present in the workflow
     nodes = workflow.get("nodes", []) or []
@@ -340,6 +333,17 @@ def semantic_score(
 
         if intent.get("need_transform") and not nodes_summary["has_transform"]:
             support_ok = 0.0
+            evidence.append({
+                "rule": "support_transform_required",
+                "from": "intent",
+                "to": "transform",
+                "applicable": True,
+                "ok": False,
+                "sources": [],
+                "targets": [],
+                "path": [],
+                "note": "transform requested but missing; support score forced to 0"
+            })
         else:
             support_ok = matched_support / len(required_support)
 
@@ -421,6 +425,18 @@ def semantic_score(
             "path_nodes": sorted(path_nodes),
         })
 
+        evidence.append({
+            "rule": "intent_edge",
+            "from": a,
+            "to": b,
+            "applicable": bool(sources and targets),
+            "ok": bool(ok_edge) if (sources and targets) else None,
+            "sources": list(sources),
+            "targets": sorted(list(targets)),
+            "path": sorted(path_nodes),
+            "note": "intent edge satisfied" if ok_edge else "intent edge missing"
+        })
+
     # 6) Compute a semantic relevant node set:
     #    - direct capability match
     #    - plus any node on a semantic path between key capabilities
@@ -436,76 +452,138 @@ def semantic_score(
 
     # 6.2 Semantic paths relevance (multi-hop)
     # Helper for adding paths:
-    def _add_paths(sources: List[str], targets: List[str]) -> bool:
-        if not sources or not targets or not G:
+    def _split_rule(rule_name: str) -> Tuple[Optional[str], Optional[str]]:
+        """
+        Parse names like 'schedule->http(required)'.
+        Returns (from_cap, to_cap) if parseable.
+        """
+        if "->" not in rule_name:
+            return None, None
+        left, right = rule_name.split("->", 1)
+        right = right.split("(", 1)[0]
+        return left.strip(), right.strip()
+
+    def _add_paths(sources: List[str], targets: List[str], rule_name: str) -> bool:
+        from_cap, to_cap = _split_rule(rule_name)
+
+        # Not applicable
+        if not sources or not targets or not G.number_of_nodes() == 0:
+            evidence.append({
+                "rule": rule_name,
+                "from": from_cap,
+                "to": to_cap,
+                "applicable": False,
+                "ok": None,
+                "sources": list(sources),
+                "targets": list(targets),
+                "path": [],
+                "note": "not applicable (sources/targets empty or graph missing)"
+            })
             return False
+
         has_path, path_nodes = _collect_semantic_path_nodes(G, index, sources, set(targets))
         if has_path:
             relevant_nodes.update(path_nodes)
+
+        evidence.append({
+            "rule": rule_name,
+            "from": from_cap,
+            "to": to_cap,
+            "applicable": True,
+            "ok": bool(has_path),
+            "sources": list(sources),
+            "targets": list(targets),
+            "path": sorted(path_nodes),
+            "note": "required semantic path found" if has_path else "required semantic path missing"
+        })
         return has_path
 
-    def _add_paths_optional(sources: List[str], targets: List[str]) -> None:
-        """
-        Optional (weak) path relevance:
-        - we do NOT require a path to exist;
-        - if a path exists, we add its nodes into relevant_nodes.
-        """
+    def _add_paths_optional(sources: List[str], targets: List[str], rule_name: str) -> None:
+        from_cap, to_cap = _split_rule(rule_name)
+
         if not sources or not targets or not G:
+            evidence.append({
+                "rule": rule_name,
+                "from": from_cap,
+                "to": to_cap,
+                "applicable": False,
+                "ok": None,
+                "sources": list(sources),
+                "targets": list(targets),
+                "path": [],
+                "note": "not applicable (optional)"
+            })
             return
-        _, path_nodes = _collect_semantic_path_nodes(G, index, sources, set(targets))
-        relevant_nodes.update(path_nodes)
+
+        has_path, path_nodes = _collect_semantic_path_nodes(G, index, sources, set(targets))
+        if has_path:
+            relevant_nodes.update(path_nodes)
+
+        evidence.append({
+            "rule": rule_name,
+            "from": from_cap,
+            "to": to_cap,
+            "applicable": True,
+            "ok": bool(has_path),
+            "sources": list(sources),
+            "targets": list(targets),
+            "path": sorted(path_nodes),
+            "note": "optional semantic path found" if has_path else "optional semantic path not found"
+        })
 
     # schedule -> http
     if intent.get("need_schedule") and intent.get("need_http"):
-        _add_paths(schedule_ids, http_ids)
+        _add_paths(schedule_ids, http_ids, "schedule->http(required)")
 
     # schedule -> email/slack/telegram
     if intent.get("need_schedule"):
         if intent.get("need_email"):
-            _add_paths(schedule_ids, email_ids)
+            _add_paths(schedule_ids, email_ids, "schedule->email(required)")
         if intent.get("need_slack"):
-            _add_paths(schedule_ids, slack_ids)
+            _add_paths(schedule_ids, slack_ids, "schedule->slack(required)")
         if intent.get("need_telegram"):
-            _add_paths(schedule_ids, telegram_ids)
+            _add_paths(schedule_ids, telegram_ids, "schedule->telegram(required)")
 
     # http -> email/slack/telegram
     if intent.get("need_http"):
         if intent.get("need_email"):
-            _add_paths(http_ids, email_ids)
+            _add_paths(http_ids, email_ids, "http->email(required)")
         if intent.get("need_slack"):
-            _add_paths(http_ids, slack_ids)
+            _add_paths(http_ids, slack_ids, "http->slack(required)")
         if intent.get("need_telegram"):
-            _add_paths(http_ids, telegram_ids)
+            _add_paths(http_ids, telegram_ids, "http->telegram(required)")
         if intent.get("need_db"):
-            _add_paths_optional(http_ids, db_ids)
+            _add_paths_optional(http_ids, db_ids, "http->db(optional)")
 
     # form -> transform -> db -> notify
     if intent.get("need_form"):
         if intent.get("need_transform"):
-            _add_paths(form_ids, transform_ids)
+            _add_paths(form_ids, transform_ids, "form->transform(required)")
         if intent.get("need_db"):
-            _add_paths_optional(form_ids, db_ids)
+            _add_paths_optional(form_ids, db_ids, "form->db(optional)")
 
     if intent.get("need_transform") and intent.get("need_db"):
-        _add_paths_optional(transform_ids, db_ids)
-
+        _add_paths_optional(transform_ids, db_ids, "transform->db(optional)")
+    
     if intent.get("need_condition"):
         if intent.get("need_slack"):
-            _add_paths(condition_ids, slack_ids)
+            _add_paths(condition_ids, slack_ids, "condition->slack(required)")
         if intent.get("need_email"):
-            _add_paths(condition_ids, email_ids)
+            _add_paths(condition_ids, email_ids, "condition->email(required)")
     
     # If the prompt says “notify if ...” but does NOT specify email/slack/tg,
     # we still consider Condition -> (any workflow action) as relevant.
     if intent.get("need_conditional_notify") and not action_targets:
-        _add_paths_optional(condition_ids, workflow_action_targets)
+        _add_paths_optional(condition_ids, workflow_action_targets, "condition->action(optional)")
 
     # --- DB paths: OPTIONAL weak constraints (only add if path exists) ---
     if intent.get("need_db"):
         if intent.get("need_email"):
-            _add_paths_optional(db_ids, email_ids)
+            _add_paths_optional(db_ids, email_ids, "db->email(optional)")
         if intent.get("need_slack"):
-            _add_paths_optional(db_ids, slack_ids)
+            _add_paths_optional(db_ids, slack_ids, "db->slack(optional)")
+        if intent.get("need_telegram"):
+            _add_paths_optional(db_ids, telegram_ids, "db->telegram(optional)")
     
     # --- Conditional conflict (conditional action) ---
     conditional_ok = 1.0
@@ -539,9 +617,32 @@ def semantic_score(
         # Intent does NOT require conditional notify,
         # but workflow has Condition -> Action paths => weak penalty
         if condition_ids and workflow_action_targets:
-            hp, _ = _collect_semantic_path_nodes(G, index, condition_ids, set(workflow_action_targets))
+            hp, pn = _collect_semantic_path_nodes(G, index, condition_ids, set(workflow_action_targets))
             if hp:
                 conditional_ok = 0.35
+                evidence.append({
+                    "rule": "extra_conditional_notify",
+                    "from": "condition",
+                    "to": "action",
+                    "applicable": True,
+                    "ok": False,
+                    "sources": list(condition_ids),
+                    "targets": list(workflow_action_targets),
+                    "path": sorted(pn),
+                    "note": "workflow has conditional notify but intent does not require it"
+                })
+            else:
+                evidence.append({
+                    "rule": "extra_conditional_notify",
+                    "from": "condition",
+                    "to": "action",
+                    "applicable": True,
+                    "ok": True,
+                    "sources": list(condition_ids),
+                    "targets": list(workflow_action_targets),
+                    "path": [],
+                    "note": "no extra conditional notify path"
+                })
 
     # --- Param-sem check (fields/threshold align) ---
     param_sem_ok = 1.0
@@ -647,6 +748,60 @@ def semantic_score(
     if intent.get("need_conditional_notify") and not workflow_action_targets:
         missing_caps.append("action")
 
+    # alignment JSON for visualization
+    workflow_edges = []
+    try:
+        for u, v in G.edges():
+            workflow_edges.append({"source": u, "target": v})
+    except Exception:
+        workflow_edges = []
+
+    # label + capability tagging
+    def _guess_cap_for_node(label: str) -> Optional[str]:
+        if any(k in label for k in ("schedule","cron","trigger","webhook")): return "schedule"
+        if "http" in label or "request" in label: return "http"
+        if "email" in label: return "email"
+        if "slack" in label: return "slack"
+        if "telegram" in label: return "telegram"
+        if any(k in label for k in ("airtable","notion","sheet","spreadsheet","database","db")): return "db"
+        if any(k in label for k in ("form","webhook")): return "form"
+        if any(k in label for k in ("if","switch","router","branch","condition")): return "condition"
+        if any(k in label for k in ("function","set","merge","transform","map","validate","parse","format")): return "transform"
+        return None
+
+    workflow_nodes = []
+    for n in nodes:
+        nid = n.get("id")
+        if nid is None:
+            continue
+        label = n.get("name") or n.get("type") or nid
+        cap = _guess_cap_for_node(_node_label(n))
+        workflow_nodes.append({
+            "id": nid,
+            "label": label,
+            "capability": cap,
+            "relevant": nid in relevant_nodes
+        })
+
+    intent_edges_json = []
+    for em in edge_matches:
+        intent_edges_json.append({
+            "from": em["from"],
+            "to": em["to"],
+            "ok": em["ok"],
+            "path": em["path_nodes"]
+        })
+
+    alignment_graph = {
+        "intent_caps": sorted(list(caps)),
+        "intent_edges": intent_edges_json,
+        "workflow_nodes": workflow_nodes,
+        "workflow_edges": workflow_edges,
+        "relevant_nodes": sorted(list(relevant_nodes)),
+        "irrelevant_nodes": irrelevant_nodes,
+        "missing_capabilities": missing_caps,
+    }
+
     detail = {
         "trigger": float(trigger_ok),
         "action": float(action_ok),
@@ -678,7 +833,9 @@ def semantic_score(
             "conditional": 1.0,
             "param_sem": 1.0,
             "intent_edge": 0.5
-        },                   
+        }, 
+        "evidence": evidence,
+        "alignment_graph": alignment_graph,                  
     }
 
     return M, issues, detail
