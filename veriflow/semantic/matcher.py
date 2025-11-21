@@ -20,7 +20,7 @@ def _is_action_node(label: str) -> bool:
     action_keywords = (
         "email", "slack", "telegram",
         "sms", "discord", "notification",
-        "http request",
+        #"http request",
     )
     return any(k in label for k in action_keywords)
 
@@ -321,6 +321,28 @@ def semantic_score(
     else:
         action_ok = matched / denom
 
+    # 4.5) Support capability sub-score (non-action capabilities only)
+    support_caps = ["form", "transform", "condition", "db"]
+    required_support = [c for c in support_caps if intent.get(f"need_{c}", False)]
+
+    if not required_support:
+        support_ok = 1.0
+    else:
+        matched_support = 0
+        if intent.get("need_form") and nodes_summary["has_form"]:
+            matched_support += 1
+        if intent.get("need_transform") and nodes_summary["has_transform"]:
+            matched_support += 1
+        if intent.get("need_condition") and nodes_summary["has_condition"]:
+            matched_support += 1
+        if intent.get("need_db") and nodes_summary["has_db"]:
+            matched_support += 1
+
+        if intent.get("need_transform") and not nodes_summary["has_transform"]:
+            support_ok = 0.0
+        else:
+            support_ok = matched_support / len(required_support)
+
     # ---- Semantic coverage: relevant node set ----
     # 5) Ordering sub-score (generic ordering rules)
     order_ok = order_ok_by_path(workflow, intent)
@@ -519,7 +541,7 @@ def semantic_score(
         if condition_ids and workflow_action_targets:
             hp, _ = _collect_semantic_path_nodes(G, index, condition_ids, set(workflow_action_targets))
             if hp:
-                conditional_ok = 0.5
+                conditional_ok = 0.35
 
     # --- Param-sem check (fields/threshold align) ---
     param_sem_ok = 1.0
@@ -568,7 +590,9 @@ def semantic_score(
         blob = json.dumps(workflow, ensure_ascii=False).lower()
         missing_fields = [f for f in fields if f not in blob]
         if missing_fields:
-            param_sem_ok = min(param_sem_ok, 0.5)
+            param_sem_ok = 0.0 # min(param_sem_ok, 0.5)
+            #ratio = (len(fields) - len(missing_fields)) / max(1, len(fields))
+            #param_sem_ok = min(param_sem_ok, 0.5 * ratio)
             issues.append(f"Some requested fields are not reflected in workflow parameters: {missing_fields}")
 
     # intent-graph edge score (denominator = only edges where both capabilities exist)
@@ -584,7 +608,7 @@ def semantic_score(
         intent_edge_ok = 1.0
     
     # 7) Aggregate
-    M = round((trigger_ok + action_ok + order_ok + conditional_ok + param_sem_ok + 0.5*intent_edge_ok) / 5.5, 2)
+    M = round((trigger_ok + action_ok + support_ok + order_ok + conditional_ok + param_sem_ok + 0.5*intent_edge_ok) / 6.5, 2)
 
     # 8) Issues
     if trigger_ok < 1.0:
@@ -626,6 +650,7 @@ def semantic_score(
     detail = {
         "trigger": float(trigger_ok),
         "action": float(action_ok),
+        "support": float(support_ok),
         "order": float(order_ok),
         "conditional": float(conditional_ok),
         "param_sem": float(param_sem_ok),
@@ -648,6 +673,7 @@ def semantic_score(
         "score_weights": {
             "trigger": 1.0,
             "action": 1.0,
+            "support": 1.0,
             "order": 1.0,
             "conditional": 1.0,
             "param_sem": 1.0,
