@@ -41,6 +41,10 @@ def inspect_nodes(nodes: List[dict]) -> Dict[str, bool]:
         "has_http": False,
         "has_slack": False,
         "has_telegram": False,
+        "has_db": False,
+        "has_form": False,
+        "has_condition": False,
+        "has_transform": False,
     }
     for n in nodes:
         t = (n.get("type", "") + " " + n.get("name", "")).lower()
@@ -54,6 +58,14 @@ def inspect_nodes(nodes: List[dict]) -> Dict[str, bool]:
             summary["has_slack"] = True
         if "telegram" in t:
             summary["has_telegram"] = True
+        if any(k in t for k in ("airtable", "notion", "sheet", "spreadsheet", "database", "db")):
+            summary["has_db"] = True
+        if any(k in t for k in ("form", "webhook")):
+            summary["has_form"] = True
+        if any(k in t for k in ("if", "switch", "router", "branch", "condition")):
+            summary["has_condition"] = True
+        if any(k in t for k in ("function", "set", "merge", "transform", "map", "validate", "parse", "format")):
+            summary["has_transform"] = True
     return summary
 
 def _capability_relevant_label(label: str, intent: Dict[str, bool]) -> bool:
@@ -67,6 +79,10 @@ def _capability_relevant_label(label: str, intent: Dict[str, bool]) -> bool:
         or (intent.get("need_http") and ("http" in label or "request" in label))
         or (intent.get("need_slack") and "slack" in label)
         or (intent.get("need_telegram") and "telegram" in label)
+        or (intent.get("need_db") and any(k in label for k in ("airtable","notion","sheet","spreadsheet","database","db")))
+        or (intent.get("need_form") and any(k in label for k in ("form","webhook")))
+        or (intent.get("need_condition") and any(k in label for k in ("if","switch","router","branch","condition")))
+        or (intent.get("need_transform") and any(k in label for k in ("function","set","merge","transform","map","validate","parse","format")))
     )
 
 def _collect_semantic_path_nodes(
@@ -132,9 +148,10 @@ def _collect_semantic_path_nodes(
 
     return found_any, path_nodes
 
-def order_ok_by_path(workflow: Dict[str, Any]) -> float:
+def order_ok_by_path(workflow: Dict[str, Any], intent: Dict[str, bool]) -> float:
     """
-    Check if there exists a semantically coherent HTTP->Email path.
+    Generic semantic ordering check based on intent.
+    Only enforce ordering rules for capabilities explicitly required by intent.
     """
     nodes = workflow.get("nodes", [])
     if not nodes:
@@ -143,14 +160,49 @@ def order_ok_by_path(workflow: Dict[str, Any]) -> float:
     G = build_dag(workflow)
     index: Dict[str, dict] = {n["id"]: n for n in nodes if "id" in n}
 
-    http_ids = _find_nodes(nodes, lambda t: ("http" in t) or ("request" in t))
-    email_ids = set(_find_nodes(nodes, lambda t: ("email" in t)))
+    # Precompute capability node id sets
+    cap_nodes = {
+        "schedule": _find_nodes(nodes, lambda t: any(k in t for k in ("schedule","cron","trigger","webhook"))),
+        "http": _find_nodes(nodes, lambda t: ("http" in t) or ("request" in t)),
+        "email": _find_nodes(nodes, lambda t: "email" in t),
+        "slack": _find_nodes(nodes, lambda t: "slack" in t),
+        "telegram": _find_nodes(nodes, lambda t: "telegram" in t),
+        "db": _find_nodes(nodes, lambda t: any(k in t for k in ("airtable","notion","sheet","spreadsheet","database","db"))),
+        "form": _find_nodes(nodes, lambda t: any(k in t for k in ("form","webhook"))),
+        "condition": _find_nodes(nodes, lambda t: any(k in t for k in ("if","switch","router","branch","condition"))),
+        "transform": _find_nodes(nodes, lambda t: any(k in t for k in ("function","set","merge","transform","map","validate","parse","format"))),
+    }
 
-    if not http_ids or not email_ids:
+    # ORDER_RULES: (source_cap, target_cap) both must exist to require an ordering path
+    ORDER_RULES = [
+        ("schedule", "http"),
+        ("schedule", "email"),
+        ("schedule", "slack"),
+        ("form", "transform"),
+        ("transform", "db"),
+        ("http", "db"),
+        # ("db", "email"),
+        ("condition", "slack"),  # slack typically after condition when needed
+    ]
+
+    def _cap_required(cap: str) -> bool:
+        return intent.get(f"need_{cap}", False)
+
+    required = []
+    for src_cap, tgt_cap in ORDER_RULES:
+        if _cap_required(src_cap) and _cap_required(tgt_cap):
+            if cap_nodes[src_cap] and cap_nodes[tgt_cap]:
+                required.append((cap_nodes[src_cap], set(cap_nodes[tgt_cap])))
+
+    if not required:
         return 1.0
 
-    has_path, _ = _collect_semantic_path_nodes(G, index, http_ids, email_ids)
-    return 1.0 if has_path else 0.0
+    ok = True
+    for sources, targets in required:
+        has_path, _ = _collect_semantic_path_nodes(G, index, sources, targets)
+        ok = ok and has_path
+
+    return 1.0 if ok else 0.0
 
 def _desired_keys(intent: Dict[str, bool]) -> List[str]:
     """Return list of desired capability keys (those starting with 'need_')."""
@@ -214,15 +266,16 @@ def semantic_score(
         matched += 1
 
     # Do not count schedule in the denominator for action coverage
-    denom = len(desired) - (1 if intent.get("need_schedule") else 0)
+    action_keys = {"need_email", "need_http", "need_slack", "need_telegram"}
+    denom = sum(1 for k in desired if k in action_keys)
     if denom <= 0:
         action_ok = 1.0
     else:
         action_ok = matched / denom
 
     # ---- Semantic coverage: relevant node set ----
-    # 5) Ordering sub-score (HTTP→Email path when both required)
-    order_ok = order_ok_by_path(workflow) if (intent.get("need_http") and intent.get("need_email")) else 1.0
+    # 5) Ordering sub-score (generic ordering rules)
+    order_ok = order_ok_by_path(workflow, intent)
 
     # Build graph + index once for relevance + path collection
     G = build_dag(workflow) if nodes else nx.DiGraph()
@@ -234,7 +287,11 @@ def semantic_score(
     email_ids = _find_nodes(nodes, lambda t: "email" in t)
     slack_ids = _find_nodes(nodes, lambda t: "slack" in t)
     telegram_ids = _find_nodes(nodes, lambda t: "telegram" in t)
-
+    db_ids = _find_nodes(nodes, lambda t: any(k in t for k in ("airtable","notion","sheet","spreadsheet","database","db")))
+    form_ids = _find_nodes(nodes, lambda t: any(k in t for k in ("form","webhook")))
+    transform_ids = _find_nodes(nodes, lambda t: any(k in t for k in ("function","set","merge","transform","map","validate","parse","format")))
+    condition_ids = _find_nodes(nodes, lambda t: any(k in t for k in ("if","switch","router","branch","condition")))
+ 
     # 6) Compute a semantic relevant node set:
     #    - direct capability match
     #    - plus any node on a semantic path between key capabilities
@@ -259,6 +316,17 @@ def semantic_score(
             relevant_nodes.update(path_nodes)
         return has_path
 
+    def _add_paths_optional(sources: List[str], targets: List[str]) -> None:
+        """
+        Optional (weak) path relevance:
+        - we do NOT require a path to exist;
+        - if a path exists, we add its nodes into relevant_nodes.
+        """
+        if not sources or not targets or not G:
+            return
+        _, path_nodes = _collect_semantic_path_nodes(G, index, sources, set(targets))
+        relevant_nodes.update(path_nodes)
+
     # schedule -> http
     if intent.get("need_schedule") and intent.get("need_http"):
         _add_paths(schedule_ids, http_ids)
@@ -280,6 +348,32 @@ def semantic_score(
             _add_paths(http_ids, slack_ids)
         if intent.get("need_telegram"):
             _add_paths(http_ids, telegram_ids)
+        if intent.get("need_db"):
+            _add_paths_optional(http_ids, db_ids)
+
+    # form -> transform -> db -> notify
+    if intent.get("need_form"):
+        if intent.get("need_transform"):
+            _add_paths(form_ids, transform_ids)
+        if intent.get("need_db"):
+            _add_paths_optional(form_ids, db_ids)
+
+    if intent.get("need_transform") and intent.get("need_db"):
+        _add_paths_optional(transform_ids, db_ids)
+
+    if intent.get("need_condition"):
+        if intent.get("need_slack"):
+            _add_paths(condition_ids, slack_ids)
+        if intent.get("need_email"):
+            _add_paths(condition_ids, email_ids)
+
+    # --- DB paths: OPTIONAL weak constraints (only add if path exists) ---
+    if intent.get("need_db"):
+        if intent.get("need_email"):
+            _add_paths_optional(db_ids, email_ids)
+        if intent.get("need_slack"):
+            _add_paths_optional(db_ids, slack_ids)
+    
 
     # 7) Aggregate
     M = round((trigger_ok + action_ok + order_ok) / 3, 2)
@@ -296,6 +390,14 @@ def semantic_score(
         issues.append("Missing Slack node for intent")
     if intent.get("need_telegram") and not nodes_summary["has_telegram"]:
         issues.append("Missing Telegram node for intent")
+    if intent.get("need_db") and not nodes_summary["has_db"]:
+        issues.append("Missing DB/storage node for intent")
+    if intent.get("need_form") and not nodes_summary["has_form"]:
+        issues.append("Missing Form/Webhook node for intent")
+    if intent.get("need_condition") and not nodes_summary["has_condition"]:
+        issues.append("Missing Condition/Branching node for intent")
+    if intent.get("need_transform") and not nodes_summary["has_transform"]:
+        issues.append("Missing Transform/Validation node for intent")
 
     # 9) Irrelevant nodes: nodes that are not on any capability or semantic path
     irrelevant_nodes: List[str] = []

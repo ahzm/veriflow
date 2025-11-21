@@ -30,7 +30,7 @@ class IntentResult:
 KEYWORDS = {
     "need_schedule": (
         # CN
-        "每天", "每小时", "定时", "每日", "工作日", "9点", "07:00",
+        "每天", "每小时", "定时", "每日", "工作日",
         # EN direct cues
         "schedule", "cron", "every day", "daily", "every weekday", "each day", "every morning", "weekday",
         "weekdays"
@@ -47,6 +47,24 @@ KEYWORDS = {
     ),
     "need_slack": ("slack", "斯拉克"),
     "need_telegram": ("telegram", "电报", "tg", "Telegram"),
+    # Data store / DB-like targets
+    "need_db": (
+        "airtable", "sheet", "spreadsheet", "google sheets", "notion",
+        "database", "db", "表格", "存储", "写入表", "入库"
+    ),
+    # User input / form / webhook sources
+    "need_form": (
+        "form", "表单", "填写", "提交", "google form", "typeform", "survey"
+    ),
+    # Conditional / branching
+    "need_condition": (
+        "if", "else", "condition", "branch", "threshold", "超过", "大于", "小于", "否则", "条件"
+    ),
+    # Data transform / validate / map
+    "need_transform": (
+        "validate", "validation", "clean", "parse", "format",
+        "transform", "map", "set", "function", "转换", "校验", "解析", "格式化"
+    ),
 }
 
 # --- Negative patterns ("no email") ---
@@ -60,8 +78,29 @@ NEG_EMAIL_PATTERNS = (
     "do not send email", "don't send email",
 )
 
+NEG_SLACK_PATTERNS = (
+    "不要slack", "不发slack", "不通知slack",
+    "no slack", "don't slack", "do not slack", "do not notify slack",
+)
+NEG_HTTP_PATTERNS = (
+    "不要http", "不请求", "不调用接口",
+    "no http", "don't call api", "do not call api", "without api",
+)
+NEG_TELEGRAM_PATTERNS = (
+    "不要telegram", "不发电报",
+    "no telegram", "don't telegram", "do not telegram",
+)
+NEG_DB_PATTERNS = (
+    "不要存储", "不写入表", "不入库",
+    "no db", "no database", "don't store", "do not store",
+)
+
+
 # --- Intent keys inventory ---
-INTENT_KEYS = ["need_schedule", "need_email", "need_http", "need_slack", "need_telegram"]
+INTENT_KEYS = [
+    "need_schedule", "need_email", "need_http", "need_slack", "need_telegram",
+    "need_db", "need_form", "need_condition", "need_transform"
+]
 
 # --- English time expressions helpers ---
 # Matches: 9, 9am, 9 am, 09:00, 9:00, 9.00, 09h00, etc.
@@ -90,7 +129,16 @@ def _normalize(text: str) -> str:
 def _contains_any(text: str, keywords) -> bool:
     """Return True if any keyword is a substring of text (case-insensitive)."""
     t = text.lower()
-    return any(k.lower() in t for k in keywords)
+    for k in keywords:
+        kk = k.lower()
+        # VERY short keywords -> use word boundary to avoid false positives
+        if len(kk) <= 2:
+            if re.search(rf"\b{re.escape(kk)}\b", t):
+                return True
+        else:
+            if kk in t:
+                return True
+    return False
 
 
 def _has_en_schedule_pattern(text: str) -> bool:
@@ -111,6 +159,22 @@ def _has_negative_email(text: str) -> bool:
     """Detect explicit 'no email / 不要邮件' style negation."""
     t = text.lower()
     return any(p.lower() in t for p in NEG_EMAIL_PATTERNS)
+
+def _has_negative_slack(text: str) -> bool:
+    t = text.lower()
+    return any(p.lower() in t for p in NEG_SLACK_PATTERNS)
+
+def _has_negative_http(text: str) -> bool:
+    t = text.lower()
+    return any(p.lower() in t for p in NEG_HTTP_PATTERNS)
+
+def _has_negative_telegram(text: str) -> bool:
+    t = text.lower()
+    return any(p.lower() in t for p in NEG_TELEGRAM_PATTERNS)
+
+def _has_negative_db(text: str) -> bool:
+    t = text.lower()
+    return any(p.lower() in t for p in NEG_DB_PATTERNS)
 
 def _coerce_bool(v: Any) -> bool:
     """Best-effort conversion to bool."""
@@ -216,13 +280,52 @@ def rule_based_intent(prompt: str) -> IntentResult:
         if email_hit and email_neg:
             intent_chain.append("rule: email keywords found but explicitly negated (no email)")
 
-    # --- Other booleans via keywords (http, slack, telegram) ---
-    for key in ("need_http", "need_slack", "need_telegram"):
+    # need_http
+    http_hit = _contains_any(text, KEYWORDS["need_http"])
+    http_neg = _has_negative_http(text)
+    intent["need_http"] = bool(http_hit and not http_neg)
+    conf["need_http"] = _rule_score(intent["need_http"])
+    if http_hit and not http_neg:
+        intent_chain.append("rule: matched need_http keywords")
+    elif http_hit and http_neg:
+        intent_chain.append("rule: need_http keywords found but explicitly negated")
+
+    # need_slack
+    slack_hit = _contains_any(text, KEYWORDS["need_slack"])
+    slack_neg = _has_negative_slack(text)
+    intent["need_slack"] = bool(slack_hit and not slack_neg)
+    conf["need_slack"] = _rule_score(intent["need_slack"])
+    if slack_hit and not slack_neg:
+        intent_chain.append("rule: matched need_slack keywords")
+    elif slack_hit and slack_neg:
+        intent_chain.append("rule: need_slack keywords found but explicitly negated")
+
+    # need_telegram
+    tg_hit = _contains_any(text, KEYWORDS["need_telegram"])
+    tg_neg = _has_negative_telegram(text)
+    intent["need_telegram"] = bool(tg_hit and not tg_neg)
+    conf["need_telegram"] = _rule_score(intent["need_telegram"])
+    if tg_hit and not tg_neg:
+        intent_chain.append("rule: matched need_telegram keywords")
+    elif tg_hit and tg_neg:
+        intent_chain.append("rule: need_telegram keywords found but explicitly negated")
+
+    # need_db
+    db_hit = _contains_any(text, KEYWORDS["need_db"])
+    db_neg = _has_negative_db(text)
+    intent["need_db"] = bool(db_hit and not db_neg)
+    conf["need_db"] = _rule_score(intent["need_db"])
+    if db_hit and not db_neg:
+        intent_chain.append("rule: matched need_db keywords")
+    elif db_hit and db_neg:
+        intent_chain.append("rule: need_db keywords found but explicitly negated")
+
+    # need_form / need_condition / need_transform (no negation for now)
+    for key in ("need_form", "need_condition", "need_transform"):
         hit = _contains_any(text, KEYWORDS[key])
         intent[key] = bool(hit)
         conf[key] = _rule_score(hit)
         if hit:
-            # e.g., "rule: matched need_http keywords"
             intent_chain.append(f"rule: matched {key} keywords")
 
     # Overall confidence: average of active keys, fallback to mean
@@ -251,7 +354,8 @@ def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mi
     sys_msg = (
         "You are a precise intent extractor for low-code workflow tasks. "
         "Given a natural-language description, output a strict JSON object with boolean flags: "
-        "{need_schedule, need_email, need_http, need_slack, need_telegram}. "
+        "{need_schedule, need_email, need_http, need_slack, need_telegram, "
+        "need_db, need_form, need_condition, need_transform}."
         "Also include a 'confidence' object with float scores in [0,1] per key. "
         "Also include a 'chain' array with short natural-language justifications explaining how each intent was inferred."
     )
