@@ -1,7 +1,8 @@
 name: veriflow
 channels:
-  - defaults
   - conda-forge
+  - defaults
+
 dependencies:
   - python=3.10
   - pandas
@@ -20,3 +21,4 @@ dependencies:
       - seaborn
       - pytest
       - tqdm
+      - sentence-transformers

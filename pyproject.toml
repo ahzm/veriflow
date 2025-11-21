@@ -17,12 +17,16 @@ dependencies = [
   "typer",
   "rich",
   "matplotlib",
-  "pytest",
   "tqdm",
   "scipy",
   "openai",
   "tiktoken",
 ]
+
+[project.optional-dependencies]
+embed = ["sentence-transformers"]
+
+dev = ["pytest"]
 
 [tool.setuptools]
 [tool.setuptools.packages.find]
