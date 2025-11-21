@@ -6,6 +6,12 @@ import json
 from veriflow.utils.graph import build_dag, build_scc_dag
 from veriflow.semantic.intent_extractor import extract_intent_hybrid
 
+# Optional embedding relevance (if embedding backend available)
+try:
+    from veriflow.semantic.embedding import embedding_relevance_boost
+except Exception:
+    embedding_relevance_boost = None
+
 # --- Helpers for semantic ordering ---
 
 def _node_label(n: dict) -> str:
@@ -106,7 +112,6 @@ def flatten_keys(obj: Any, prefix: str = "") -> Set[str]:
 
     return keys
 
-
 def normalize_field_name(f: str) -> str:
     """
     Normalize intent field name to improve matching:
@@ -187,7 +192,6 @@ def field_aliases(f: str) -> Set[str]:
         aliases.update(FIELD_SYNONYMS["id"])
 
     return {a for a in aliases if a}
-
 
 def _collect_semantic_path_nodes(
     G: nx.DiGraph,
@@ -773,6 +777,18 @@ def semantic_score(
             _add_paths_optional(db_ids, slack_ids, "db->slack(optional)")
         if intent.get("need_telegram"):
             _add_paths_optional(db_ids, telegram_ids, "db->telegram(optional)")
+    
+    # 6.3 Embedding relevance (soft boost, optional)
+    if embedding_relevance_boost is not None:
+        relevant_nodes = embedding_relevance_boost(
+            prompt=prompt,
+            nodes=nodes,
+            node_label_fn=_node_label,
+            relevant_nodes=relevant_nodes,
+            evidence=evidence,
+            top_k=3,
+            sim_threshold=0.55,
+        )
     
     # --- Conditional conflict (conditional action) ---
     conditional_ok = 1.0
