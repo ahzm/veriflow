@@ -370,10 +370,15 @@ def rule_based_intent(prompt: str) -> IntentResult:
         for k in ("need_email", "need_slack", "need_telegram")
     )
     cond_notify = bool(cond_notify_hit)
-    conf["need_conditional_notify"] = 0.85 if (cond_notify_hit and any_action_hit) else 0.7 if cond_notify_hit else 0.05
+    any_action_hit = any(intent.get(k, False) for k in ("need_email", "need_slack", "need_telegram"))
 
     intent["need_conditional_notify"] = cond_notify
-    conf["need_conditional_notify"] = _rule_score(cond_notify)
+    conf["need_conditional_notify"] = ( 
+        0.85 if (cond_notify_hit and any_action_hit) 
+        else 0.7 if cond_notify_hit
+        else 0.05
+    )
+
     if cond_notify:
         intent_chain.append("rule: matched need_conditional_notify (condition controls notification)")
     

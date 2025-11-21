@@ -209,6 +209,50 @@ def _desired_keys(intent: Dict[str, bool]) -> List[str]:
     """Return list of desired capability keys (those starting with 'need_')."""
     return [k for k, v in intent.items() if v and k.startswith("need_")]
 
+# --- build explicit intent graph ---
+def build_intent_graph(intent: Dict[str, bool]) -> Tuple[Set[str], List[Tuple[str, str]]]:
+    """
+    Build a simple capability graph from intent flags.
+    Nodes: capability names
+    Edges: semantic dependencies that should hold in workflow
+    """
+    caps: Set[str] = set()
+    edges: List[Tuple[str, str]] = []
+
+    # capability nodes
+    if intent.get("need_schedule"):  caps.add("schedule")
+    if intent.get("need_form"):      caps.add("form")
+    if intent.get("need_http"):      caps.add("http")
+    if intent.get("need_transform"): caps.add("transform")
+    if intent.get("need_condition"): caps.add("condition")
+    if intent.get("need_email"):     caps.add("email")
+    if intent.get("need_slack"):     caps.add("slack")
+    if intent.get("need_telegram"):  caps.add("telegram")
+    if intent.get("need_db"):        caps.add("db")
+
+    # edges == ORDER_RULES + conditional rule
+    ORDER_RULES = [
+        ("schedule", "http"),
+        ("schedule", "email"),
+        ("schedule", "slack"),
+        ("schedule", "telegram"),
+        ("form", "transform"),
+        ("transform", "db"),
+        ("http", "db"),
+        ("condition", "email"),
+        ("condition", "slack"),
+        ("condition", "telegram"),
+    ]
+
+    for a, b in ORDER_RULES:
+        if a in caps and b in caps:
+            edges.append((a, b))
+
+    # conditional notify means: condition -> action (explicit or implicit)
+    if intent.get("need_conditional_notify") and "condition" in caps:
+        edges.append(("condition", "action"))
+
+    return caps, edges
 
 def semantic_score(
     workflow: Dict[str, Any],
@@ -295,11 +339,69 @@ def semantic_score(
     form_ids = _find_nodes(nodes, lambda t: any(k in t for k in ("form","webhook")))
     transform_ids = _find_nodes(nodes, lambda t: any(k in t for k in ("function","set","merge","transform","map","validate","parse","format")))
     condition_ids = _find_nodes(nodes, lambda t: any(k in t for k in ("if","switch","router","branch","condition")))
- 
+    
+    # collect requested action targets
+    action_targets: List[str] = []
+    if intent.get("need_email"):
+        action_targets += email_ids
+    if intent.get("need_slack"):
+        action_targets += slack_ids
+    if intent.get("need_telegram"):
+        action_targets += telegram_ids
+
+    workflow_action_targets: List[str] = email_ids + slack_ids + telegram_ids
+
+    # --- intent graph -> workflow alignment report ---
+    caps, edges = build_intent_graph(intent)
+
+    relevant_nodes: Set[str] = set()
+
+    cap_nodes_map = {
+        "schedule": schedule_ids,
+        "form": form_ids,
+        "http": http_ids,
+        "transform": transform_ids,
+        "condition": condition_ids,
+        "email": email_ids,
+        "slack": slack_ids,
+        "telegram": telegram_ids,
+        "db": db_ids,
+        # "action" is special (implicit), handled below
+    }
+
+    capability_matches: Dict[str, bool] = {}
+    for c in caps:
+        if c == "action":
+            continue
+        capability_matches[c] = bool(cap_nodes_map.get(c))
+
+    edge_matches: List[Dict[str, Any]] = []
+    for a, b in edges:
+        if b == "action":
+            # action can be any terminal notify node
+            targets = set(email_ids + slack_ids + telegram_ids)
+        else:
+            targets = set(cap_nodes_map.get(b, []))
+
+        sources = cap_nodes_map.get(a, [])
+        ok_edge = False
+        path_nodes: Set[str] = set()
+        if sources and targets:
+            ok_edge, path_nodes = _collect_semantic_path_nodes(G, index, sources, targets)
+
+        if ok_edge:
+            relevant_nodes.update(path_nodes)
+
+        edge_matches.append({
+            "from": a,
+            "to": b,
+            "ok": bool(ok_edge),
+            "path_nodes": sorted(path_nodes),
+        })
+
     # 6) Compute a semantic relevant node set:
     #    - direct capability match
     #    - plus any node on a semantic path between key capabilities
-    relevant_nodes: Set[str] = set()
 
     # 6.1 Direct capability relevance (local)
     for n in nodes:
@@ -400,17 +502,6 @@ def semantic_score(
         }
         return mapping.get(op, [op.lower()])
 
-    # collect requested action targets
-    action_targets: List[str] = []
-    if intent.get("need_email"):
-        action_targets += email_ids
-    if intent.get("need_slack"):
-        action_targets += slack_ids
-    if intent.get("need_telegram"):
-        action_targets += telegram_ids
-
-    workflow_action_targets: List[str] = email_ids + slack_ids + telegram_ids
-
     if intent.get("need_conditional_notify"):
         # Intent requires Condition -> Action path
         if condition_ids and not action_targets:
@@ -480,8 +571,20 @@ def semantic_score(
             param_sem_ok = min(param_sem_ok, 0.5)
             issues.append(f"Some requested fields are not reflected in workflow parameters: {missing_fields}")
 
+    # intent-graph edge score (denominator = only edges where both capabilities exist)
+    valid_edges = [e for e in edge_matches if e["path_nodes"] or e["ok"] or (
+        cap_nodes_map.get(e["from"], []) and 
+        (cap_nodes_map.get(e["to"], []) if e["to"] != "action" else workflow_action_targets)
+    )]
+
+    if valid_edges:
+        intent_edge_ok = sum(e["ok"] for e in valid_edges) / len(valid_edges)
+    else:
+        # If no edges were actually applicable, treat it as perfect score
+        intent_edge_ok = 1.0
+    
     # 7) Aggregate
-    M = round((trigger_ok + action_ok + order_ok + conditional_ok + param_sem_ok) / 5, 2)
+    M = round((trigger_ok + action_ok + order_ok + conditional_ok + param_sem_ok + 0.5*intent_edge_ok) / 5.5, 2)
 
     # 8) Issues
     if trigger_ok < 1.0:
@@ -516,19 +619,40 @@ def semantic_score(
         if node_id not in relevant_nodes:
             irrelevant_nodes.append(node_id)
 
+    missing_caps = [c for c, ok in capability_matches.items() if not ok]
+    if intent.get("need_conditional_notify") and not workflow_action_targets:
+        missing_caps.append("action")
+
     detail = {
         "trigger": float(trigger_ok),
         "action": float(action_ok),
         "order": float(order_ok),
         "conditional": float(conditional_ok),
         "param_sem": float(param_sem_ok),
+        "intent_edge": float(intent_edge_ok),
+        "intent_edge_note": "ratio of satisfied intent-graph edges",
         "params_req": params_req,
         "intent_conf": float(intent_res.overall_confidence),
         # storing as float-compatible value is convenient when exporting
         "source": intent_res.source,            # Keep the source string separately (not a float)
         "intent": intent,
         "intent_chain": intent_res.meta.get("intent_chain", []),
-        "irrelevant_nodes": irrelevant_nodes,                       
+        "irrelevant_nodes": irrelevant_nodes,
+        "intent_caps": sorted(caps),
+        "intent_edges": edges,
+        "missing_capabilities": missing_caps,
+        "alignment": {
+            "capability_matches": capability_matches,
+            "edge_matches": edge_matches,
+        },
+        "score_weights": {
+            "trigger": 1.0,
+            "action": 1.0,
+            "order": 1.0,
+            "conditional": 1.0,
+            "param_sem": 1.0,
+            "intent_edge": 0.5
+        },                   
     }
 
     return M, issues, detail
