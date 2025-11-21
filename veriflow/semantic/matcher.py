@@ -3,7 +3,7 @@
 from typing import Dict, Any, Tuple, List, Set, Optional
 import networkx as nx
 import json
-from veriflow.utils.graph import build_dag
+from veriflow.utils.graph import build_dag, build_scc_dag
 from veriflow.semantic.intent_extractor import extract_intent_hybrid
 
 # --- Helpers for semantic ordering ---
@@ -149,6 +149,66 @@ def _collect_semantic_path_nodes(
 
     return found_any, path_nodes
 
+def _collect_semantic_path_nodes_scc(
+    G0, Gc, comp_of, nodes_of_comp,
+    index,
+    sources, targets,
+    max_depth=6
+):
+    """
+    SCC-level BFS:
+        - BFS in compressed DAG (Gc)
+        - Expand components back to original nodes
+    """
+    from collections import deque
+
+    source_comps = [comp_of[s] for s in sources if s in comp_of]
+    target_comps = {comp_of[t] for t in targets if t in comp_of}
+
+    if not source_comps or not target_comps:
+        return False, set()
+
+    found = False
+    final_nodes = set()
+
+    for sc in source_comps:
+        visited = {sc}
+        parents = {sc: None}
+        q = deque([(sc, 0)])
+
+        while q:
+            cur, depth = q.popleft()
+            if depth > max_depth:
+                continue
+
+            if cur in target_comps:
+                found = True
+                # Expand component-path into node ids
+                pc = cur
+                while pc is not None:
+                    final_nodes.update(nodes_of_comp[pc])
+                    pc = parents.get(pc)
+                continue
+
+            for nxt in Gc.successors(cur):
+                if nxt in visited:
+                    continue
+                # Cut path if nxt contains unrelated action node
+                if nxt not in target_comps:
+                    cut = False
+                    for nid in nodes_of_comp[nxt]:
+                        label = _node_label(index.get(nid, {}))
+                        if _is_action_node(label):
+                            cut = True; break
+                    if cut:
+                        continue
+
+                visited.add(nxt)
+                parents[nxt] = cur
+                q.append((nxt, depth + 1))
+
+    return found, final_nodes
+
 def order_ok_by_path(workflow: Dict[str, Any], intent: Dict[str, bool]) -> float:
     """
     Generic semantic ordering check based on intent.
@@ -158,7 +218,7 @@ def order_ok_by_path(workflow: Dict[str, Any], intent: Dict[str, bool]) -> float
     if not nodes:
         return 1.0
 
-    G = build_dag(workflow)
+    Gc, G0, comp_of, nodes_of_comp = build_scc_dag(workflow)
     index: Dict[str, dict] = {n["id"]: n for n in nodes if "id" in n}
 
     # Precompute capability node id sets
@@ -192,7 +252,13 @@ def order_ok_by_path(workflow: Dict[str, Any], intent: Dict[str, bool]) -> float
 
     ok = True
     for sources, targets in required:
-        has_path, _ = _collect_semantic_path_nodes(G, index, sources, targets)
+        has_path, _ = _collect_semantic_path_nodes_scc(
+                        G0, Gc, comp_of, nodes_of_comp,
+                        index,
+                        sources,
+                        set(targets),
+                        max_depth=6
+                    )
         ok = ok and has_path
 
     return 1.0 if ok else 0.0
@@ -353,6 +419,7 @@ def semantic_score(
 
     # Build graph + index once for relevance + path collection
     G = build_dag(workflow) if nodes else nx.DiGraph()
+    Gc, G0, comp_of, nodes_of_comp = build_scc_dag(workflow) if nodes else (nx.DiGraph(), nx.DiGraph(), {}, {})
     index: Dict[str, dict] = {n["id"]: n for n in nodes if "id" in n}
 
     # Node groups by capability
@@ -413,7 +480,13 @@ def semantic_score(
         ok_edge = False
         path_nodes: Set[str] = set()
         if sources and targets:
-            ok_edge, path_nodes = _collect_semantic_path_nodes(G, index, sources, targets)
+            ok_edge, path_nodes = _collect_semantic_path_nodes_scc(
+                                    G0, Gc, comp_of, nodes_of_comp,
+                                    index,
+                                    sources,
+                                    targets,
+                                    max_depth=6
+                                )
 
         if ok_edge:
             relevant_nodes.update(path_nodes)
@@ -467,7 +540,7 @@ def semantic_score(
         from_cap, to_cap = _split_rule(rule_name)
 
         # Not applicable
-        if not sources or not targets or not G.number_of_nodes() == 0:
+        if not sources or not targets or not Gc.number_of_nodes() == 0:
             evidence.append({
                 "rule": rule_name,
                 "from": from_cap,
@@ -481,7 +554,13 @@ def semantic_score(
             })
             return False
 
-        has_path, path_nodes = _collect_semantic_path_nodes(G, index, sources, set(targets))
+        has_path, path_nodes = _collect_semantic_path_nodes_scc(
+                                G0, Gc, comp_of, nodes_of_comp,
+                                index,
+                                sources,
+                                set(targets),
+                                max_depth=6
+                            )
         if has_path:
             relevant_nodes.update(path_nodes)
 
@@ -501,7 +580,7 @@ def semantic_score(
     def _add_paths_optional(sources: List[str], targets: List[str], rule_name: str) -> None:
         from_cap, to_cap = _split_rule(rule_name)
 
-        if not sources or not targets or not G:
+        if not sources or not targets or Gc.number_of_nodes() == 0:
             evidence.append({
                 "rule": rule_name,
                 "from": from_cap,
@@ -515,7 +594,13 @@ def semantic_score(
             })
             return
 
-        has_path, path_nodes = _collect_semantic_path_nodes(G, index, sources, set(targets))
+        has_path, path_nodes = _collect_semantic_path_nodes_scc(
+                                G0, Gc, comp_of, nodes_of_comp,
+                                index,
+                                sources,
+                                set(targets),
+                                max_depth=6
+                            )
         if has_path:
             relevant_nodes.update(path_nodes)
 
@@ -607,8 +692,12 @@ def semantic_score(
         if condition_ids and not action_targets:
             conditional_ok = 1.0
         elif action_targets and condition_ids:
-            has_path, _ = _collect_semantic_path_nodes(
-                G, index, condition_ids, set(action_targets)
+            has_path, _ = _collect_semantic_path_nodes_scc(
+                G0, Gc, comp_of, nodes_of_comp,
+                index,
+                condition_ids,
+                set(action_targets),
+                max_depth=6
             )
             conditional_ok = 1.0 if has_path else 0.0
         else:
@@ -617,7 +706,13 @@ def semantic_score(
         # Intent does NOT require conditional notify,
         # but workflow has Condition -> Action paths => weak penalty
         if condition_ids and workflow_action_targets:
-            hp, pn = _collect_semantic_path_nodes(G, index, condition_ids, set(workflow_action_targets))
+            hp, pn = _collect_semantic_path_nodes_scc(
+                G0, Gc, comp_of, nodes_of_comp,
+                index,
+                condition_ids,
+                set(workflow_action_targets),
+                max_depth=6
+            )
             if hp:
                 conditional_ok = 0.35
                 evidence.append({
