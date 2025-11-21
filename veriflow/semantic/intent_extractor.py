@@ -65,6 +65,14 @@ KEYWORDS = {
         "validate", "validation", "clean", "parse", "format",
         "transform", "map", "set", "function", "转换", "校验", "解析", "格式化"
     ),
+    # Conditional notification (condition controlling action)
+    "need_conditional_notify": (
+        # CN
+        "就通知", "报警", "告警", "提醒", "超过就通知", "低于就报警",
+        "如果...就发", "满足...才通知",
+        # EN
+        "notify if", "alert if", "send if", "only if", "if ... notify", "if ... alert"
+    ),
 }
 
 # --- Negative patterns ("no email") ---
@@ -99,7 +107,7 @@ NEG_DB_PATTERNS = (
 # --- Intent keys inventory ---
 INTENT_KEYS = [
     "need_schedule", "need_email", "need_http", "need_slack", "need_telegram",
-    "need_db", "need_form", "need_condition", "need_transform"
+    "need_db", "need_form", "need_condition", "need_transform", "need_conditional_notify",
 ]
 
 # --- English time expressions helpers ---
@@ -108,6 +116,32 @@ TIME_REGEX = re.compile(
     r"\b((?:[01]?\d|2[0-3])\s*(?:[:h.]\s*[0-5]\d)?\s*(?:am|pm)?)\b",
     flags=re.IGNORECASE,
 )
+
+# --- Light param extraction
+THRESHOLD_REGEX = re.compile(
+    r"(>=|<=|>|<|超过|大于|小于)\s*([0-9]+(?:\.[0-9]+)?)"
+)
+
+FIELD_REGEX = re.compile(
+    r"\b(temperature|temp|cpu|usage|price|库存|销量|温度|湿度)\b",
+    flags=re.IGNORECASE
+)
+
+def extract_params(prompt: str) -> Dict[str, Any]:
+    """Extract coarse parameters like thresholds and field names from prompt."""
+    t = _normalize(prompt)
+    params: Dict[str, Any] = {}
+
+    m = THRESHOLD_REGEX.search(t)
+    if m:
+        params["threshold_op"] = m.group(1)
+        params["threshold_value"] = float(m.group(2))
+
+    fields = FIELD_REGEX.findall(t)
+    if fields:
+        params["fields"] = sorted(set([f.lower() for f in fields]))
+
+    return params
 
 # Common English schedule phrasing (coarse filter; time will be verified by TIME_REGEX)
 EN_SCHEDULE_PHRASES = (
@@ -131,8 +165,8 @@ def _contains_any(text: str, keywords) -> bool:
     t = text.lower()
     for k in keywords:
         kk = k.lower()
-        # VERY short keywords -> use word boundary to avoid false positives
-        if len(kk) <= 2:
+        has_non_ascii = any(ord(ch) > 127 for ch in kk)
+        if len(kk) <= 2 and not has_non_ascii:
             if re.search(rf"\b{re.escape(kk)}\b", t):
                 return True
         else:
@@ -327,11 +361,32 @@ def rule_based_intent(prompt: str) -> IntentResult:
         conf[key] = _rule_score(hit)
         if hit:
             intent_chain.append(f"rule: matched {key} keywords")
+    
+    # need_conditional_notify:
+    # heuristic: conditional cue + at least one action cue
+    cond_notify_hit = _contains_any(text, KEYWORDS["need_conditional_notify"])
+    any_action_hit = any(
+        intent.get(k, False)
+        for k in ("need_email", "need_slack", "need_telegram")
+    )
+    cond_notify = bool(cond_notify_hit)
+    conf["need_conditional_notify"] = 0.85 if (cond_notify_hit and any_action_hit) else 0.7 if cond_notify_hit else 0.05
+
+    intent["need_conditional_notify"] = cond_notify
+    conf["need_conditional_notify"] = _rule_score(cond_notify)
+    if cond_notify:
+        intent_chain.append("rule: matched need_conditional_notify (condition controls notification)")
+    
+    if intent.get("need_conditional_notify"):
+        intent["need_condition"] = True
+        conf["need_condition"] = max(conf.get("need_condition", 0.05), 0.7)
 
     # Overall confidence: average of active keys, fallback to mean
     active = [conf[k] for k, v in intent.items() if v]
     overall = sum(active) / max(1, len(active)) if active else sum(conf.values()) / max(1, len(conf))
-    return IntentResult(intent=intent, confidence=conf, overall_confidence=overall, source="rule", meta={"intent_chain": intent_chain},)
+
+    params = extract_params(prompt)
+    return IntentResult(intent=intent, confidence=conf, overall_confidence=overall, source="rule", meta={"intent_chain": intent_chain, "params": params},)
 
 def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mini") -> Optional[Dict[str, Any]]:
     """Call LLM to refine or correct the base intent.
@@ -355,7 +410,7 @@ def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mi
         "You are a precise intent extractor for low-code workflow tasks. "
         "Given a natural-language description, output a strict JSON object with boolean flags: "
         "{need_schedule, need_email, need_http, need_slack, need_telegram, "
-        "need_db, need_form, need_condition, need_transform}."
+        "need_db, need_form, need_condition, need_transform, need_conditional_notify}."
         "Also include a 'confidence' object with float scores in [0,1] per key. "
         "Also include a 'chain' array with short natural-language justifications explaining how each intent was inferred."
     )

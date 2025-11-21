@@ -2,6 +2,7 @@
 
 from typing import Dict, Any, Tuple, List, Set, Optional
 import networkx as nx
+import json
 from veriflow.utils.graph import build_dag
 from veriflow.semantic.intent_extractor import extract_intent_hybrid
 
@@ -245,6 +246,9 @@ def semantic_score(
     # 1) Extract intent (rule-based with optional LLM refinement)
     intent_res = extract_intent_hybrid(prompt, use_llm=use_llm)
     intent = intent_res.intent
+    params_req = intent_res.meta.get("params", {}) or {}
+
+    issues: List[str] = []
 
     # 2) Inspect nodes present in the workflow
     nodes = workflow.get("nodes", []) or []
@@ -366,6 +370,11 @@ def semantic_score(
             _add_paths(condition_ids, slack_ids)
         if intent.get("need_email"):
             _add_paths(condition_ids, email_ids)
+    
+    # If the prompt says “notify if ...” but does NOT specify email/slack/tg,
+    # we still consider Condition -> (any workflow action) as relevant.
+    if intent.get("need_conditional_notify") and not action_targets:
+        _add_paths_optional(condition_ids, workflow_action_targets)
 
     # --- DB paths: OPTIONAL weak constraints (only add if path exists) ---
     if intent.get("need_db"):
@@ -374,12 +383,107 @@ def semantic_score(
         if intent.get("need_slack"):
             _add_paths_optional(db_ids, slack_ids)
     
+    # --- Conditional conflict (conditional action) ---
+    conditional_ok = 1.0
+
+    def _normalize_op(op: str) -> List[str]:
+        op = op.strip()
+        mapping = {
+            ">": [">", "gt", "greater", "greaterthan", "min_exclusive"],
+            "<": ["<", "lt", "less", "lessthan", "max_exclusive"],
+            ">=": [">=", "gte", "ge", "at_least", "min_inclusive"],
+            "<=": ["<=", "lte", "le", "at_most", "max_inclusive"],
+            "超过": [">", "gt", "greater", "greaterthan"],
+            "大于": [">", "gt", "greater", "greaterthan"],
+            "小于": ["<", "lt", "less", "lessthan"],
+            "低于": ["<", "lt", "less", "lessthan"],
+        }
+        return mapping.get(op, [op.lower()])
+
+    # collect requested action targets
+    action_targets: List[str] = []
+    if intent.get("need_email"):
+        action_targets += email_ids
+    if intent.get("need_slack"):
+        action_targets += slack_ids
+    if intent.get("need_telegram"):
+        action_targets += telegram_ids
+
+    workflow_action_targets: List[str] = email_ids + slack_ids + telegram_ids
+
+    if intent.get("need_conditional_notify"):
+        # Intent requires Condition -> Action path
+        if condition_ids and not action_targets:
+            conditional_ok = 1.0
+        elif action_targets and condition_ids:
+            has_path, _ = _collect_semantic_path_nodes(
+                G, index, condition_ids, set(action_targets)
+            )
+            conditional_ok = 1.0 if has_path else 0.0
+        else:
+            conditional_ok = 0.0
+    else:
+        # Intent does NOT require conditional notify,
+        # but workflow has Condition -> Action paths => weak penalty
+        if condition_ids and workflow_action_targets:
+            hp, _ = _collect_semantic_path_nodes(G, index, condition_ids, set(workflow_action_targets))
+            if hp:
+                conditional_ok = 0.5
+
+    # --- Param-sem check (fields/threshold align) ---
+    param_sem_ok = 1.0
+
+    # Threshold alignment: check condition node parameters
+    if "threshold_value" in params_req:
+        wanted = float(params_req["threshold_value"])
+        wanted_op = params_req.get("threshold_op")
+        found_value_match = False
+        found_op_match = False
+
+        op_aliases = _normalize_op(wanted_op) if wanted_op else []
+
+        for cid in condition_ids:
+            node = index.get(cid, {})
+            p = node.get("parameters", {}) or {}
+            blob_p = json.dumps(p, ensure_ascii=False).lower()
+
+
+            for key, v in p.items():
+                # check value
+                try:
+                    val = float(v)
+                    if abs(val - wanted) <= 1e-3:
+                        found_value_match = True
+                except Exception:
+                    pass
+
+                if wanted_op and any(a in blob_p for a in op_aliases):
+                    found_op_match = True
+
+            if found_value_match and (not wanted_op or found_op_match):
+                break
+
+        if not found_value_match:
+            param_sem_ok = 0.0
+            issues.append(f"Threshold value {wanted} not found in Condition node parameters")
+        
+        elif wanted_op and not found_op_match:
+            param_sem_ok = min(param_sem_ok, 0.5)
+            issues.append(f"Threshold operator '{wanted_op}' not aligned with workflow parameters")
+
+    # Field alignment (coarse): search field names in workflow json
+    if params_req.get("fields"):
+        fields = params_req["fields"]
+        blob = json.dumps(workflow, ensure_ascii=False).lower()
+        missing_fields = [f for f in fields if f not in blob]
+        if missing_fields:
+            param_sem_ok = min(param_sem_ok, 0.5)
+            issues.append(f"Some requested fields are not reflected in workflow parameters: {missing_fields}")
 
     # 7) Aggregate
-    M = round((trigger_ok + action_ok + order_ok) / 3, 2)
+    M = round((trigger_ok + action_ok + order_ok + conditional_ok + param_sem_ok) / 5, 2)
 
     # 8) Issues
-    issues: List[str] = []
     if trigger_ok < 1.0:
         issues.append("Intent requires scheduling, but no schedule/trigger node")
     if intent.get("need_email") and not nodes_summary["has_email"]:
@@ -398,6 +502,10 @@ def semantic_score(
         issues.append("Missing Condition/Branching node for intent")
     if intent.get("need_transform") and not nodes_summary["has_transform"]:
         issues.append("Missing Transform/Validation node for intent")
+    if intent.get("need_conditional_notify") and conditional_ok < 1.0:
+        issues.append("Intent requires conditional notification, but no Condition->Action path found")
+    if (not intent.get("need_conditional_notify")) and conditional_ok < 1.0:
+        issues.append("Workflow contains conditional notification but intent does not require it")
 
     # 9) Irrelevant nodes: nodes that are not on any capability or semantic path
     irrelevant_nodes: List[str] = []
@@ -412,6 +520,9 @@ def semantic_score(
         "trigger": float(trigger_ok),
         "action": float(action_ok),
         "order": float(order_ok),
+        "conditional": float(conditional_ok),
+        "param_sem": float(param_sem_ok),
+        "params_req": params_req,
         "intent_conf": float(intent_res.overall_confidence),
         # storing as float-compatible value is convenient when exporting
         "source": intent_res.source,            # Keep the source string separately (not a float)
