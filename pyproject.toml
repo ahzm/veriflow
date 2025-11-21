@@ -24,5 +24,11 @@ dependencies = [
   "tiktoken",
 ]
 
+[tool.setuptools]
+[tool.setuptools.packages.find]
+include = ["veriflow*"]
+exclude = ["bench*", "report*", "experiments*", "tests*"]
+
 [project.scripts]
 veriflow = "veriflow.cli:app"
+
