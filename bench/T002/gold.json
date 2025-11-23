@@ -1,0 +1,55 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Schedule Trigger",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "0 9 * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "HTTP Request",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://api.weather.test?q=Paris",
+                "options": {}
+            }
+        },
+        {
+            "id": "3",
+            "name": "Email",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {
+                "to": "me@example.com",
+                "subject": "Daily Weather in Paris",
+                "text": "Today's temperature is {{$json[\"temperature\"]}} °C."
+            }
+        }
+    ],
+    "connections": {
+        "Schedule Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request": {
+            "main": [
+                [
+                    {
+                        "node": "Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

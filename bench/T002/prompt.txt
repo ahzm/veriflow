@@ -1,0 +1,8 @@
+You are an assistant helping me to automate a daily weather email.
+
+Build an n8n workflow that:
+- triggers every morning at 9am,
+- calls a weather API for the city of Pau,
+- sends me an email with the current temperature.
+
+Make sure the email body uses the data returned by the HTTP request.
