@@ -8,13 +8,13 @@ from veriflow.structural.metrics import compute_structural_metrics
 from veriflow.utils.graph import build_dag, has_trigger, exit_coverage
 
 
-def structural_check(workflow: Dict[str, Any], small_graph_floor: float = 0.3, weights: dict = None) -> Tuple[float, List[str]]:
+def structural_check(workflow: Dict[str, Any], small_graph_floor: float = 0.3, weights: dict = None) -> Tuple[float, List[str], Dict[str, Any]]: 
     """
     Compute the structural score S and collect human-readable issues.
     S aggregates: schema validity, graph quality (from metrics.py), trigger presence, exit coverage.
 
     Returns:
-        S (float in [0,1]), issues (List[str])
+        S (float in [0,1]), issues (List[str]), details
     """
     issues: List[str] = []
 
@@ -48,9 +48,16 @@ def structural_check(workflow: Dict[str, Any], small_graph_floor: float = 0.3, w
         issues.append("Missing trigger node")
 
     # exit_coverage expects a DAG view of the workflow
-    G = build_dag(workflow)
-    flow = float(exit_coverage(G))  # fraction of sinks reachable as intended
-    if flow < 1.0:
+    flow_computed = True
+    try:
+        G = build_dag(workflow)
+        flow = float(exit_coverage(G))  # fraction of sinks reachable as intended
+    except Exception:
+        flow_computed = False
+        flow = 0.0
+        issues.append("Exit coverage could not be computed (graph invalid)")
+
+    if flow_computed and flow < 1.0:
         issues.append("Not all terminal nodes are covered by the main flow")
 
     # 4) Aggregate structural score (weights can be tuned; sum to 1.0)
