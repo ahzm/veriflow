@@ -8,7 +8,7 @@ def _extract_edges(workflow: Dict[str, Any]) -> List[tuple]:
     Extract directed edges (src_name, dst_name) from an n8n-style 'connections' dict.
     Supports shapes like:
       connections[src]["main"] = [
-         [ {"node": "B", "type": "main", "index": 0}, {"node": "C", ...} ],   # path with multiple hops
+         [ {"node": "B", "type": "main", "index": 0}, {"node": "C", ...} ],   # path with multiple targets
          [ {"node": "D", "type": "main", "index": 0} ]                         # single-hop path
       ]
     """
@@ -21,7 +21,7 @@ def _extract_edges(workflow: Dict[str, Any]) -> List[tuple]:
             if not isinstance(paths, list):
                 continue
             for path in paths:
-                # Each 'path' should be a list of dict hops; be defensive
+                # Each 'path' should be a list of dict targets; be defensive
                 if isinstance(path, dict):
                     # Rare shape: some tools directly put a dict instead of a list
                     dst = path.get("node")
@@ -35,6 +35,8 @@ def _extract_edges(workflow: Dict[str, Any]) -> List[tuple]:
                         dst = hop.get("node")
                         if dst:
                             edges.append((src_name, dst))
+    # de-duplicate edges to avoid inflating edge counts
+    edges = list(set(edges))
     return edges
 
 def compute_structural_metrics(workflow: Dict[str, Any], small_graph_floor: float = 0.3, weights: Dict[str, float] = None) -> Dict[str, float]:
@@ -48,7 +50,8 @@ def compute_structural_metrics(workflow: Dict[str, Any], small_graph_floor: floa
     # Build graph using node 'name' (fallback to 'id' when name is missing)
     names = []
     for n in nodes:
-        name = n.get("name") or n.get("id")
+        nid = n.get("id")
+        name = str(nid) if nid is not None else n.get("name")
         if name is not None:
             names.append(name)
 
@@ -106,8 +109,6 @@ def compute_structural_metrics(workflow: Dict[str, Any], small_graph_floor: floa
         "connected_ratio": float(connected_ratio),
         "acyclic": float(acyclic),
         "orphan_ratio": float(orphan_ratio),
-        "avg_out_norm": float(avg_out_norm),
-        "structural_score": float(structural_score),
         "avg_out_norm": float(avg_out_norm),
         "structural_score": float(structural_score),
         "_small_graph_floor": float(small_graph_floor),
