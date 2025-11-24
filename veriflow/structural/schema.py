@@ -7,7 +7,7 @@ N8N_MINIMAL_SCHEMA = {
             "type": "array",
             "items": {
                 "type": "object",
-                "required": ["id", "name", "type", "parameters"],
+                "required": ["id", "name", "type"],
                 "properties": {
                     "id": {"type": ["string", "number"]},
                     "name": {"type": "string"},
