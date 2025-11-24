@@ -1,7 +1,8 @@
 # veriflow/structural/metrics.py
 
 import networkx as nx
-from typing import Dict, Any, List
+from typing import Callable, Set, List, Dict, Any, Tuple, Optional
+from collections import deque
 
 def _extract_edges(workflow: Dict[str, Any]) -> List[tuple]:
     """
@@ -39,6 +40,141 @@ def _extract_edges(workflow: Dict[str, Any]) -> List[tuple]:
     edges = list(set(edges))
     return edges
 
+def _extract_trigger_names(nodes: List[dict]) -> List[str]:
+    """
+    Heuristic trigger detection by node type/name.
+    """
+    triggers = []
+    for n in nodes:
+        label = str(n.get("type","")).lower()
+        name  = str(n.get("name","")).lower()
+        if any(k in label for k in ("trigger", "webhook", "schedule", "cron")) \
+            or name.startswith(("schedule","cron")):
+            triggers.append(n.get("name") or n.get("id"))
+    return [str(t) for t in triggers if t is not None]
+
+
+def find_unreachable_nodes(workflow: Dict[str, Any]) -> Set[str]:
+    """
+    Return set of node names/ids that are unreachable from any trigger.
+    """
+    nodes = workflow.get("nodes", []) or []
+    edges = _extract_edges(workflow)
+
+    # Build adjacency on node names
+    names = []
+    for n in nodes:
+        nm = n.get("name") or n.get("id")
+        if nm is not None:
+            names.append(str(nm))
+
+    adj = {nm: [] for nm in names}
+    for u, v in edges:
+        if u is None or v is None:
+            continue
+        u, v = str(u), str(v)
+        adj.setdefault(u, []).append(v)
+
+    triggers = _extract_trigger_names(nodes)
+    if not triggers:
+        # If no trigger found, treat all nodes unreachable (structural checker also reports missing trigger)
+        return set(names)
+
+    reachable: Set[str] = set()
+    q = deque(triggers)
+    reachable.update(triggers)
+
+    while q:
+        cur = q.popleft()
+        for nxt in adj.get(cur, []):
+            if nxt not in reachable:
+                reachable.add(nxt)
+                q.append(nxt)
+
+    return set(names) - reachable
+
+def find_dead_end_chains(
+    workflow: Dict[str, Any],
+    action_predicate: Optional[Callable[[dict], bool]] = None
+) -> List[List[str]]:
+    """
+    Find dead-end chains starting from reachable nodes:
+      - node is reachable from trigger
+      - out_degree == 0
+      - node is NOT an action/terminal node
+    Returns list of chains (each chain is a list of node names from ancestor->deadend).
+    """
+    nodes = workflow.get("nodes", []) or []
+    edges = _extract_edges(workflow)
+
+    # map name->node dict
+    def name_of(n):
+        nm = n.get("name") or n.get("id")
+        return str(nm) if nm is not None else None
+
+    index = {name_of(n): n for n in nodes if name_of(n) is not None}
+
+    names = list(index.keys())
+
+    # adjacency + reverse adjacency
+    adj = {nm: [] for nm in names}
+    radj = {nm: [] for nm in names}
+    for u, v in edges:
+        if u is None or v is None:
+            continue
+        u, v = str(u), str(v)
+        adj.setdefault(u, []).append(v)
+        radj.setdefault(v, []).append(u)
+
+    triggers = _extract_trigger_names(nodes)
+    if not triggers:
+        return []
+
+    # reachable first
+    reachable: Set[str] = set()
+    q = deque(triggers)
+    reachable.update(triggers)
+    while q:
+        cur = q.popleft()
+        for nxt in adj.get(cur, []):
+            if nxt not in reachable:
+                reachable.add(nxt)
+                q.append(nxt)
+
+    # default action predicate: email/slack/tg/http/db treated as terminal-ish
+    def _default_is_action(node: dict) -> bool:
+        label = (str(node.get("type", "")) + " " + str(node.get("name", ""))).lower()
+        return any(k in label for k in ("email", "slack", "telegram", "http", "request", "db", "database"))
+
+    is_action = action_predicate or _default_is_action
+
+    deadends = []
+    for nm in reachable:
+        node = index.get(nm, {})
+        if len(adj.get(nm, [])) == 0 and not is_action(node):
+            deadends.append(nm)
+
+    chains: List[List[str]] = []
+    for de in deadends:
+        chain = [de]
+        cur = de
+        # walk backwards until branching point or trigger
+        while True:
+            preds = [p for p in radj.get(cur, []) if p in reachable]
+            if len(preds) != 1:
+                break
+            p = preds[0]
+            if p in triggers:
+                chain.append(p)
+                break
+            chain.append(p)
+            cur = p
+
+        chain.reverse()
+        chains.append(chain)
+
+    return chains
+
 def compute_structural_metrics(workflow: Dict[str, Any], small_graph_floor: float = 0.3, weights: Dict[str, float] = None) -> Dict[str, float]:
     """
     Compute structural metrics for an n8n-style workflow.
@@ -50,10 +186,12 @@ def compute_structural_metrics(workflow: Dict[str, Any], small_graph_floor: floa
     # Build graph using node 'name' (fallback to 'id' when name is missing)
     names = []
     for n in nodes:
-        nid = n.get("id")
-        name = str(nid) if nid is not None else n.get("name")
-        if name is not None:
-            names.append(name)
+        nm = n.get("name") or n.get("id")
+        if nm is not None:
+            names.append(str(nm))
+    
+    # mapping name -> id
+    name_to_id = { str(n.get("name") or n.get("id")): n.get("id") for n in nodes }
 
     G = nx.DiGraph()
     G.add_nodes_from(names)
@@ -103,6 +241,13 @@ def compute_structural_metrics(workflow: Dict[str, Any], small_graph_floor: floa
         w["C"]*connected_ratio + w["A"]*acyclic + w["O"]*(1-orphan_ratio) + w["D"]*avg_out_norm, 2
     )
 
+    # unreachable + dead ends
+    unreachable = find_unreachable_nodes(workflow)
+    unreachable_ratio = len(unreachable) / n_nodes
+
+    dead_end_chains = find_dead_end_chains(workflow)
+    dead_end_ratio = len(dead_end_chains) / max(1, n_nodes)
+
     return {
         "n_nodes": float(n_nodes),
         "n_edges": float(n_edges),
@@ -111,6 +256,13 @@ def compute_structural_metrics(workflow: Dict[str, Any], small_graph_floor: floa
         "orphan_ratio": float(orphan_ratio),
         "avg_out_norm": float(avg_out_norm),
         "structural_score": float(structural_score),
+        "unreachable_nodes": [name_to_id.get(u, u) for u in unreachable],
+        "unreachable_ratio": float(unreachable_ratio),
+        "dead_end_chains": [
+            [name_to_id.get(x, x) for x in chain]
+            for chain in dead_end_chains
+        ],
+        "dead_end_ratio": float(dead_end_ratio),
         "_small_graph_floor": float(small_graph_floor),
         "_weights": w
     }
