@@ -5,18 +5,42 @@ N8N_MINIMAL_SCHEMA = {
     "properties": {
         "nodes": {
             "type": "array",
+            "minItems": 1,
             "items": {
                 "type": "object",
                 "required": ["id", "name", "type"],
                 "properties": {
                     "id": {"type": ["string", "number"]},
+
                     "name": {"type": "string"},
-                    "type": {"type": "string"},  # e.g., n8n-nodes-base.emailSend
-                    "parameters": {"type": "object"}
+
+                    "type": {
+                        "type": "string",
+                        "pattern": ".+\\..+"    # n8n-like type format
+                    },
+
+                    "parameters": {
+                        "type": "object",
+                        "additionalProperties": True,
+                        "default": {}
+                    }
                 }
-            },
-            "minItems": 1
+            }
         },
-        "connections": {"type": "object"}
+
+        "connections": {
+            "type": "object",
+            "patternProperties": {
+                "^.*$": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^main$": {
+                            "type": "array"
+                        }
+                    },
+                    "additionalProperties": True
+                }
+            }
+        }
     }
 }
