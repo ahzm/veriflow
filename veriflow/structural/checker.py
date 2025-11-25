@@ -24,7 +24,7 @@ def structural_check(workflow: Dict[str, Any], small_graph_floor: float = 0.3, w
         validate(instance=workflow, schema=N8N_MINIMAL_SCHEMA)
     except ValidationError as e:
         syntax_ok = 0.0
-        issues.append(f"Schema validation error: {e.message}")
+        issues.append(f"[SCHEMA] Schema validation error: {e.message}")
 
     # 2) Graph-derived metrics (single source of truth for structure quality)
     m = compute_structural_metrics(workflow, small_graph_floor=small_graph_floor, weights=weights)
@@ -36,25 +36,43 @@ def structural_check(workflow: Dict[str, Any], small_graph_floor: float = 0.3, w
 
     # Issue collection from metrics (kept simple and interpretable)
     if conn < 1.0:
-        issues.append("Workflow not fully connected")
+        issues.append(
+            f"[STRUCTURE] Workflow not fully connected "
+            f"(largest weakly connected component covers {conn:.2f} of nodes)"
+        )
     if acyclic < 1.0:
-        issues.append("Workflow contains cycles")
+        issues.append(
+            "[STRUCTURE] Workflow contains cycles "
+            "(may cause infinite loops or repeated execution)"
+        )
     if orphan > 0.0:
-        issues.append(f"Workflow has orphan nodes (ratio={orphan:.2f})")
+        issues.append(
+            f"[STRUCTURE] Orphan nodes detected (ratio={orphan:.2f}) "
+            "(nodes with no incoming and no outgoing edges)"
+        )
 
     unreachable_nodes = m.get("unreachable_nodes", []) or []
     dead_end_chains = m.get("dead_end_chains", []) or []
 
     if unreachable_nodes:
-        issues.append(f"Unreachable nodes from trigger: {unreachable_nodes}")
+        issues.append(
+            f"[REACHABILITY] Unreachable nodes from any trigger: {unreachable_nodes} "
+            "(these nodes will never be executed)"
+        )
 
     if dead_end_chains:
-        issues.append(f"Dead-end chains (reachable but no continuation): {dead_end_chains}")
+        issues.append(
+            f"[REACHABILITY] Dead-end chains found (reachable but no continuation): "
+            f"{dead_end_chains}"
+        )
 
     # 3) Trigger presence and exit coverage
     trig = 1.0 if has_trigger(workflow.get("nodes", [])) else 0.0
     if trig == 0.0:
-        issues.append("Missing trigger node")
+        issues.append(
+            "[FLOW] Missing trigger node "
+            "(workflow has no entry point such as schedule/webhook/trigger)"
+        )
 
     # exit_coverage expects a DAG view of the workflow
     flow_computed = True
@@ -64,10 +82,16 @@ def structural_check(workflow: Dict[str, Any], small_graph_floor: float = 0.3, w
     except Exception:
         flow_computed = False
         flow = 0.0
-        issues.append("Exit coverage could not be computed (graph invalid)")
+        issues.append(
+            "[FLOW] Exit coverage could not be computed (graph invalid or non-DAG)"
+            
+        )
 
     if flow_computed and m.get("n_nodes", 0) >= 2 and flow < 0.95:
-        issues.append("Not all terminal nodes are covered by the main flow")
+        issues.append(
+            f"[FLOW] Not all terminal nodes are covered by the main flow "
+            f"(exit coverage={flow:.2f})"
+        )
 
     unreachable_ratio = float(m.get("unreachable_ratio", 0.0))
     dead_end_ratio = float(m.get("dead_end_ratio", 0.0))
@@ -102,6 +126,15 @@ def structural_check(workflow: Dict[str, Any], small_graph_floor: float = 0.3, w
         "dead_end_ratio": dead_end_ratio,
         "penalty": penalty,
         "k": k,
+        "explanation": {
+            "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+            "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+            "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+            "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+            "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+            "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+            "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions",
+        },
     }
 
     return S, issues, detail
