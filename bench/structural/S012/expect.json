@@ -1,0 +1,11 @@
+{
+    "desc": "Larger DAG with one non-action dead-end branch.",
+    "assert": {
+        "has_trigger": true,
+        "connected": true,
+        "has_cycles": false,
+        "has_orphans": false,
+        "has_unreachable": false,
+        "has_dead_ends": true
+    }
+}

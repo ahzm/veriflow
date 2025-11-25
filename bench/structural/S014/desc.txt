@@ -1,0 +1,1 @@
+Single email action node with no trigger and no edges.

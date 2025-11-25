@@ -1,0 +1,11 @@
+{
+    "desc": "Workflow contains a cycle but all nodes are reachable and non-orphan.",
+    "assert": {
+        "has_trigger": true,
+        "connected": true,
+        "has_cycles": true,
+        "has_orphans": false,
+        "has_unreachable": false,
+        "has_dead_ends": false
+    }
+}

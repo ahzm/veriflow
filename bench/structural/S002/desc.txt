@@ -1,0 +1,1 @@
+Trigger fans out to HTTP->Email and Slack; well-formed multi-branch DAG.

@@ -1,0 +1,11 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Email",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {}
+        }
+    ],
+    "connections": {}
+}

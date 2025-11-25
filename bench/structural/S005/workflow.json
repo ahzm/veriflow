@@ -1,0 +1,69 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Schedule1",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {}
+        },
+        {
+            "id": "2",
+            "name": "HTTP1",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {}
+        },
+        {
+            "id": "3",
+            "name": "Email1",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {}
+        },
+        {
+            "id": "4",
+            "name": "Schedule2",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {}
+        },
+        {
+            "id": "5",
+            "name": "HTTP2",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {}
+        }
+    ],
+    "connections": {
+        "Schedule1": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP1": {
+            "main": [
+                [
+                    {
+                        "node": "Email1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Schedule2": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

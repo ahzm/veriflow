@@ -1,0 +1,1 @@
+Two disconnected trigger components; globally disconnected but each component is locally fine.

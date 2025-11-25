@@ -1,0 +1,29 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "HTTP",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {}
+        },
+        {
+            "id": "2",
+            "name": "Email",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {}
+        }
+    ],
+    "connections": {
+        "HTTP": {
+            "main": [
+                [
+                    {
+                        "node": "Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

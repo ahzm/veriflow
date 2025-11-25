@@ -1,0 +1,11 @@
+{
+    "desc": "Single trigger node; orphan and dead-end.",
+    "assert": {
+        "has_trigger": true,
+        "connected": true,
+        "has_cycles": false,
+        "has_orphans": true,
+        "has_unreachable": false,
+        "has_dead_ends": true
+    }
+}

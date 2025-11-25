@@ -1,0 +1,11 @@
+{
+    "desc": "Path list with multiple hops from Trigger; structurally fine.",
+    "assert": {
+        "has_trigger": true,
+        "connected": true,
+        "has_cycles": false,
+        "has_orphans": false,
+        "has_unreachable": false,
+        "has_dead_ends": false
+    }
+}

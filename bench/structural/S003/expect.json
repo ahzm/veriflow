@@ -1,0 +1,11 @@
+{
+    "desc": "Workflow without any trigger; everything unreachable from triggers.",
+    "assert": {
+        "has_trigger": false,
+        "connected": true,
+        "has_cycles": false,
+        "has_orphans": false,
+        "has_unreachable": true,
+        "has_dead_ends": false
+    }
+}

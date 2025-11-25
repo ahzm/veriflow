@@ -1,0 +1,11 @@
+{
+    "desc": "Single non-trigger node; no trigger and unreachable from any trigger.",
+    "assert": {
+        "has_trigger": false,
+        "connected": true,
+        "has_cycles": false,
+        "has_orphans": true,
+        "has_unreachable": true,
+        "has_dead_ends": false
+    }
+}

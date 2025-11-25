@@ -1,0 +1,11 @@
+{
+    "desc": "Disconnected cycle component without trigger; main component fine.",
+    "assert": {
+        "has_trigger": true,
+        "connected": false,
+        "has_cycles": true,
+        "has_orphans": false,
+        "has_unreachable": true,
+        "has_dead_ends": false
+    }
+}

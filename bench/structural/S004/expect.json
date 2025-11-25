@@ -1,0 +1,11 @@
+{
+    "desc": "One orphan node and one unreachable node from the trigger.",
+    "assert": {
+        "has_trigger": true,
+        "connected": false,
+        "has_cycles": false,
+        "has_orphans": true,
+        "has_unreachable": true,
+        "has_dead_ends": false
+    }
+}

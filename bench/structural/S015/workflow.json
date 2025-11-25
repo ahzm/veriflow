@@ -1,0 +1,76 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "parameters": {}
+        },
+        {
+            "id": "2",
+            "name": "HTTP",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {}
+        },
+        {
+            "id": "3",
+            "name": "Transform",
+            "type": "n8n-nodes-base.function",
+            "parameters": {}
+        },
+        {
+            "id": "4",
+            "name": "Email",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {}
+        },
+        {
+            "id": "5",
+            "name": "LogSet",
+            "type": "n8n-nodes-base.set",
+            "parameters": {}
+        }
+    ],
+    "connections": {
+        "Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "LogSet",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP": {
+            "main": [
+                [
+                    {
+                        "node": "Transform",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Transform": {
+            "main": [
+                [
+                    {
+                        "node": "Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

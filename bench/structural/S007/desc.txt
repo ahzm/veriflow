@@ -1,0 +1,1 @@
+Reachable chain Trigger->Function->Set with no terminal action node: a dead-end chain.

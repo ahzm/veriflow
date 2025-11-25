@@ -1,0 +1,1 @@
+Connections main list directly contains hop dict (no extra list nesting); extractor should handle this rare shape.

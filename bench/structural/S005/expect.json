@@ -1,0 +1,11 @@
+{
+    "desc": "Two disconnected components, both triggered.",
+    "assert": {
+        "has_trigger": true,
+        "connected": false,
+        "has_cycles": false,
+        "has_orphans": false,
+        "has_unreachable": false,
+        "has_dead_ends": false
+    }
+}

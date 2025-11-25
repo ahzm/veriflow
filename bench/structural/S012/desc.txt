@@ -1,0 +1,1 @@
+Main path to Email plus a Side1->Side2 branch where Side2 is a non-action dead-end.

@@ -1,0 +1,59 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "parameters": {}
+        },
+        {
+            "id": "2",
+            "name": "HTTP",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {}
+        },
+        {
+            "id": "3",
+            "name": "Email",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {}
+        },
+        {
+            "id": "4",
+            "name": "Slack",
+            "type": "n8n-nodes-base.slack",
+            "parameters": {}
+        }
+    ],
+    "connections": {
+        "Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Slack",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP": {
+            "main": [
+                [
+                    {
+                        "node": "Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

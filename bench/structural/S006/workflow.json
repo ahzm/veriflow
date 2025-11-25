@@ -1,0 +1,68 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "parameters": {}
+        },
+        {
+            "id": "2",
+            "name": "NodeA",
+            "type": "n8n-nodes-base.set",
+            "parameters": {}
+        },
+        {
+            "id": "3",
+            "name": "NodeB",
+            "type": "n8n-nodes-base.set",
+            "parameters": {}
+        },
+        {
+            "id": "4",
+            "name": "Email",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {}
+        }
+    ],
+    "connections": {
+        "Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "NodeA",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NodeA": {
+            "main": [
+                [
+                    {
+                        "node": "NodeB",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "NodeB": {
+            "main": [
+                [
+                    {
+                        "node": "Trigger",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

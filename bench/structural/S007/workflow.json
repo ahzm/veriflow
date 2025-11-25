@@ -1,0 +1,46 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Trigger",
+            "type": "n8n-nodes-base.manualTrigger",
+            "parameters": {}
+        },
+        {
+            "id": "2",
+            "name": "FunctionNode",
+            "type": "n8n-nodes-base.function",
+            "parameters": {}
+        },
+        {
+            "id": "3",
+            "name": "SetNode",
+            "type": "n8n-nodes-base.set",
+            "parameters": {}
+        }
+    ],
+    "connections": {
+        "Trigger": {
+            "main": [
+                [
+                    {
+                        "node": "FunctionNode",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "FunctionNode": {
+            "main": [
+                [
+                    {
+                        "node": "SetNode",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

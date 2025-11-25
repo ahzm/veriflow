@@ -1,0 +1,1 @@
+Single path list containing two hops; extractor should handle and still be well-formed.

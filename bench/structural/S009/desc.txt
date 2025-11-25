@@ -1,0 +1,1 @@
+Normal Trigger->Condition->Email path plus an unreachable ExtraNode.

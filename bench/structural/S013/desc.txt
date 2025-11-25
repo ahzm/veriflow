@@ -1,0 +1,1 @@
+Main Trigger->Email component plus a separate 2-node cycle without any trigger.

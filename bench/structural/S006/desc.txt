@@ -1,0 +1,1 @@
+Cycle between Trigger, NodeA, NodeB, plus Email as a sink.

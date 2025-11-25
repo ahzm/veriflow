@@ -1,0 +1,11 @@
+{
+    "desc": "Direct dict hops in connection paths; still a simple Trigger->Email.",
+    "assert": {
+        "has_trigger": true,
+        "connected": true,
+        "has_cycles": false,
+        "has_orphans": false,
+        "has_unreachable": false,
+        "has_dead_ends": false
+    }
+}

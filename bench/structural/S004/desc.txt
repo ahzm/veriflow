@@ -1,0 +1,1 @@
+Trigger->Email plus a completely isolated Orphan node.
