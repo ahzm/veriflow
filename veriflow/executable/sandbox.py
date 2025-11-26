@@ -52,7 +52,7 @@ def validate_workflow(
     path_ok, unreachable_nodes = _check_reachability(G, nodes)
     if not path_ok:
         for u in unreachable_nodes:
-            issues.append(f"Unreachable node: {u}")
+            issues.append(f"[PATH] Unreachable node: {u}")
 
     # 3) Data-flow consistency (static, new)
     dataflow_ok = 1.0
@@ -71,7 +71,7 @@ def validate_workflow(
     except Exception as e:
         dataflow_ok = 0.0
         dataflow_applicable = False
-        issues.append(f"Data-flow analysis failed: {e}")
+        issues.append(f"[DATAFLOW] Data-flow analysis failed: {e}")
 
     # 4) Runtime simulation (safe, no side effects)
     runtime_ok, run_issues, exec_log = _simulate_runtime(G, nodes, time_budget_sec=time_budget_sec, enable_faults=enable_faults,
@@ -93,6 +93,7 @@ def validate_workflow(
         "dataflow_ok":   dataflow_ok, 
         "weights": w,
         "missing_params": missing_params,
+        "param_detail": param_detail, 
         "unreachable_nodes": unreachable_nodes,
         "dataflow_detail": df_detail,
         "executed_nodes": exec_log.get("executed_nodes", []),
@@ -126,19 +127,19 @@ def _check_parameters(nodes: List[Dict[str, Any]]) -> Tuple[bool, List[str], Dic
         if "http" in ntype or "httprequest" in ntype:
             if not _has_nonempty(params, "url"):
                 ok = False
-                missing.append(f"HTTP Request '{nname}' missing parameter: url")
+                missing.append(f"[PARAM] HTTP Request '{nname}' missing parameter: url")
             elif not _looks_like_url(params.get("url")):
                 ok = False
-                missing.append(f"HTTP Request '{nname}' url does not look valid")
+                missing.append(f"[PARAM] HTTP Request '{nname}' url does not look valid")
 
         if "email" in ntype and "send" in ntype:
             # n8n-nodes-base.emailSend
             if not _has_nonempty(params, "to"):
                 ok = False
-                missing.append(f"Email '{nname}' missing parameter: to")
+                missing.append(f"[PARAM] Email '{nname}' missing parameter: to")
             if not _has_nonempty(params, "subject"):
                 ok = False
-                missing.append(f"Email '{nname}' missing parameter: subject")
+                missing.append(f"[PARAM] Email '{nname}' missing parameter: subject")
             # body is optional for our sandbox
 
         if "cron" in ntype or "schedule" in ntype or "trigger" in ntype:
@@ -146,7 +147,7 @@ def _check_parameters(nodes: List[Dict[str, Any]]) -> Tuple[bool, List[str], Dic
             cron = params.get("cronExpression") or params.get("cron") or ""
             if not cron or not _looks_like_cron(cron):
                 ok = False
-                missing.append(f"Schedule '{nname}' has invalid or missing cron expression")
+                missing.append(f"[PARAM] Schedule '{nname}' has invalid or missing cron expression")
 
         if "slack" in ntype:
             # optional: channel/text minimal checks
@@ -182,7 +183,7 @@ def _build_node_index(nodes):
     for n in nodes:
         nid = n.get("id")
         nname = n.get("name")
-        if nid:
+        if nid is not None:
             idx[str(nid)] = n
         if nname:
             idx[str(nname)] = n
@@ -196,7 +197,7 @@ def _check_reachability(G: nx.DiGraph, nodes: List[Dict[str, Any]]) -> Tuple[boo
     # Discover triggers by inspecting node definitions if available; fall back to key heuristic.
     triggers = []
     for k in G.nodes:
-        node = index.get(k)
+        node = index.get(str(k))
         if node and _is_trigger_node(node):
             triggers.append(k)
         else:
@@ -254,7 +255,7 @@ def _simulate_runtime(
     # find triggers (same logic as reachability)
     triggers = []
     for k in order:
-        node = index.get(k)
+        node = index.get(str(k))
         if node and _is_trigger_node(node):
             triggers.append(k)
         else:
@@ -263,26 +264,24 @@ def _simulate_runtime(
                 triggers.append(k)
 
     if not triggers and len(order) > 0:
-        issues.append("No trigger node found for execution start")
+        issues.append("[RUNTIME] No trigger node found for execution start")
         # still proceed in given order
 
     runner = NodeRunnerRegistry()
 
-    visited = set()
     queue = triggers[:] if triggers else order[:]
     seen_enqueued = set(queue)
 
     while queue:
         if time.time() - start > time_budget_sec:
-            issues.append("Sandbox time budget exceeded")
+            issues.append("[RUNTIME] Sandbox time budget exceeded")
             break
 
         curr = queue.pop(0)
-        visited.add(curr)
-        node = index.get(curr) 
+        node = index.get(str(curr)) 
         if not node:
             results[str(curr)] = {"ok": False, "msg": "Missing node definition"}
-            issues.append(f"Node '{curr}' missing definition in nodes[]")
+            issues.append(f"[RUNTIME] Node '{curr}' missing definition in nodes[]")
             # still enqueue successors to keep traversal consistent
         else:            
             # (1) Fault injection before actual execution (optional)
@@ -295,7 +294,7 @@ def _simulate_runtime(
                 executed.append(str(curr))
                 faulted_nodes.append(str(curr))
                 results[str(curr)] = {"ok": False, "msg": f_msg}
-                issues.append(f"Injected fault at '{curr}': {f_msg}")
+                issues.append(f"[RUNTIME] Injected fault at '{curr}': {f_msg}")
                 continue  # Do not run the real node
 
             # (2) Normal execution
@@ -303,7 +302,7 @@ def _simulate_runtime(
             results[str(curr)] = {"ok": ok, "msg": msg}
             executed.append(str(curr))
             if not ok:
-                issues.append(f"Execution failed at '{curr}': {msg}")
+                issues.append(f"[RUNTIME] Execution failed at '{curr}': {msg}")
 
         for succ in G.successors(curr):
             if succ not in seen_enqueued:
@@ -315,7 +314,7 @@ def _simulate_runtime(
 
     # Build human-readable name mapping and executed name list
     name_map = {n.get("id"): n.get("name", n.get("id")) for n in nodes if n.get("id") is not None}
-    executed_readable = [index.get(k, {}).get("name", str(k)) for k in executed]
+    executed_readable = [index.get(str(k), {}).get("name", str(k)) for k in executed]
 
     return runtime_ok, issues, {"node_results": results, 
                                 "executed_nodes": executed, 
