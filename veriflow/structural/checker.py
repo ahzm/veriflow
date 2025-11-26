@@ -18,6 +18,34 @@ def structural_check(workflow: Dict[str, Any], small_graph_floor: float = 0.3, w
     """
     issues: List[str] = []
 
+    # Build helper maps for human-readable diagnostics
+    nodes = workflow.get("nodes", []) or []
+    id_to_name = {}
+    for n in nodes:
+        nid = n.get("id")
+        nm = n.get("name") or (str(nid) if nid is not None else None)
+        if nid is not None:
+            id_to_name[str(nid)] = nm or str(nid)
+        if nm is not None:
+            id_to_name[str(nm)] = nm
+
+    def _fmt_node_id(nid: Any) -> str:
+        """
+        Render a node identifier as 'Name (id=...)' when possible,
+        otherwise fallback to the raw identifier.
+        """
+        key = str(nid)
+        name = id_to_name.get(key)
+        if not name or name == key:
+            return key
+        return f"{name} (id={key})"
+
+    def _fmt_chain(chain: List[Any]) -> str:
+        """
+        Render a dead-end chain as 'A -> B -> C' with human-readable labels.
+        """
+        return " -> ".join(_fmt_node_id(x) for x in chain)
+
     # 1) Schema validation (syntax)
     syntax_ok = 1.0
     try:
@@ -33,37 +61,44 @@ def structural_check(workflow: Dict[str, Any], small_graph_floor: float = 0.3, w
     orphan   = float(m.get("orphan_ratio", 1.0))      # fraction of isolated nodes
     avg_out  = float(m.get("avg_out_norm", 0.0))      # normalized avg out-degree
     base_struct = float(m.get("structural_score", 0.0))
+    n_nodes  = int(m.get("n_nodes", 0))
 
     # Issue collection from metrics (kept simple and interpretable)
     if conn < 1.0:
         issues.append(
-            f"[STRUCTURE] Workflow not fully connected "
-            f"(largest weakly connected component covers {conn:.2f} of nodes)"
+            f"[STRUCTURE] Workflow not fully connected: largest weakly connected "
+            f"component covers {conn:.2f} of nodes."
         )
     if acyclic < 1.0:
         issues.append(
-            "[STRUCTURE] Workflow contains cycles "
-            "(may cause infinite loops or repeated execution)"
+            "[STRUCTURE] Workflow contains directed cycles; "
+            "this may cause repeated or unexpected execution."
         )
     if orphan > 0.0:
+        approx_orphans = int(round(orphan * n_nodes)) if n_nodes > 0 else "some"
         issues.append(
-            f"[STRUCTURE] Orphan nodes detected (ratio={orphan:.2f}) "
-            "(nodes with no incoming and no outgoing edges)"
+            f"[STRUCTURE] Orphan nodes detected (no incoming and no outgoing edges): "
+            f"≈ {approx_orphans} node(s), ratio={orphan:.2f}. "
         )
 
     unreachable_nodes = m.get("unreachable_nodes", []) or []
     dead_end_chains = m.get("dead_end_chains", []) or []
 
     if unreachable_nodes:
+        formatted = [_fmt_node_id(nid) for nid in unreachable_nodes]
         issues.append(
-            f"[REACHABILITY] Unreachable nodes from any trigger: {unreachable_nodes} "
-            "(these nodes will never be executed)"
+            f"[REACHABILITY] Unreachable nodes from any trigger: "
+            + ", ".join(formatted)
+            + "(these nodes will never be executed in the current graph)."
         )
 
     if dead_end_chains:
+        formatted_chains = [_fmt_chain(chain) for chain in dead_end_chains]
         issues.append(
-            f"[REACHABILITY] Dead-end chains found (reachable but no continuation): "
-            f"{dead_end_chains}"
+            f"[REACHABILITY] Dead-end chains found (reachable but no continuation "
+            "towards terminal actions): "
+            + "; ".join(formatted_chains)
+            + "."
         )
 
     # 3) Trigger presence and exit coverage
