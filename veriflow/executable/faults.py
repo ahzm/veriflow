@@ -4,11 +4,13 @@ from typing import Tuple, Dict, Any
 import random
 
 # Fault profile definitions
+# rate: probability to inject a fault when this profile is active
+# api/data/node: whether this profile may inject that class of faults
 FAULT_PROFILES = {
     "minimal":  {"rate": 0.05, "api": True,  "data": False, "node": False},
     "medium":   {"rate": 0.15, "api": True,  "data": True,  "node": False},
     "chaos":    {"rate": 0.30, "api": True,  "data": True,  "node": True},
-    "llm":      {"rate": 0.20, "api": False, "data": True,  "node": False},
+    "llm":      {"rate": 0.20, "api": False, "data": True,  "node": False}, # focus on data/schema faults for LLM-generated flows
     "prod":     {"rate": 0.10, "api": True,  "data": True,  "node": True},
 }
 
