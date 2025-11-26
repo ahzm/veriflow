@@ -43,14 +43,14 @@ def check_dataflow(
             continue
         fields = _extract_json_fields(node)
         if fields:
-            required[key] = fields
+            required[str(key)] = fields
 
     # 2) Infer produced fields per node (local)
     produced_local: Dict[str, Set[str]] = {}
     for key, node in index.items():
         if str(key) not in graph_nodes:
             continue
-        produced_local[key] = _infer_produced_fields(node)
+        produced_local[str(key)] = _infer_produced_fields(node)
 
     # 3) Propagate available fields along topological order
     available: Dict[str, Set[str]] = {}
@@ -61,16 +61,19 @@ def check_dataflow(
         order = list(G.nodes)
 
     for n in order:
+        n_str = str(n)
+
         # Fields produced locally by this node
-        local = set()
-        node_def = index.get(n)
+        local: Set[str] = set()
+        node_def = index.get(n_str)
         if node_def is not None:
-            local = produced_local.get(n, set())
+            local = produced_local.get(n_str, set())
+
         # Fields coming from predecessors (union)
         pred_fields: Set[str] = set()
         for p in G.predecessors(n):
-            pred_fields |= available.get(p, set())
-        available[n] = pred_fields | local
+            pred_fields |= available.get(str(p), set())
+        available[n_str] = pred_fields | local
 
     # 4) Check missing fields
     issues: List[str] = []
@@ -82,7 +85,7 @@ def check_dataflow(
             per_node_missing[n] = missing
             node_name = _node_label(index.get(n), default=str(n))
             issues.append(
-                f"Data-flow issue: node '{node_name}' references "
+                f"[DATAFLOW] Data-flow issue: node '{node_name}' references "
                 f"$json fields {missing} that are not provided by upstream nodes"
             )
 
