@@ -1,0 +1,31 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "*/5 * * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "Email Missing Subject",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {
+                "to": "user@example.com"
+            }
+        }
+    ],
+    "connections": {
+        "Cron": {
+            "main": [
+                [
+                    {
+                        "node": "Email Missing Subject"
+                    }
+                ]
+            ]
+        }
+    }
+}

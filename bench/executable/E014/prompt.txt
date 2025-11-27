@@ -1,0 +1,1 @@
+Cron -> HTTP -> Slack -> Telegram. Slack and Telegram nodes are treated as minimal no-op mocks; they should not break parameter or runtime checks.

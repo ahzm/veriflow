@@ -1,0 +1,1 @@
+Cron trigger followed by an HTTP node with an invalid URL (no http/https scheme). Parameters are present but invalid, so parameter and runtime checks should fail.

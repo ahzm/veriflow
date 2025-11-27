@@ -1,0 +1,1 @@
+Cron -> HTTP -> Email. The Email subject uses {{$json.statusCode}} (dot notation instead of bracket notation). Data-flow should still detect 'statusCode', produced by the HTTP node, so data-flow passes.

@@ -1,0 +1,1 @@
+Cron with invalid cron expression followed by a valid HTTP node. Parameter check should fail because of the cron, and the runtime simulation should fail on the cron as well.

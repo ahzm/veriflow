@@ -1,0 +1,1 @@
+Cron trigger calling an HTTP node without the required url parameter. Everything else is fine. We expect parameter and runtime checks to fail, but the graph is reachable.

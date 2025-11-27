@@ -1,0 +1,32 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "*/15 * * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "Email Using Missing Field",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {
+                "to": "user@example.com",
+                "subject": "Status {{$json[\"statusCode\"]}}"
+            }
+        }
+    ],
+    "connections": {
+        "Cron": {
+            "main": [
+                [
+                    {
+                        "node": "Email Using Missing Field"
+                    }
+                ]
+            ]
+        }
+    }
+}

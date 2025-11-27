@@ -1,0 +1,1 @@
+Cron trigger connected to an HTTP node. A separate Email node is never connected in the graph. Parameters are all valid, runtime is fine, but reachability must report the email node as unreachable.

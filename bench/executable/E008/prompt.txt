@@ -1,0 +1,1 @@
+Cron trigger → HTTP → Email. The Email subject uses {{$json["statusCode"]}}, which is produced by the HTTP node. All checks should pass including data-flow.

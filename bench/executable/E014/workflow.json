@@ -1,0 +1,61 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "*/10 * * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "HTTP",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://example.com"
+            }
+        },
+        {
+            "id": "3",
+            "name": "Slack Notify",
+            "type": "n8n-nodes-base.slack",
+            "parameters": {}
+        },
+        {
+            "id": "4",
+            "name": "Telegram Notify",
+            "type": "n8n-nodes-base.telegram",
+            "parameters": {}
+        }
+    ],
+    "connections": {
+        "Cron": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP"
+                    }
+                ]
+            ]
+        },
+        "HTTP": {
+            "main": [
+                [
+                    {
+                        "node": "Slack Notify"
+                    }
+                ]
+            ]
+        },
+        "Slack Notify": {
+            "main": [
+                [
+                    {
+                        "node": "Telegram Notify"
+                    }
+                ]
+            ]
+        }
+    }
+}

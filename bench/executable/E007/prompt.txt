@@ -1,0 +1,1 @@
+Cron trigger followed by an Email node whose subject references a JSON field 'statusCode' that is never produced by any upstream node. We expect a data-flow error but parameters, path and runtime are all valid.

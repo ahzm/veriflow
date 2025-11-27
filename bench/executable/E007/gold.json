@@ -1,0 +1,14 @@
+{
+    "assert": {
+        "param_ok": true,
+        "path_ok": true,
+        "runtime_ok": true,
+        "dataflow_ok": false,
+        "E_min": 0.75,
+        "E_max": 0.85,
+        "has_param_issues": false,
+        "has_path_issues": false,
+        "has_runtime_issues": false,
+        "has_dataflow_issues": true
+    }
+}

@@ -1,0 +1,1 @@
+A single HTTP node with a valid URL but no trigger node at all. Parameters and runtime are fine, but there is no entry point so reachability should fail.

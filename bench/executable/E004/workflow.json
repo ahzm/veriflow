@@ -1,0 +1,13 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Bad Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "INVALID_CRON"
+            }
+        }
+    ],
+    "connections": {}
+}

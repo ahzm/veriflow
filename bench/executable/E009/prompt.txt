@@ -1,0 +1,1 @@
+Email node comes before an HTTP node in the graph. The Email subject references {{$json["statusCode"]}} but only the later HTTP node produces it. Data-flow should report the field as missing.

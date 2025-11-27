@@ -1,0 +1,31 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "0 * * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "HTTP Request Without URL",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "method": "GET"
+            }
+        }
+    ],
+    "connections": {
+        "Cron": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request Without URL"
+                    }
+                ]
+            ]
+        }
+    }
+}

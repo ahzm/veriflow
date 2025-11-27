@@ -1,0 +1,1 @@
+Cron trigger that calls an HTTP API and then sends an email using the HTTP statusCode inside the subject. All parameters are correctly set and the graph is linear and reachable.

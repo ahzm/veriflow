@@ -1,0 +1,13 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Standalone HTTP",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://example.com"
+            }
+        }
+    ],
+    "connections": {}
+}

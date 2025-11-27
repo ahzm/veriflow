@@ -1,0 +1,66 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "*/2 * * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "HTTP 1",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://example.com/step1"
+            }
+        },
+        {
+            "id": "3",
+            "name": "HTTP 2",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://example.com/step2"
+            }
+        },
+        {
+            "id": "4",
+            "name": "Email Final",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {
+                "to": "user@example.com",
+                "subject": "Body is {{$json[\"body\"]}}"
+            }
+        }
+    ],
+    "connections": {
+        "Cron": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP 1"
+                    }
+                ]
+            ]
+        },
+        "HTTP 1": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP 2"
+                    }
+                ]
+            ]
+        },
+        "HTTP 2": {
+            "main": [
+                [
+                    {
+                        "node": "Email Final"
+                    }
+                ]
+            ]
+        }
+    }
+}

@@ -1,0 +1,1 @@
+Two independent cron triggers, each calling its own HTTP node. All nodes are reachable from at least one trigger, parameters and runtime are fine. No data-flow templates.

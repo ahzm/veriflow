@@ -1,0 +1,1 @@
+Cron -> HTTP1 -> HTTP2 -> Email. Both HTTP nodes produce JSON fields, and the Email node uses {{$json["body"]}} which is already available from HTTP1 and propagated through HTTP2. All checks should pass.

@@ -1,0 +1,31 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Bad Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "* * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "HTTP OK",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://example.com"
+            }
+        }
+    ],
+    "connections": {
+        "Bad Cron": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP OK"
+                    }
+                ]
+            ]
+        }
+    }
+}

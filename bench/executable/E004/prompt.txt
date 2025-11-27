@@ -1,0 +1,1 @@
+Single cron node with an invalid cron expression. No HTTP or email nodes. We expect parameter and runtime checks to fail, and the graph is trivially reachable.

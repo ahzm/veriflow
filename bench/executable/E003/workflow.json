@@ -1,0 +1,31 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "*/10 * * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "HTTP Invalid URL",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "example.com/api"
+            }
+        }
+    ],
+    "connections": {
+        "Cron": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Invalid URL"
+                    }
+                ]
+            ]
+        }
+    }
+}

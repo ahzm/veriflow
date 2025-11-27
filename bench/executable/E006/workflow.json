@@ -1,0 +1,40 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "0 0 * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "HTTP Request",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://example.com/data"
+            }
+        },
+        {
+            "id": "3",
+            "name": "Unreachable Email",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {
+                "to": "foo@example.com",
+                "subject": "Hello"
+            }
+        }
+    ],
+    "connections": {
+        "Cron": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request"
+                    }
+                ]
+            ]
+        }
+    }
+}

@@ -1,0 +1,56 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron A",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "*/10 * * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "HTTP A",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://example.com/a"
+            }
+        },
+        {
+            "id": "3",
+            "name": "Cron B",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "5 * * * *"
+            }
+        },
+        {
+            "id": "4",
+            "name": "HTTP B",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://example.com/b"
+            }
+        }
+    ],
+    "connections": {
+        "Cron A": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP A"
+                    }
+                ]
+            ]
+        },
+        "Cron B": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP B"
+                    }
+                ]
+            ]
+        }
+    }
+}

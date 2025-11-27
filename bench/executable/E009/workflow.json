@@ -1,0 +1,49 @@
+{
+    "nodes": [
+        {
+            "id": "1",
+            "name": "Cron",
+            "type": "n8n-nodes-base.cron",
+            "parameters": {
+                "cronExpression": "0 * * * *"
+            }
+        },
+        {
+            "id": "2",
+            "name": "Email First",
+            "type": "n8n-nodes-base.emailSend",
+            "parameters": {
+                "to": "user@example.com",
+                "subject": "Status {{$json[\"statusCode\"]}}"
+            }
+        },
+        {
+            "id": "3",
+            "name": "HTTP Later",
+            "type": "n8n-nodes-base.httpRequest",
+            "parameters": {
+                "url": "https://example.com/api"
+            }
+        }
+    ],
+    "connections": {
+        "Cron": {
+            "main": [
+                [
+                    {
+                        "node": "Email First"
+                    }
+                ]
+            ]
+        },
+        "Email First": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Later"
+                    }
+                ]
+            ]
+        }
+    }
+}
