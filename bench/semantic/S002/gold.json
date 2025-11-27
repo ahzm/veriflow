@@ -1,4 +1,20 @@
 {
-  "min_score": 0.4,
-  "max_score": 0.88
+  "assert": {
+    "trigger_ok": true,
+    "action_ok": true,
+    "support_ok": true,
+    "order_ok": true,
+    "conditional_ok": true,
+    "param_sem_ok": false,
+    "intent_edge_ok": true,
+    "M_min": 0.83,
+    "M_max": 0.93,
+    "has_trigger_issue": false,
+    "has_action_issue": false,
+    "has_support_issue": false,
+    "has_order_issue": false,
+    "has_conditional_issue": false,
+    "has_param_sem_issue": true,
+    "has_intent_edge_issue": false
+  }
 }
