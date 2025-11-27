@@ -810,7 +810,7 @@ def semantic_score(
     if intent.get("need_conditional_notify"):
         # Intent requires Condition -> Action path
         if condition_ids and not action_targets:
-            conditional_ok = 1.0
+            conditional_ok = 0.0
         elif action_targets and condition_ids:
             has_path, _ = _collect_semantic_path_nodes_scc(
                 G0, Gc, comp_of, nodes_of_comp,
@@ -924,9 +924,9 @@ def semantic_score(
                 missing_fields.append(f)
 
         if missing_fields:
-            param_sem_ok = 0.0 # min(param_sem_ok, 0.5)
-            #ratio = (len(fields) - len(missing_fields)) / max(1, len(fields))
-            #param_sem_ok = min(param_sem_ok, 0.5 * ratio)
+            matched = len(fields) - len(missing_fields)
+            ratio = matched / max(1, len(fields))
+            param_sem_ok = min(param_sem_ok, 0.5 * ratio)
             issues.append(f"Some requested fields are not reflected in workflow parameters: {missing_fields}")
 
     # intent-graph edge score (denominator = only edges where both capabilities exist)
@@ -936,7 +936,8 @@ def semantic_score(
     )]
 
     if valid_edges:
-        intent_edge_ok = sum(e["ok"] for e in valid_edges) / len(valid_edges)
+        intent_edge_ok = sum(1.0 if e["ok"] else 0.0 for e in valid_edges) / len(valid_edges)
+
     else:
         # If no edges were actually applicable, treat it as perfect score
         intent_edge_ok = 1.0

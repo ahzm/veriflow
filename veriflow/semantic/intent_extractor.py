@@ -365,12 +365,9 @@ def rule_based_intent(prompt: str) -> IntentResult:
     # need_conditional_notify:
     # heuristic: conditional cue + at least one action cue
     cond_notify_hit = _contains_any(text, KEYWORDS["need_conditional_notify"])
-    any_action_hit = any(
-        intent.get(k, False)
-        for k in ("need_email", "need_slack", "need_telegram")
-    )
-    cond_notify = bool(cond_notify_hit)
     any_action_hit = any(intent.get(k, False) for k in ("need_email", "need_slack", "need_telegram"))
+
+    cond_notify = bool(cond_notify_hit)
 
     intent["need_conditional_notify"] = cond_notify
     conf["need_conditional_notify"] = ( 
