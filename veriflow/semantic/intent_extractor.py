@@ -396,16 +396,19 @@ def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mi
     Returns a cleaned JSON dict (see _validate_llm_json) or None on failure.
     """
     if openai is None:
+        print("[intent_llm] openai package not available, fallback to rule")
         return None
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
+        print("[intent_llm] OPENAI_API_KEY not set, fallback to rule")
         return None
 
     # New-style client; if your environment uses the older SDK, adapt accordingly.
     try:
         from openai import OpenAI
         client = OpenAI(api_key=api_key)
-    except Exception:
+    except Exception as e:
+        print(f"[intent_llm] failed to init OpenAI client: {e!r}")
         return None
 
     sys_msg = (
@@ -432,13 +435,24 @@ def _call_llm(prompt: str, base_intent: Dict[str, bool], model: str = "gpt-4o-mi
                 {"role": "user", "content": user_msg},
             ],
             temperature=0,
-            max_tokens=200,
+            max_tokens=500,
+            response_format={"type": "json_object"},
         )
         content = resp.choices[0].message.content.strip()
         try:
             raw = json.loads(content)
         except Exception:
-            return None
+            start = content.find("{")
+            end = content.rfind("}")
+            if start != -1 and end != -1 and end > start:
+                try:
+                    raw = json.loads(content[start:end+1])
+                except Exception:
+                    print("[intent_llm] JSON decode error, raw content:", content[:200])
+                    return None
+            else:
+                print("[intent_llm] JSON decode error, raw content:", content[:200])
+                return None
         return _validate_llm_json(raw)
 
     # First attempt
