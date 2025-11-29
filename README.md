@@ -1,6 +1,6 @@
-# 🔍 Veriflow: Structural–Semantic–Executable Verification for LLM-based Low-Code Workflows
+# 🔍 VeriFlow: Structural–Semantic–Executable Verification for LLM-generated Low-Code Workflows
 
-**Veriflow** is a lightweight verification framework for **LLM-based low-code workflow systems** such as [n8n](https://n8n.io).  
+**VeriFlow** is a lightweight verification framework for **LLM-generated low-code workflow systems** such as [n8n](https://n8n.io).  
 It aims to bridge human-language task specifications and formal workflow validation through a hybrid pipeline combining structural analysis, semantic intent recognition, and sandbox-level executability simulation.
 It provides **formal-inspired consistency checking** across three complementary dimensions:
 
@@ -8,7 +8,9 @@ It provides **formal-inspired consistency checking** across three complementary 
 - 💡 **Semantic** – intent alignment and node-type adequacy (rule + LLM hybrid)  
 - ⚙️ **Executable** – sandbox-based simulation and reachability validation  
 
-The framework also includes **publication-ready visualization** tools for workflow DAGs and a **batch evaluation CLI** for large-scale benchmarks.
+The framework also includes **visualization** tools for workflow DAGs and a **batch evaluation CLI** for large-scale benchmarks.
+
+VeriFlow is intended for researchers, workflow designers, and developers building or evaluating LLM-generated automations.
 
 ---
 
@@ -29,7 +31,7 @@ LLM Workflow Generation                 Human-written Workflow
                          ↓
            Intent Extraction (LLM + Rule)
                          ↓
-Structural — Semantic — Executability Analysis
+Structural — Semantic — Executable Verification
                          ↓
                 JSON Report + Visualization
 ```
@@ -111,6 +113,7 @@ bench/GenLLM/W5/
 These generated workflows can then be validated using verify or bench.
 
 ### 1. Verify a single workflow
+Runs structural, semantic, and executability checks on one workflow.
 ```bash
 python -m veriflow.cli verify \
   --input bench/T001/gold.json \
@@ -133,6 +136,17 @@ python scripts/plot_dag.py \
   -o experiments/results/T001_dag.png
 ```
 
+### 3. Verify a bench of workflows
+Runs batch verification and exports CSV + detailed reports.
+```bash
+python -m veriflow.cli bench \  
+  --glob "bench/GenLLM/W20C/*/*.json" \ 
+  --out experiments/results/GenLLM_W20C.csv \      
+  --use-llm \
+  --sandbox \
+  --dump-details
+```
+ 
 ## 🧩 Architecture
 
 ```
@@ -198,6 +212,23 @@ veriflow/
 }
 ```
 
+## 📊 Benchmarks
+
+VeriFlow includes the **GenLLM** benchmark, containing more than **700 LLM-generated workflows**.  
+Among these, **690 workflows** form the evaluation subset used in our experiments.
+(The remaining workflows include auxiliary cases for tool debugging and are not part of the main evaluation.)
+
+The benchmark is constructed from structured natural-language prompt sets:
+- **Wk**:   k unconstrained prompts (e.g., W10, W20, W60, W100)  
+- **WkC**: constrained prompts with nested conditions, multi-trigger logic, and stricter behavioral requirements
+
+Each prompt corresponds to one generated n8n workflow under:
+```
+bench/GenLLM/W30/
+bench/GenLLM/prompts/W30.txt
+```
+These datasets support large-scale evaluation of structural, semantic, and executable verification.
+
 ## 🧭 Milestones (Implemented)
 - ✅ Structural metrics with robustness for small DAGs
 - ✅ Hybrid semantic mode (rule + LLM)
@@ -207,3 +238,14 @@ veriflow/
 - ✅ Publication-grade DAG plotting with highlighted paths
 - ✅ Logging and I/O utilities (veriflow.utils)
 - ✅ Benchmark suite support (bench/*)
+
+## 📚 Citation
+If you use VeriFlow in scientific publications, please cite:
+
+```bibtex
+@misc{veriflow2025,
+  title = {VeriFlow: A Framework for Multi-Dimensional Verification of LLM-generated Low-Code Workflows},
+  year = {2025},
+  url = {https://github.com/ahzm/veriflow}
+}
+```
