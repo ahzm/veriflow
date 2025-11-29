@@ -1,0 +1,239 @@
+W80_01
+Design a workflow that manages complex cross-channel retail promotions: define promotions, propagate to POS and e-commerce, monitor performance, and auto-adjust underperforming campaigns.
+
+W80_02
+Create a workflow that orchestrates multi-step manufacturing quality control: capture inspection data, run statistical checks, quarantine defective batches, and notify production leads.
+
+W80_03
+Build a workflow that manages multi-tenancy configuration for a SaaS app: propagate config changes, validate per-tenant overrides, and roll back on errors.
+
+W80_04
+Define a workflow that automates city parking policy enforcement: ingest sensor data, detect violations, issue notices, and track appeals.
+
+W80_05
+Construct a workflow that coordinates advanced analytics experiments: schedule experiments, version datasets, log configurations, and publish results.
+
+W80_06
+Design a workflow that manages multi-stage content recommendation evaluation: run A/B tests, collect metrics, compute lift, and roll out winners.
+
+W80_07
+Create a workflow that orchestrates pharmaceutical supply chain cold-chain monitoring: track temperatures, detect excursions, and trigger remediation.
+
+W80_08
+Build a workflow that manages multi-step customs clearance: collect documents, validate, interact with customs APIs, and notify stakeholders.
+
+W80_09
+Define a workflow that automates airline schedule optimization data flows: integrate demand forecasts, slot constraints, and publish schedules.
+
+W80_10
+Construct a workflow that coordinates cross-bank open banking payments: initiate, confirm, reconcile, and handle failures.
+
+W80_11
+Design a workflow that manages higher-education accreditation evidence: collect documents, map to standards, and generate submission packages.
+
+W80_12
+Create a workflow that orchestrates complex 3D printing orders: validate models, price jobs, queue prints, and notify customers.
+
+W80_13
+Build a workflow that manages NGO monitoring and evaluation frameworks: collect indicators, validate, aggregate, and report.
+
+W80_14
+Define a workflow that automates fleet maintenance scheduling: integrate telematics, schedule services, and track completion.
+
+W80_15
+Construct a workflow that coordinates cyber incident tabletop exercises: plan scenarios, send injects, collect responses, and generate reports.
+
+W80_16
+Design a workflow that manages multi-channel banking alerts: detect events, deduplicate, prioritize, and send via preferred channels.
+
+W80_17
+Create a workflow that orchestrates museum exhibition rotations: track objects, conditions, loans, and shipping.
+
+W80_18
+Build a workflow that manages complex inter-library loan requests: route, track, and notify patrons.
+
+W80_19
+Define a workflow that automates grid-scale battery dispatch optimization: pull price signals, run optimization, and send setpoints.
+
+W80_20
+Construct a workflow that coordinates cross-border copyright licensing: track rights, expirations, and usage.
+
+W80_21
+Design a workflow that manages sports league scheduling: generate fixtures, handle constraints, update calendars, and notify teams.
+
+W80_22
+Create a workflow that orchestrates media campaign trafficking: ingest briefs, build placements, push to ad platforms, and reconcile delivery.
+
+W80_23
+Build a workflow that manages university exam timetabling: avoid conflicts, allocate rooms, and publish schedules.
+
+W80_24
+Define a workflow that automates citizen permit applications: intake, validate, route for approvals, and issue permits.
+
+W80_25
+Construct a workflow that coordinates vehicle recall campaigns: identify owners, send notices, schedule repairs, and track completion.
+
+W80_26
+Design a workflow that manages cross-platform news publishing: curate stories, localize content, and publish to multiple apps and sites.
+
+W80_27
+Create a workflow that orchestrates drone delivery logistics: plan routes, schedule flights, track deliveries, and notify customers.
+
+W80_28
+Build a workflow that manages scientific instrument time allocation: handle proposals, peer review, schedule runs, and log results.
+
+W80_29
+Define a workflow that automates complex option trading back-office operations: match trades, compute margins, and reconcile books.
+
+W80_30
+Construct a workflow that coordinates climate adaptation project tracking: manage projects, milestones, and impact indicators.
+
+W80_31
+Design a workflow that manages digital identity verification across channels: documents, biometrics, and risk scoring.
+
+W80_32
+Create a workflow that orchestrates freight forwarding operations: bookings, customs, tracking, and delivery confirmations.
+
+W80_33
+Build a workflow that manages energy community billing: meter aggregation, allocation, invoicing, and reporting.
+
+W80_34
+Define a workflow that automates higher-education curriculum change approvals: proposals, committee reviews, and catalog updates.
+
+W80_35
+Construct a workflow that coordinates city emergency response drills: plan, execute, collect feedback, and report.
+
+W80_36
+Design a workflow that manages complex insurance reinsurance cessions: allocate risks, compute premiums, and report.
+
+W80_37
+Create a workflow that orchestrates transnational clinical registry updates: collect, validate, harmonize, and publish datasets.
+
+W80_38
+Build a workflow that manages cross-media rights for sports events: track territories, platforms, and sublicenses.
+
+W80_39
+Define a workflow that automates outbound call center campaigns: segment contacts, schedule calls, log outcomes, and adjust scripts.
+
+W80_40
+Construct a workflow that coordinates maritime port operations: berthing schedules, cargo handling, and customs.
+
+W80_41
+Design a workflow that manages complex tax audit case management: case intake, evidence collection, and decisions.
+
+W80_42
+Create a workflow that orchestrates architecture review boards: intake proposals, schedule reviews, collect decisions, and document patterns.
+
+W80_43
+Build a workflow that manages cross-institution research ethics approvals: submissions, reviews, amendments, and renewals.
+
+W80_44
+Define a workflow that automates NGO grant portfolio risk monitoring: indicators, early warnings, and alerts.
+
+W80_45
+Construct a workflow that coordinates airline interline settlement reconciliation: match coupons, detect mismatches, and resolve.
+
+W80_46
+Design a workflow that manages large corporate training programs: enrollments, attendance tracking, assessments, and certificates.
+
+W80_47
+Create a workflow that orchestrates real-time fraud case investigations: alerts, enrichment, tasking, and outcomes.
+
+W80_48
+Build a workflow that manages smart city lighting optimization: sensor data, dimming schedules, and maintenance.
+
+W80_49
+Define a workflow that automates complex logistics claims: claim intake, documentation, validation, and settlement.
+
+W80_50
+Construct a workflow that coordinates open data portal publishing: dataset submissions, QA, metadata, and releases.
+
+W80_51
+Design a workflow that manages multi-hospital bed capacity coordination: real-time census, transfer suggestions, and alerts.
+
+W80_52
+Create a workflow that orchestrates airport stand allocation: flight schedules, constraints, and assignments.
+
+W80_53
+Build a workflow that manages global brand asset approvals: asset submissions, regional reviews, and final approvals.
+
+W80_54
+Define a workflow that automates financial regulatory reporting: data aggregation, validation, and multi-regulator submissions.
+
+W80_55
+Construct a workflow that coordinates crowd-sourced mapping updates: validate edits, merge, and publish tiles.
+
+W80_56
+Design a workflow that manages inter-university student exchanges: applications, approvals, and credit transfers.
+
+W80_57
+Create a workflow that orchestrates telecommunication network capacity planning: demand forecasts, plans, and approvals.
+
+W80_58
+Build a workflow that manages patent annuity payments: track deadlines, compute fees, and execute payments.
+
+W80_59
+Define a workflow that automates multi-step loan restructuring: proposals, simulations, approvals, and contract updates.
+
+W80_60
+Construct a workflow that coordinates airline route profitability analysis: collect data, compute route KPIs, and propose changes.
+
+W80_61
+Design a workflow that manages cross-chain blockchain bridge operations: monitor transfers, reconcile states, and alert on anomalies.
+
+W80_62
+Create a workflow that orchestrates pharmaceutical clinical supply management: forecast, package, ship, and reconcile.
+
+W80_63
+Build a workflow that manages national standardized testing logistics: exam production, distribution, and scoring.
+
+W80_64
+Define a workflow that automates satellite imaging tasking: requests, prioritization, scheduling, and delivery.
+
+W80_65
+Construct a workflow that coordinates disaster early-warning message dissemination: multi-channel alerts and confirmations.
+
+W80_66
+Design a workflow that manages smart grid demand response events: trigger events, notify participants, and settle incentives.
+
+W80_67
+Create a workflow that orchestrates complex B2B onboarding in fintech: KYC, KYB, risk scoring, and account setup.
+
+W80_68
+Build a workflow that manages higher-education alumni mentoring programs: match mentors and mentees, schedule sessions, and track outcomes.
+
+W80_69
+Define a workflow that automates intermodal transport tracking: link sea, rail, and road segments, and provide unified tracking.
+
+W80_70
+Construct a workflow that coordinates global product recall intelligence: monitor regulators, detect relevant recalls, and notify teams.
+
+W80_71
+Design a workflow that manages cross-agency social benefit cases: share data, coordinate decisions, and prevent duplication.
+
+W80_72
+Create a workflow that orchestrates museum collection digitization across institutions: prioritize, scan, and publish.
+
+W80_73
+Build a workflow that manages ESG supplier assessments: collect questionnaires, compute scores, and manage remediation.
+
+W80_74
+Define a workflow that automates media royalties allocations: usage data, split calculations, and payouts.
+
+W80_75
+Construct a workflow that coordinates academic journal special issue management: proposals, submissions, reviews, and publication.
+
+W80_76
+Design a workflow that manages satellite ground station scheduling: pass windows, conflicts, and rebookings.
+
+W80_77
+Create a workflow that orchestrates multi-utility billing consolidation: electricity, water, gas, and internet services.
+
+W80_78
+Build a workflow that manages humanitarian cash transfer programs: eligibility, payments, and reconciliation.
+
+W80_79
+Define a workflow that automates complex trade surveillance: detect suspicious patterns across instruments and venues.
+
+W80_80
+Construct a workflow that coordinates cross-border health surveillance reporting: ingest case data, validate, aggregate, and report.
