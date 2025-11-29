@@ -1,0 +1,149 @@
+W50_01
+Trigger every day at 9am, fetch the latest EUR/USD rate, and email it.
+
+W50_02
+Webhook receives new user data; send welcome email and log event.
+
+W50_03
+Fetch humidity hourly; if > 85, send Slack alert.
+
+W50_04
+Each Friday at 18:00 fetch weekly GitHub trends and email.
+
+W50_05
+Webhook order data; if amount < 20, Slack warning; else email confirmation.
+
+W50_06
+At 7am daily fetch AI news and email three headlines.
+
+W50_07
+Webhook temperature; if > 30C send Slack heat alert.
+
+W50_08
+Every 2 hours check uptime API; if “down”, email admin.
+
+W50_09
+Webhook form submission; email the user data.
+
+W50_10
+Check BTC hourly; if below $55k send Slack alert.
+
+W50_11
+Fetch PM2.5 daily at 8am; if > 90 send health advisory email.
+
+W50_12
+Webhook submission; email and HTTP-log content.
+
+W50_13
+Hourly CO2 check; if > 800ppm notify Slack.
+
+W50_14
+Webhook errorCode; forward to Slack.
+
+W50_15
+Backup API JSON nightly and email link.
+
+W50_16
+Check rainfall probability; if > 70, email warning.
+
+W50_17
+Webhook GitHub issue; send title to Slack.
+
+W50_18
+Daily at 06:30, email three motivational quotes.
+
+W50_19
+Webhook “stockSymbol”; fetch price and email.
+
+W50_20
+Fetch earthquake alerts every 4 hours and email.
+
+W50_21
+Webhook customer message; auto-reply email and log to HTTP.
+
+W50_22
+Morning pollen level API; if high notify Slack.
+
+W50_23
+Weekly weather summary Monday 8am email.
+
+W50_24
+Webhook sales; if total > 1000 Slack celebration.
+
+W50_25
+Daily at 21:00 email crypto market summary.
+
+W50_26
+Ping uptime API every 45 minutes; latency alert Slack.
+
+W50_27
+Webhook “city”; get weather and email.
+
+W50_28
+AQI hourly; if < 40 Slack “good air” message.
+
+W50_29
+Webhook feedback; send thank-you email.
+
+W50_30
+Fetch sunrise/sunset at sunrise; email summary.
+
+W50_31
+At 10am check stock gainers and email top 5.
+
+W50_32
+Webhook IoT sensor; if battery < 20% Slack alert.
+
+W50_33
+Daily COVID stats; email new cases count.
+
+W50_34
+Webhook “url”; check uptime and email status.
+
+W50_35
+Every 2 hours fetch air pressure; if low Slack storm alert.
+
+W50_36
+Every Sunday fetch weekly exchange rate summary and email.
+
+W50_37
+Webhook new signup; email onboarding checklist.
+
+W50_38
+Hourly fetch ETH gas fee; if < 20gwei Slack notify.
+
+W50_39
+At 19:00 fetch movie recommendations and email.
+
+W50_40
+Webhook employee timesheet; forward to HR email.
+
+W50_41
+Every 3 hours fetch NASA APOD and email title + URL.
+
+W50_42
+Webhook project update; send Slack summary.
+
+W50_43
+At midnight call backup API and email result.
+
+W50_44
+Every morning fetch random poem and email.
+
+W50_45
+Webhook contains “productId”; fetch price and email.
+
+W50_46
+Every hour check weather alerts; if storm warning email me.
+
+W50_47
+Webhook new ticket; notify Slack with ticket priority.
+
+W50_48
+Daily at 14:00 get trending research papers and email me.
+
+W50_49
+Webhook survey response; thank user by email.
+
+W50_50
+Every 6 hours fetch wildfire alerts and notify Slack.

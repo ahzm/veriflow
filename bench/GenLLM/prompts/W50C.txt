@@ -1,0 +1,149 @@
+W50_01
+Design a workflow that consolidates HR data from multiple regional systems, harmonizes employee records, detects inconsistencies, updates a global HR database, and sends region-specific discrepancy reports to HR managers.
+
+W50_02
+Create a workflow that manages complex loan applications: intake forms, perform credit checks via API, calculate risk scores, route high-risk applications to manual review, auto-approve low-risk ones, and notify applicants with personalized decisions.
+
+W50_03
+Build a workflow that coordinates a bug triage process: pull new issues from GitHub, categorize them using an NLP classifier API, assign owners based on components, enforce SLAs with reminders, and summarize weekly triage outcomes to engineering leads.
+
+W50_04
+Define a workflow that orchestrates student enrollment: receive applications, validate prerequisites against academic records, assign advisors, create accounts in LMS and identity systems, send onboarding materials, and track enrollment funnel metrics.
+
+W50_05
+Construct a workflow that manages energy usage optimization: ingest smart meter readings, compute time-of-use costs, detect unusual consumption patterns, send recommendations via email, and update a dashboard with building-level KPIs.
+
+W50_06
+Design a workflow that orchestrates a complex partner referral program: track referrals from multiple sources, validate eligibility, compute tiered rewards, trigger payouts via payment API, and send partners detailed monthly statements.
+
+W50_07
+Create a workflow that automates legal hold notifications: when a legal case is opened, identify relevant custodians, send hold notices via email, track acknowledgements, suspend data deletion policies, and generate compliance reports.
+
+W50_08
+Build a workflow that manages multi-stage marketing funnels: capture leads, enrich them via firmographic APIs, assign nurture journeys, track engagement events, dynamically adapt journeys, and send performance summaries to marketing operations.
+
+W50_09
+Define a workflow that orchestrates procurement approvals: receive purchase requests, validate budget availability from finance API, route multi-level approvals based on amount, generate POs in ERP, and log all steps for audit.
+
+W50_10
+Construct a workflow that coordinates multi-cloud backup verification: schedule backups, fetch backup statuses from different providers, run periodic restore tests on samples, record results, and alert infrastructure teams on failed tests.
+
+W50_11
+Design a workflow that manages customer health scoring: integrate product usage, support tickets, and billing data, compute composite health scores, classify customers into tiers, notify success managers, and trigger playbooks for at-risk accounts.
+
+W50_12
+Create a workflow that automates publication of research datasets: validate metadata, anonymize sensitive fields, generate DOIs via an external service, upload datasets to a repository, and send confirmation emails to authors.
+
+W50_13
+Build a workflow that coordinates data retention policies: periodically scan storage locations, identify data past retention thresholds, request approvals for deletion where needed, perform deletions, and log detailed retention reports.
+
+W50_14
+Define a workflow that orchestrates urban mobility analytics: ingest public transport feeds, combine with city sensor data, compute congestion indicators, publish open data via API, and notify city planners when thresholds are breached.
+
+W50_15
+Construct a workflow that manages content syndication: pull approved articles from a CMS, transform formats for multiple partner platforms, push updates via APIs, monitor publishing status, and reconcile views and click metrics.
+
+W50_16
+Design a workflow that automates security vulnerability handling: ingest scanner reports, deduplicate findings, map vulnerabilities to asset owners, open tickets with severity-based SLAs, and send periodic progress reports to security management.
+
+W50_17
+Create a workflow that coordinates scholarship application processing: intake applications, verify supporting documents, compute eligibility scores, route to reviewers, aggregate decisions, and notify applicants while updating a funding dashboard.
+
+W50_18
+Build a workflow that manages IoT fleet firmware updates: segment devices by model and region, schedule phased rollout, track update success rates via telemetry, automatically pause rollouts on failure spikes, and report outcomes.
+
+W50_19
+Define a workflow that orchestrates lab sample logistics: receive sample submissions, print barcodes, track movements across stations, update LIMS via API, and alert technicians about delayed samples relative to target timelines.
+
+W50_20
+Construct a workflow that automates employee offboarding: triggered by HR events, revoke access across multiple systems, archive mailboxes, transfer ownership of resources, notify managers, and generate an offboarding completion report.
+
+W50_21
+Design a workflow that coordinates multi-channel debt collection: identify overdue invoices, segment customers by risk, send sequence of reminders via email and SMS, escalate to phone agents, and update collection status in ERP.
+
+W50_22
+Create a workflow that manages cross-border tax calculations: ingest orders, detect jurisdictions, compute tax using a tax API, reconcile differences with accounting, and generate jurisdiction-specific tax reports.
+
+W50_23
+Build a workflow that orchestrates employee performance reviews: notify reviewers, collect feedback forms, consolidate scores, generate summaries per employee, and store results in HR systems with appropriate access controls.
+
+W50_24
+Define a workflow that supports citizen service requests: intake via multiple channels, categorize topics, route to responsible departments, track status updates, and send citizens progress notifications until closure.
+
+W50_25
+Construct a workflow that manages donation campaigns: integrate donation events from multiple payment providers, issue receipts, assign donors to campaigns, compute campaign KPIs, and send dashboards to organizers.
+
+W50_26
+Design a workflow that automates cross-system data reconciliation: compare nightly exports from two CRMs, detect mismatches, attempt auto-fix based on rules, escalate unresolved items, and log reconciliation statistics.
+
+W50_27
+Create a workflow that orchestrates design review cycles: capture design submissions from a repo, notify reviewers, track comments and approvals, enforce deadlines, and update a design status board.
+
+W50_28
+Build a workflow that manages subscription feature entitlements: map SKUs to entitlements, listen to subscription changes, update entitlements in a feature flag service, and notify customers of new feature access.
+
+W50_29
+Define a workflow that performs ESG reporting: ingest emissions and energy data, normalize units, compute standard ESG metrics, generate regulator-compliant reports, and send them to stakeholders.
+
+W50_30
+Construct a workflow that automates multi-stage customer onboarding for a bank: perform KYC checks, verify documents, create accounts, set initial limits, schedule welcome calls, and track drop-off reasons.
+
+W50_31
+Design a workflow that coordinates complex returns management: accept return requests, validate policy eligibility, generate shipping labels, inspect returned items status from warehouse API, issue refunds or rejections, and log reasons.
+
+W50_32
+Create a workflow that manages referral hiring: track referrals, verify candidate stages, grant bonuses upon successful hires, notify referrers, and produce quarterly referral performance reports.
+
+W50_33
+Build a workflow that orchestrates cross-team release notes: collect changes from multiple repos, group them by feature area, generate human-readable notes, send drafts to product owners, and publish approved notes.
+
+W50_34
+Define a workflow that automates subscription usage alerts: monitor usage metrics, detect nearing quota thresholds, send warning emails, offer upgrades, and notify account managers of heavy users.
+
+W50_35
+Construct a workflow that coordinates grant reporting deadlines: track grant milestones, remind researchers and administrators, collect progress updates, and compile a consolidated report for funders.
+
+W50_36
+Design a workflow that manages multi-tenant SaaS configuration drift: periodically snapshot tenant configs, detect drifts from baseline, propose remediation steps, and notify operations.
+
+W50_37
+Create a workflow that orchestrates digital signage content: schedule content per location, deploy via API to players, monitor playback status, and provide daily proof-of-play reports.
+
+W50_38
+Build a workflow that manages B2B contract renewals: track contract end dates, calculate renewal options, notify account managers with recommended actions, and update CRM stages based on outcomes.
+
+W50_39
+Define a workflow that automates alumni engagement: segment alumni, trigger tailored communications around events and giving campaigns, track responses, and update engagement scores.
+
+W50_40
+Construct a workflow that coordinates scientific experiment pipelines: schedule experiments, collect sensor data, run analysis jobs via HTTP APIs, store results, and notify researchers with visual summaries.
+
+W50_41
+Design a workflow that manages multi-step insurance claims: collect claim data, validate coverage, estimate damage using an external API, request additional documents, and decide payouts or denials.
+
+W50_42
+Create a workflow that orchestrates multi-region content takedown requests: receive legal notices, identify all affected platforms, remove content via APIs, log actions, and send confirmations to requesters.
+
+W50_43
+Build a workflow that manages code-of-conduct violation reports: intake confidential reports, route to a small review committee, track investigation steps, and log anonymized statistics.
+
+W50_44
+Define a workflow that automates library acquisitions: collect purchase requests, check holdings and budgets, place orders with vendors, update catalog entries, and notify requesters of availability.
+
+W50_45
+Construct a workflow that coordinates hackathon project submissions: accept projects, check completeness, assign judges, collect scores, compute rankings, and publish results.
+
+W50_46
+Design a workflow that manages cross-channel outage communications: detect outages from monitoring, determine impacted customers, send status updates via email and SMS, update a status page, and send post-mortem summaries.
+
+W50_47
+Create a workflow that orchestrates media licensing: track licenses and expirations, notify content owners ahead of expiry, remove or update content, and generate compliance reports.
+
+W50_48
+Build a workflow that manages co-marketing campaigns with partners: coordinate asset approvals, share leads, track joint events, reconcile metrics, and send partners regular performance summaries.
+
+W50_49
+Define a workflow that automates travel booking approvals: reconcile trip requests, check policy constraints, route approvals, book flights and hotels via APIs once approved, and send itineraries.
+
+W50_50
+Construct a workflow that coordinates emergency notifications: receive crisis alerts, determine affected regions, send multi-channel alerts, track acknowledgements, and compile incident summaries for leadership.
