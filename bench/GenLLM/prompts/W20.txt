@@ -1,0 +1,59 @@
+W20_01
+Trigger every morning at 8am, fetch today’s weather from an API, and send me an email summarizing temperature and rain probability.
+
+W20_02
+When a webhook receives a JSON object with a customer email, send them a welcome message and log the payload via an HTTP Request.
+
+W20_03
+Check an API every hour for Bitcoin price, and if it exceeds $70,000, send a Slack alert with the new value.
+
+W20_04
+Fetch daily top news headlines from a public API at 7am and email me the three most relevant ones.
+
+W20_05
+When a webhook receives an order event, validate that the amount is above 50, and then send a confirmation email to the customer.
+
+W20_06
+Run every midnight, call an API to fetch server health metrics, and send a Slack alert if CPU usage is above 85%.
+
+W20_07
+Monitor a GitHub repository using a webhook, and when a new issue is created, email the issue title and URL.
+
+W20_08
+Every Monday morning, fetch currency exchange rates (EUR→USD, CNY→EUR), format them as text, and send them via email.
+
+W20_09
+On hourly schedule, check weather API for wind speed. If wind speed > 40 km/h, send a Slack storm warning.
+
+W20_10
+When receiving a webhook with a list of email addresses, iterate through them and send each person a short notification email.
+
+W20_11
+Every 30 minutes, call an API to get website uptime status. If the “status” field equals “down”, email the admin team.
+
+W20_12
+Fetch daily AQI (air quality index) at 6am. If AQI > 120, send a Slack message recommending mask usage.
+
+W20_13
+When a webhook receives a support ticket, extract “user”, “priority”, and “message”, and forward them to a Slack channel.
+
+W20_14
+Check a cryptocurrency API for Ethereum gas fees every hour; if base fee < 20 gwei, email me that it’s a good time to transact.
+
+W20_15
+At noon daily, fetch trending GitHub repositories and email me the top three with their descriptions.
+
+W20_16
+When receiving a webhook containing “temperature”, if temperature < 5°C, send a Slack message advising to turn on heating.
+
+W20_17
+Run every 6 hours, call an API for stock price of AAPL, and email me price, percentage change, and volume.
+
+W20_18
+When webhook receives a JSON with "deviceId" and “errorCode”, forward the error information to Slack for debugging.
+
+W20_19
+Every day at 20:00, fetch currency conversion rate USD→JPY and USD→EUR, and send them in a short email summary.
+
+W20_20
+On webhook trigger, receive customer form data, send a confirmation email, then call an HTTP endpoint to log the submission.

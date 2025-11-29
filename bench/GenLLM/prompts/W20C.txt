@@ -1,0 +1,59 @@
+W20_01
+Design an n8n workflow that monitors a shared mailbox for new support tickets, extracts ticket metadata, classifies urgency via an HTTP ML API, routes high-priority tickets to Slack, and creates corresponding issues in Jira with bidirectional status updates.
+
+W20_02
+Create a workflow that runs every hour, pulls sales data from a REST API, enriches it with currency rates from another API, aggregates KPIs per region, writes daily snapshots to a database, and emails a summary report only if anomalies are detected.
+
+W20_03
+Build a workflow that listens to a webhook with IoT sensor alerts, validates payload schemas, deduplicates alerts within a 10-minute window, stores them in a database, sends grouped notifications to Teams, and opens incidents in ServiceNow for critical devices.
+
+W20_04
+Define a workflow that starts from a scheduled trigger, queries a CRM for contacts with expiring subscriptions, generates personalized renewal offers with dynamic discounts, sends emails, logs responses to a Google Sheet, and retries failed sends with exponential backoff.
+
+W20_05
+Create a multi-branch workflow that receives GitHub webhook events, filters for pull-request events, runs static analysis via an HTTP API, posts comments back to GitHub, updates a Notion documentation page, and sends a summary digest to a Slack channel.
+
+W20_06
+Design a workflow that monitors an e-commerce order database for newly paid orders, checks inventory in an external ERP via REST, splits orders into multiple shipments when necessary, sends confirmation emails, and logs all decisions in an audit trail sheet.
+
+W20_07
+Build a workflow that consumes messages from an MQTT broker via webhook, normalizes the payloads, aggregates metrics per device over 5-minute tumbling windows, pushes metrics to a time-series database, and alerts via email when thresholds are exceeded.
+
+W20_08
+Construct a workflow that synchronizes contacts between HubSpot and Salesforce: detects changes in either system, resolves conflicts using recency rules, writes back updates to both platforms, and sends a weekly reconciliation report with discrepancies.
+
+W20_09
+Define a workflow that watches a shared drive for new CSV files, validates schema and size constraints, splits large files into chunks, uploads them to a data warehouse via API, archives originals, and sends status notifications with links to processed datasets.
+
+W20_10
+Create a workflow that orchestrates an approval process for budget requests: intake via webform webhook, validate mandatory fields, route to manager for approval by email, escalate to director after a timeout, and update a central tracking sheet with all decisions.
+
+W20_11
+Design a workflow that runs nightly, fetches error logs from multiple microservices via HTTP, parses and classifies errors, clusters similar ones, creates aggregated bug tickets in Jira, and posts a ranked list of top recurring issues to Slack.
+
+W20_12
+Build a workflow that listens to Stripe webhook events for subscription lifecycle changes, updates a billing database, sends tailored customer emails per event type, notifies the finance Slack channel, and updates MRR/ARR dashboards via an analytics API.
+
+W20_13
+Construct a workflow that periodically scrapes multiple RSS feeds, extracts article metadata, classifies topics using an external NLP API, stores results in a search index, and sends topic-specific email digests to different subscriber segments.
+
+W20_14
+Create a workflow that ingests employee timesheets submitted via webhook, validates project codes against an internal API, computes overtime and missing entries, updates a payroll spreadsheet, and sends discrepancy alerts to HR and employees.
+
+W20_15
+Define a workflow that monitors Twitter mentions of a brand via API, filters by language and sentiment, creates tickets in a support system for negative mentions, posts summaries to Slack, and logs all interactions in a central database.
+
+W20_16
+Design a workflow that orchestrates onboarding of new customers: triggered by a CRM event, creates accounts in three SaaS tools via APIs, sends a welcome email sequence, schedules a follow-up meeting, and logs each onboarding step with success or failure status.
+
+W20_17
+Build a workflow that receives product feedback from multiple channels (webhook, email parsing), normalizes and tags feedback with an NLP API, pushes structured items into a backlog tool, and sends weekly summaries with trend graphs via email.
+
+W20_18
+Create a workflow that manages data privacy requests: intake via form webhook, validates identity using an external verification API, retrieves data from multiple systems, compiles a downloadable archive link, and tracks deadlines and completion in a compliance log.
+
+W20_19
+Define a workflow that watches a CI/CD system for failed builds, fetches build logs from an HTTP API, extracts root-cause hints, posts detailed summaries to a chat channel, creates or updates issues in Git, and reminds assignees if not resolved within 48 hours.
+
+W20_20
+Construct a workflow that coordinates marketing campaigns: triggered by a planned schedule, segments users based on attributes from a data warehouse, personalizes email content, triggers follow-up SMS for non-openers, and writes performance metrics back to analytics.

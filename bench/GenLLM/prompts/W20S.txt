@@ -1,0 +1,59 @@
+W20_01
+Design an n8n workflow that monitors a shared "operations@company.com" inbox, classifies incoming emails into incident types (outage, performance degradation, security alert, general request) using a simple rules-based approach, creates or updates a ticket in a mock ITSM system via HTTP API, notifies the on-call Slack channel, and escalates to a manager if the ticket has been open longer than 4 hours.
+
+W20_02
+Create an n8n workflow that runs every morning at 07:00, fetches yesterday's sales data from a mock REST API, aggregates totals per region and per product category, compares the results against target thresholds stored in a configuration node, generates a plain-text summary report, and sends it by email to both the sales director and regional managers.
+
+W20_03
+Build a workflow that listens to a webhook for new user sign-ups, checks whether the domain of the email address belongs to a list of high-value companies, enriches the user profile via a mock "company lookup" API, stores the combined data into a database-like node, triggers a Slack notification to the sales team channel, and sends a personalized welcome email including a discount code computed from simple rules.
+
+W20_04
+Design an n8n workflow for content publishing: given a trigger when a new blog post is added via HTTP request, fetch the full article metadata and body, generate a short teaser for social media, schedule posts to a mock Twitter and LinkedIn endpoint, upload images to a mock CDN HTTP API, and send an approval email to the marketing team before actually publishing.
+
+W20_05
+Create a data quality monitoring workflow that runs every hour, calls three different REST endpoints to retrieve metrics from microservices A, B, and C, checks for missing or inconsistent fields across services, logs anomalies into a "data_issues" collection, sends a Slack alert when the anomaly count exceeds a threshold, and writes a summarized daily report at midnight.
+
+W20_06
+Define an n8n workflow that periodically (every 10 minutes) polls a mock order management API, identifies all new orders with status "PENDING_PAYMENT", sends a payment reminder email to the customer, updates the order status to "REMINDER_SENT" via another API call, and creates a consolidated CSV export of all reminders sent during the day.
+
+W20_07
+Construct a workflow that, upon receiving a webhook from a Git hosting service about a merged pull request, fetches repository metadata, looks up the author and reviewers in an internal directory API, posts a formatted summary to a Slack channel, increments a "developer score" counter in a mock database node, and sends a weekly digest email to engineering management summarizing all merged PRs.
+
+W20_08
+Design a workflow for subscription renewal management: every day at 08:00, query a mock billing API for subscriptions expiring in the next 7 days, generate individualized renewal reminder emails with dynamic pricing, update a CRM-like HTTP service to log the contact attempt, and notify the account owner via Slack if a "high-value" customer is found.
+
+W20_09
+Create an n8n workflow that responds to an HTTP webhook when a CSV file of leads is uploaded. It should parse the CSV content, validate mandatory fields (name, email, company), enrich each lead via a "lead scoring" HTTP API, filter out leads with scores below a threshold, store the remaining ones in a table-like node, and send a Slack message summarizing how many leads were accepted vs rejected.
+
+W20_10
+Build a monitoring workflow that tracks a mock uptime API for three critical services every 5 minutes, computes rolling uptime over the last 24 hours, raises an incident via HTTP POST if uptime for any service drops below 99.5%, sends a notification email to the SRE mailing list, and posts a structured incident message to a Slack channel.
+
+W20_11
+Define an n8n workflow to orchestrate a simple ETL: on a schedule, fetch raw product data from an HTTP API, transform prices to a standard currency, normalize category labels, detect and flag missing critical attributes, write clean data into a mock "data_warehouse" API, and send a processing summary (counts, error rows) by email.
+
+W20_12
+Create a workflow that reacts to new support tickets created via webhook, categorizes tickets based on keywords in the subject and body, assigns priority levels, posts high-priority tickets to a "support-escalation" Slack channel, calls a mock "knowledge base search" API to retrieve three suggested articles, and sends an email to the user with links to those articles.
+
+W20_13
+Design an n8n workflow to handle a simple recruitment pipeline: whenever a candidate submits an application via HTTP, store the candidate info, send an acknowledgement email, evaluate the CV using a mock "screening score" API, route strong candidates to a "screening_passed" list, send a Slack notification to recruiters, and schedule a follow-up email if there is no response after 3 days.
+
+W20_14
+Construct a workflow that manages internal maintenance requests: a webhook receives a JSON payload describing an issue (location, category, urgency), the workflow assigns it to a mock "facility team" API, updates a tracking table, sends a Slack notification to the team, waits for a simulated "completed" callback via another webhook, and then emails the requester with a completion summary.
+
+W20_15
+Build a workflow that periodically checks a mock "license usage" API, compares current usage to licensed limits, calculates remaining quota per department, writes an aggregated report to a database-like node, and emails department heads when usage exceeds 80% of their quota.
+
+W20_16
+Create an n8n workflow that runs every night, fetches all "open invoices" from a billing API, identifies invoices overdue by more than 7 days, sends a polite reminder email, logs the reminder event via another HTTP endpoint, calculates the total overdue amount per customer, and sends a daily summary to the finance team.
+
+W20_17
+Define a workflow that coordinates a newsletter campaign: on manual trigger, read a set of subscriber segments from a configuration node, fetch the latest blog posts and product updates from two different HTTP APIs, assemble customized newsletter content per segment, send emails in batches, and log delivery results into a tracking table.
+
+W20_18
+Design an n8n workflow that monitors a mock "project management" API for tasks with status "BLOCKED", retrieves their details and owners, posts a consolidated "blocked tasks" report to a Slack channel every morning, sends individual reminder emails to task owners, and writes a log entry for each notification into a database-like node.
+
+W20_19
+Create a workflow that listens to a webhook for new IoT sensor alerts, validates the payload, groups alerts by device ID and severity, stores them into a "sensor_events" collection, raises a critical incident via HTTP API for severe alerts, and sends both Slack and email notifications summarizing the incident.
+
+W20_20
+Build an n8n workflow that orchestrates a simple customer feedback loop: when a purchase event is received via webhook, wait 3 days, send a feedback survey email, log responses arriving via another webhook into a database-like node, compute a daily Net Promoter Score, and post the results to a Slack channel along with a short textual summary.
