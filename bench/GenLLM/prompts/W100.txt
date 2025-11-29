@@ -1,0 +1,299 @@
+W100_01
+Daily FX rate email.
+
+W100_02
+Signup webhook -> welcome email.
+
+W100_03
+Humidity Slack alert.
+
+W100_04
+Weekly GitHub email.
+
+W100_05
+Order <20 Slack.
+
+W100_06
+AI news email.
+
+W100_07
+Temp >30 Slack.
+
+W100_08
+Uptime email.
+
+W100_09
+Form email.
+
+W100_10
+BTC Slack.
+
+W100_11
+PM2.5 email.
+
+W100_12
+Submission email.
+
+W100_13
+CO2 Slack.
+
+W100_14
+Error Slack.
+
+W100_15
+Backup email.
+
+W100_16
+Rain email.
+
+W100_17
+Issue Slack.
+
+W100_18
+Quotes email.
+
+W100_19
+Stock email.
+
+W100_20
+Earthquake email.
+
+W100_21
+Customer email.
+
+W100_22
+Pollen Slack.
+
+W100_23
+Weather email.
+
+W100_24
+Sales Slack.
+
+W100_25
+Crypto email.
+
+W100_26
+Latency Slack.
+
+W100_27
+City weather email.
+
+W100_28
+Good AQI Slack.
+
+W100_29
+Feedback email.
+
+W100_30
+Sunrise email.
+
+W100_31
+Stock gainers.
+
+W100_32
+IoT battery low Slack.
+
+W100_33
+COVID email.
+
+W100_34
+URL uptime.
+
+W100_35
+Air pressure Slack.
+
+W100_36
+Exchange email.
+
+W100_37
+Onboarding email.
+
+W100_38
+Gas fee Slack.
+
+W100_39
+Movies email.
+
+W100_40
+Timesheet email.
+
+W100_41
+NASA APOD email.
+
+W100_42
+Project Slack.
+
+W100_43
+Backup API email.
+
+W100_44
+Poetry email.
+
+W100_45
+Price check email.
+
+W100_46
+Storm warning email.
+
+W100_47
+Ticket Slack.
+
+W100_48
+Research email.
+
+W100_49
+Survey thank-you email.
+
+W100_50
+Wildfire Slack.
+
+W100_51
+Reddit posts.
+
+W100_52
+Invoice email.
+
+W100_53
+Solar radiation Slack.
+
+W100_54
+Geo lookup email.
+
+W100_55
+Coding challenge.
+
+W100_56
+Device Slack.
+
+W100_57
+Hazardous AQI email.
+
+W100_58
+Funny image.
+
+W100_59
+Search results.
+
+W100_60
+Aviation weather.
+
+W100_61
+Webhook userId -> profile email.
+
+W100_62
+Daily sunrise image.
+
+W100_63
+errorLevel critical -> Slack.
+
+W100_64
+Water quality email.
+
+W100_65
+Product compare email.
+
+W100_66
+Horoscope email.
+
+W100_67
+Sentiment Slack.
+
+W100_68
+Energy usage email.
+
+W100_69
+Earthquake >4 Slack.
+
+W100_70
+Shipping quote email.
+
+W100_71
+Volcano alerts email.
+
+W100_72
+Reverse geocode email.
+
+W100_73
+Cybersecurity news email.
+
+W100_74
+Attendance email.
+
+W100_75
+Crypto fear-index email.
+
+W100_76
+Audio metadata email.
+
+W100_77
+Science articles email.
+
+W100_78
+Repo stats Slack.
+
+W100_79
+Solar flare email.
+
+W100_80
+RFID event email.
+
+W100_81
+Webhook “phoneNumber” -> validate -> email.
+
+W100_82
+Daily fitness tip email.
+
+W100_83
+Webhook lead -> notify Slack.
+
+W100_84
+Hourly river water level email.
+
+W100_85
+Webhook product review -> sentiment -> email.
+
+W100_86
+Daily random vocabulary email.
+
+W100_87
+Webhook config change -> Slack alert.
+
+W100_88
+Weekly task summary email.
+
+W100_89
+Webhook contacts -> email summary.
+
+W100_90
+Hourly earthquake intensity email.
+
+W100_91
+Webhook failed login -> Slack.
+
+W100_92
+Daily solar energy forecast email.
+
+W100_93
+Webhook transaction -> risk scoring -> email.
+
+W100_94
+Trending videos daily email.
+
+W100_95
+Webhook car telemetry -> Slack.
+
+W100_96
+Ocean tide forecast email.
+
+W100_97
+Webhook visitor entry -> email.
+
+W100_98
+Pressure sensor abnormal -> Slack.
+
+W100_99
+Daily space weather email.
+
+W100_100
+Webhook task completion -> confirmation email.

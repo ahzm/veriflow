@@ -1,0 +1,299 @@
+W100_01
+Design a workflow that manages comprehensive enterprise architecture inventory updates: ingest system metadata, map dependencies, detect changes, and notify architects.
+
+W100_02
+Create a workflow that orchestrates pan-university course equivalency evaluations: collect proposals, route to committees, record decisions, and update catalogs.
+
+W100_03
+Build a workflow that manages cross-network telemedicine routing: match patients to providers based on specialty, language, and availability.
+
+W100_04
+Define a workflow that automates financial crime case management: link transactions, entities, and alerts into cases, and track investigations.
+
+W100_05
+Construct a workflow that coordinates international student visa document flows: collect documents, validate, and track statuses.
+
+W100_06
+Design a workflow that manages global HR succession planning: track roles, candidates, readiness, and development plans.
+
+W100_07
+Create a workflow that orchestrates smart building occupancy optimization: integrate sensors, bookings, and policies.
+
+W100_08
+Build a workflow that manages international public health campaign logistics: vaccine supply, outreach, and monitoring.
+
+W100_09
+Define a workflow that automates cross-border VAT refund processing: intake receipts, validate, compute refunds, and pay out.
+
+W100_10
+Construct a workflow that coordinates transit fare capping across modes: track usage, compute caps, and adjust charges.
+
+W100_11
+Design a workflow that manages film festival submissions and scheduling: intake, review, selection, and program building.
+
+W100_12
+Create a workflow that orchestrates multi-country payroll harmonization projects: map local processes, monitor changes, and track milestones.
+
+W100_13
+Build a workflow that manages global cybersecurity threat intelligence ingestion: collect feeds, normalize, deduplicate, and share IOCs.
+
+W100_14
+Define a workflow that automates union contract implementation: map clauses to system changes and track completion.
+
+W100_15
+Construct a workflow that coordinates EV charging network operations: monitor stations, detect outages, and schedule repairs.
+
+W100_16
+Design a workflow that manages cross-agency emergency evacuation planning: model routes, capacities, and responsibilities.
+
+W100_17
+Create a workflow that orchestrates multi-country clinical guideline updates: collect evidence, review, and distribute changes.
+
+W100_18
+Build a workflow that manages large-scale public works tender evaluations: intake bids, score criteria, and document decisions.
+
+W100_19
+Define a workflow that automates complex B2B billing scenarios: tiered pricing, discounts, and adjustments.
+
+W100_20
+Construct a workflow that coordinates school district bus routing: optimize routes, assign students, and publish schedules.
+
+W100_21
+Design a workflow that manages national exam item bank lifecycle: authoring, review, calibration, and retirement.
+
+W100_22
+Create a workflow that orchestrates cross-border philanthropy projects: proposals, approvals, disbursements, and impact tracking.
+
+W100_23
+Build a workflow that manages complex derivative trade lifecycle events: confirmations, collateral, and lifecycle events.
+
+W100_24
+Define a workflow that automates hospital operating room block scheduling: allocate, monitor usage, and reassign.
+
+W100_25
+Construct a workflow that coordinates large-scale customer data migration: mapping, trial runs, cutover, and validation.
+
+W100_26
+Design a workflow that manages transnational environmental permit compliance: track permits, obligations, and reporting.
+
+W100_27
+Create a workflow that orchestrates city bike-share system balancing: predict demand, plan rebalancing, and track execution.
+
+W100_28
+Build a workflow that manages cross-channel airline ancillary sales: offers, purchases, fulfillment, and reporting.
+
+W100_29
+Define a workflow that automates complex litigation case docketing: filings, deadlines, and reminders.
+
+W100_30
+Construct a workflow that coordinates national vaccination registry updates: ingest records, deduplicate, and handle corrections.
+
+W100_31
+Design a workflow that manages multi-utility outage coordination: detect and coordinate responses across electricity, water, and telecom.
+
+W100_32
+Create a workflow that orchestrates global research funding call management: announce calls, manage submissions, and track awards.
+
+W100_33
+Build a workflow that manages cross-border pension portability: requests, verifications, and transfers.
+
+W100_34
+Define a workflow that automates large enterprise software license compliance: inventory, usage analysis, and remediation.
+
+W100_35
+Construct a workflow that coordinates air traffic flow management data sharing: constraints, plans, and updates.
+
+W100_36
+Design a workflow that manages cross-sector apprenticeship programs: placements, evaluations, and completions.
+
+W100_37
+Create a workflow that orchestrates complex citizen digital identity lifecycle: issuance, updates, and revocation.
+
+W100_38
+Build a workflow that manages global product taxonomy governance: proposals, approvals, and rollout.
+
+W100_39
+Define a workflow that automates complex insurance bordereaux processing: ingest, reconcile, and report.
+
+W100_40
+Construct a workflow that coordinates national research infrastructure access: proposals, allocations, and usage metrics.
+
+W100_41
+Design a workflow that manages high-frequency trading backtesting pipelines: data ingest, strategy runs, and performance archives.
+
+W100_42
+Create a workflow that orchestrates large-scale political debate fact-checking operations: ingest claims, assign checks, and publish verdicts.
+
+W100_43
+Build a workflow that manages international refugee case referrals: intake, triage, and placement.
+
+W100_44
+Define a workflow that automates national building code compliance checks for submitted plans: run rule checks and issue reports.
+
+W100_45
+Construct a workflow that coordinates cross-border open science mandates: track publications, datasets, and compliance.
+
+W100_46
+Design a workflow that manages international trade finance document flows: LCs, invoices, and transport documents.
+
+W100_47
+Create a workflow that orchestrates global marketing asset localization: requests, translations, QA, and publishing.
+
+W100_48
+Build a workflow that manages complex maritime environmental monitoring: ingest data, detect violations, and alert authorities.
+
+W100_49
+Define a workflow that automates complex airline loyalty partner accrual and redemption reconciliation.
+
+W100_50
+Construct a workflow that coordinates multi-party construction project change orders: proposals, approvals, and implementation.
+
+W100_51
+Design a workflow that manages national biodiversity reporting: species observations, validation, and report generation.
+
+W100_52
+Create a workflow that orchestrates cross-border student mobility analytics: collect flows, analyze, and publish insights.
+
+W100_53
+Build a workflow that manages complex land registry transactions: title searches, liens, and registration.
+
+W100_54
+Define a workflow that automates complex energy futures contract settlement: data aggregation, netting, and posting.
+
+W100_55
+Construct a workflow that coordinates metropolitan traffic signal optimization: sensor data, plans, and deployments.
+
+W100_56
+Design a workflow that manages open-access publishing charges: approvals, invoicing, and funder reporting.
+
+W100_57
+Create a workflow that orchestrates large corporate sustainability data collection: KPIs, validations, and disclosures.
+
+W100_58
+Build a workflow that manages cross-country telecom roaming agreement administration: rate changes, tests, and activation.
+
+W100_59
+Define a workflow that automates complex patent portfolio pruning: metrics, proposals, and decisions.
+
+W100_60
+Construct a workflow that coordinates national disaster relief funding allocation: requests, prioritization, and disbursement.
+
+W100_61
+Design a workflow that manages large-scale workforce skills assessment and upskilling plans: assessments, recommendations, and tracking.
+
+W100_62
+Create a workflow that orchestrates multi-country election observation missions: deployment, reporting, and findings.
+
+W100_63
+Build a workflow that manages complex insurance catastrophe modeling data flows: exposure, hazard, and loss.
+
+W100_64
+Define a workflow that automates cross-border securities settlement exceptions handling.
+
+W100_65
+Construct a workflow that coordinates cross-agency digital service standard compliance: assessments, action plans, and follow-ups.
+
+W100_66
+Design a workflow that manages global loyalty coalition programs: partners, earn/burn rules, and reconciliations.
+
+W100_67
+Create a workflow that orchestrates multinational academic ranking data submissions: collect indicators, validate, and submit.
+
+W100_68
+Build a workflow that manages nationwide utility customer assistance programs: eligibility, enrollments, and re-certifications.
+
+W100_69
+Define a workflow that automates complex trade credit insurance policy administration: limits, exposures, and claims.
+
+W100_70
+Construct a workflow that coordinates cross-border criminal record exchange requests for background checks.
+
+W100_71
+Design a workflow that manages national digital health interoperability testing: scenarios, results, and certification.
+
+W100_72
+Create a workflow that orchestrates climate finance project pipelines: proposals, due diligence, approvals, and monitoring.
+
+W100_73
+Build a workflow that manages large museum collection provenance research: sources, evidence, and decisions.
+
+W100_74
+Define a workflow that automates higher-education research impact reporting: outputs, citations, and case studies.
+
+W100_75
+Construct a workflow that coordinates complex energy interconnector operations: capacity allocations, nominations, and settlements.
+
+W100_76
+Design a workflow that manages national food safety incident reporting and follow-up inspections.
+
+W100_77
+Create a workflow that orchestrates cross-border digital services tax calculations: identify in-scope revenues and compute liabilities.
+
+W100_78
+Build a workflow that manages global cloud cost optimization: ingest bills, categorize, recommend savings, and track actions.
+
+W100_79
+Define a workflow that automates complex cross-product wealth management portfolio rebalancing.
+
+W100_80
+Construct a workflow that coordinates digital identity federation onboarding for new relying parties.
+
+W100_81
+Design a workflow that manages nationwide early childhood program enrollment and placement.
+
+W100_82
+Create a workflow that orchestrates large-scale open call innovation challenges: submissions, evaluations, and awards.
+
+W100_83
+Build a workflow that manages complex marine protected area zoning changes: proposals, consultations, and approvals.
+
+W100_84
+Define a workflow that automates cross-border e-invoicing compliance: formats, validations, and submissions.
+
+W100_85
+Construct a workflow that coordinates metropolitan heatwave response plans: triggers, actions, and communications.
+
+W100_86
+Design a workflow that manages large-scale student assessment modernization projects: pilots, rollouts, and evaluations.
+
+W100_87
+Create a workflow that orchestrates multi-country transport corridor performance monitoring.
+
+W100_88
+Build a workflow that manages national cybersecurity exercise programs: scenarios, participants, and findings.
+
+W100_89
+Define a workflow that automates complex commodity trade documentation flows: BLs, inspection, and finance.
+
+W100_90
+Construct a workflow that coordinates cross-border environmental impact assessment submissions and reviews.
+
+W100_91
+Design a workflow that manages national digital inclusion program metrics: device distribution, training, and impact.
+
+W100_92
+Create a workflow that orchestrates multinational peacekeeping logistics: deployments, supplies, and rotations.
+
+W100_93
+Build a workflow that manages global art loan programs: requests, approvals, insurance, and logistics.
+
+W100_94
+Define a workflow that automates cross-market media audience measurement data integration and reporting.
+
+W100_95
+Construct a workflow that coordinates national research integrity case handling: allegations, investigations, and outcomes.
+
+W100_96
+Design a workflow that manages complex integrated water resource management reporting across basins.
+
+W100_97
+Create a workflow that orchestrates global clinical data standardization for multi-sponsor consortia.
+
+W100_98
+Build a workflow that manages multinational digital trade agreement implementation tracking.
+
+W100_99
+Define a workflow that automates cross-border cybersecurity incident notification obligations.
+
+W100_100
+Construct a workflow that coordinates planetary-scale biodiversity observation data pipelines from multiple observation networks.
