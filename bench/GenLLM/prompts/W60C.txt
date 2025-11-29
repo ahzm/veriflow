@@ -1,0 +1,179 @@
+W60_01
+Design a workflow that coordinates cross-border e-commerce compliance: detect destination country, compute duties and taxes via API, check restricted items, update order totals, and notify customers with detailed breakdowns.
+
+W60_02
+Create a workflow that manages complex onboarding for healthcare providers: verify licenses, set up accounts in multiple clinical systems, configure access roles, and send training schedules.
+
+W60_03
+Build a workflow that orchestrates customer 360-view updates: integrate CRM, billing, product analytics, and support tickets, refresh a unified profile store, and notify downstream systems of changes.
+
+W60_04
+Define a workflow that runs nightly to re-balance warehouse inventory: evaluate historical demand, compute transfer suggestions, create transfer orders in WMS, and notify logistics teams.
+
+W60_05
+Construct a workflow that automates multi-stage editorial review: capture drafts, run plagiarism checks, route to editors, enforce style guide checks via NLP API, and schedule publication.
+
+W60_06
+Design a workflow that coordinates cross-lab reagent inventory: merge stock data, predict stockouts, propose redistribution between labs, and generate purchase orders.
+
+W60_07
+Create a workflow that manages complex tax residency checks: integrate multiple data sources, compute residency status, flag ambiguous cases, and create tasks for tax specialists.
+
+W60_08
+Build a workflow that orchestrates online course session scheduling: match instructor availability, student time zones, and room capacities, then create calendar events and notifications.
+
+W60_09
+Define a workflow that handles insurance underwriting: collect application data, call risk models via HTTP, request additional info for borderline cases, and issue quotes.
+
+W60_10
+Construct a workflow that coordinates multi-step safety inspections: schedule inspections, capture findings via webhook, route critical issues to engineering, and track remediation.
+
+W60_11
+Design a workflow that automates multilingual chatbot training: ingest FAQs, translate them, generate training pairs, push them to a chatbot platform, and evaluate performance.
+
+W60_12
+Create a workflow that manages climate data pipelines: fetch satellite data, run preprocessing, store in a geospatial database, and trigger downstream analysis jobs.
+
+W60_13
+Build a workflow that orchestrates university course allocation: collect student preferences, run allocation algorithm via HTTP, notify students, and update enrollment systems.
+
+W60_14
+Define a workflow that automates influencer campaign tracking: track influencer posts, fetch metrics from social APIs, compute payouts, and send summaries to marketing and finance.
+
+W60_15
+Construct a workflow that coordinates R&D idea intake: collect ideas, tag them with NLP, route to domain experts, track decisions, and generate quarterly innovation reports.
+
+W60_16
+Design a workflow that manages multi-currency payroll: pull time data, apply currency conversions, compute payroll, send summaries for approval, and push payments via bank API.
+
+W60_17
+Create a workflow that orchestrates multi-level customer escalations: detect high-severity tickets, notify managers, schedule review meetings, and track resolution times.
+
+W60_18
+Build a workflow that manages data catalog updates: when new datasets appear, profile them, suggest metadata fields, request owner confirmations, and publish to catalog.
+
+W60_19
+Define a workflow that automates construction project progress tracking: receive updates from site apps, compare against plan, flag delays, and notify stakeholders.
+
+W60_20
+Construct a workflow that manages cross-channel education outreach: plan campaigns, send emails and SMS, track sign-ups, and adjust targeting based on response rates.
+
+W60_21
+Design a workflow that coordinates lab equipment booking: avoid conflicts, enforce maintenance blackout windows, notify users of changes, and produce utilization reports.
+
+W60_22
+Create a workflow that orchestrates legal contract approvals with multiple departments: finance, security, and legal, each with their own SLA and conditional routing.
+
+W60_23
+Build a workflow that manages multi-brand product launches: synchronize content, update pricing, coordinate announcements, and capture launch KPIs across brands.
+
+W60_24
+Define a workflow that automates airline disruption handling: detect cancellations, rebook passengers, notify them, update PNRs, and track compensation.
+
+W60_25
+Construct a workflow that coordinates vaccine distribution logistics: track inventory, schedule deliveries, monitor temperature logs, and report to health authorities.
+
+W60_26
+Design a workflow that manages academic thesis submissions: collect drafts, check plagiarism, assign reviewers, manage revisions, and register final submissions.
+
+W60_27
+Create a workflow that orchestrates multi-stage AI model retraining: detect data drift, prepare training datasets, trigger training jobs, evaluate models, and deploy if criteria are met.
+
+W60_28
+Build a workflow that manages workplace safety incident reporting: intake incidents, categorize severity, notify relevant teams, track corrective actions, and produce monthly stats.
+
+W60_29
+Define a workflow that automates vendor risk assessments: retrieve questionnaires, score responses, trigger follow-ups, and produce risk heat maps.
+
+W60_30
+Construct a workflow that coordinates library digitalization: schedule scanning, OCR documents via API, validate outputs, and publish to the library system.
+
+W60_31
+Design a workflow that manages telemedicine appointments: sync patient bookings, send reminders, manage video links, and log consultation summaries.
+
+W60_32
+Create a workflow that orchestrates film production tasks: schedule shoots, track dependencies, update call sheets, and send daily summaries to crew.
+
+W60_33
+Build a workflow that manages student financial aid disbursement: calculate eligibility, coordinate approvals, schedule disbursements, and send notifications.
+
+W60_34
+Define a workflow that automates cross-system user provisioning for large enterprises: HR trigger, IAM system, SaaS tools, and periodic reconciliation.
+
+W60_35
+Construct a workflow that coordinates complex field service operations: dispatch technicians, optimize routes, sync job statuses, and track SLAs.
+
+W60_36
+Design a workflow that manages e-learning content QA: check metadata, run accessibility scans, collect reviewer feedback, and publish only approved content.
+
+W60_37
+Create a workflow that orchestrates complex donation matching campaigns: track donor eligibility, apply matching rules, update totals, and notify donors.
+
+W60_38
+Build a workflow that manages crypto transaction monitoring: ingest blockchain events, apply rule-based and ML-based alerts, and escalate suspicious patterns.
+
+W60_39
+Define a workflow that automates retail price optimization: gather sales and competitor data, run pricing models via API, propose new prices, and route for approvals.
+
+W60_40
+Construct a workflow that coordinates clinical trial enrollment: screen patients, randomize assignments, schedule visits, and notify coordinators.
+
+W60_41
+Design a workflow that manages art exhibition logistics: track artwork shipments, condition reports, insurance coverage, and installation timelines.
+
+W60_42
+Create a workflow that orchestrates complex subscription upsell journeys: detect signals, send targeted offers, and track conversions over time.
+
+W60_43
+Build a workflow that manages transnational research collaborations: track proposals, approvals, ethics clearance, funding, and milestones.
+
+W60_44
+Define a workflow that automates airline loyalty tier recalculation: integrate flight data, compute points, adjust tiers, and send notifications.
+
+W60_45
+Construct a workflow that coordinates multi-step KYC refresh: detect expiring verifications, request updated documents, re-run checks, and update statuses.
+
+W60_46
+Design a workflow that manages NGO field project reporting: collect periodic updates, validate indicators, aggregate by region, and report to donors.
+
+W60_47
+Create a workflow that orchestrates patent portfolio monitoring: track deadlines, new citations, family changes, and alert IP lawyers.
+
+W60_48
+Build a workflow that manages global IT asset lifecycle: procurement, assignment, maintenance, and retirement with all system updates.
+
+W60_49
+Define a workflow that automates cross-border payroll tax filings: compute liabilities, generate filings, submit via APIs where possible, and store receipts.
+
+W60_50
+Construct a workflow that coordinates scientific conference reviewing and scheduling: assign reviewers, collect scores, select papers, and build sessions.
+
+W60_51
+Design a workflow that manages complex real-estate transactions: track offers, contingencies, inspections, and closings, with notifications to all parties.
+
+W60_52
+Create a workflow that orchestrates humanitarian aid distribution: track inventory, prioritize regions, coordinate deliveries, and report impact metrics.
+
+W60_53
+Build a workflow that manages airline crew scheduling: ensure legal rest, optimize rosters, handle swaps, and notify crew members.
+
+W60_54
+Define a workflow that automates academic grant expense tracking: map expenses to grants, enforce limits, and generate reports for funders.
+
+W60_55
+Construct a workflow that coordinates open-source project governance: manage proposals, voting, decisions, and public changelogs.
+
+W60_56
+Design a workflow that manages pharmaceutical batch release: track QC results, approvals, documentation, and final release decisions.
+
+W60_57
+Create a workflow that orchestrates cross-platform game telemetry analysis: ingest events, standardize schemas, compute metrics, and send dashboards.
+
+W60_58
+Build a workflow that manages public consultation processes: collect feedback, categorize comments, summarize topics, and publish responses.
+
+W60_59
+Define a workflow that automates energy market bidding: forecast demand, generate bids, submit to market APIs, and reconcile outcomes.
+
+W60_60
+Construct a workflow that coordinates multi-stage refugee resettlement: intake cases, match housing, schedule health checks, arrange schooling, and track integration milestones.
