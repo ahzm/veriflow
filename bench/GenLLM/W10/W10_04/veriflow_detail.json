@@ -1,0 +1,305 @@
+{
+  "S": 0.98,
+  "M": 1.0,
+  "E": 0.25,
+  "Overall": 0.74,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.25,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 1.0,
+    "order": 1.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.85,
+    "source": "rule",
+    "intent": {
+      "need_schedule": true,
+      "need_email": true,
+      "need_http": false,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_db": false,
+      "need_form": false,
+      "need_condition": false,
+      "need_transform": false,
+      "need_conditional_notify": false
+    },
+    "intent_chain": [
+      "rule: matched schedule keywords or English time pattern",
+      "rule: matched email keywords"
+    ],
+    "irrelevant_nodes": [],
+    "intent_caps": [
+      "email",
+      "schedule"
+    ],
+    "intent_edges": [
+      [
+        "schedule",
+        "email"
+      ]
+    ],
+    "missing_capabilities": [],
+    "alignment": {
+      "capability_matches": {
+        "schedule": true,
+        "email": true
+      },
+      "edge_matches": [
+        {
+          "from": "schedule",
+          "to": "email",
+          "ok": true,
+          "path_nodes": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        }
+      ]
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "intent_edge",
+        "from": "schedule",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1"
+        ],
+        "targets": [
+          "4"
+        ],
+        "path": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "schedule->email(required)",
+        "from": "schedule",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1"
+        ],
+        "targets": [
+          "4"
+        ],
+        "path": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "note": "no candidate nodes to boost"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "email",
+        "schedule"
+      ],
+      "intent_edges": [
+        {
+          "from": "schedule",
+          "to": "email",
+          "ok": true,
+          "path": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "GitHub Trigger",
+          "capability": "schedule",
+          "relevant": true
+        },
+        {
+          "id": "2",
+          "label": "Sentiment Analysis",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "3",
+          "label": "Label Issue",
+          "capability": null,
+          "relevant": true
+        },
+        {
+          "id": "4",
+          "label": "Email Report",
+          "capability": "email",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        }
+      ],
+      "relevant_nodes": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "irrelevant_nodes": [],
+      "missing_capabilities": []
+    }
+  },
+  "exec_detail": {
+    "param_ok": 0.0,
+    "path_ok": 1.0,
+    "runtime_ok": 0.0,
+    "dataflow_ok": 0.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [
+      "[PARAM] Schedule 'GitHub Trigger' has invalid or missing cron expression"
+    ],
+    "param_detail": {
+      "checked_nodes": 4
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": true,
+      "required_fields": {
+        "4": [
+          "score"
+        ]
+      },
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "timestamp"
+        ],
+        "3": [
+          "timestamp"
+        ],
+        "4": [
+          "timestamp"
+        ]
+      },
+      "missing_fields": {
+        "4": [
+          "score"
+        ]
+      }
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "executed_nodes_readable": [
+      "GitHub Trigger",
+      "Sentiment Analysis",
+      "Label Issue",
+      "Email Report"
+    ],
+    "name_map": {
+      "1": "GitHub Trigger",
+      "2": "Sentiment Analysis",
+      "3": "Label Issue",
+      "4": "Email Report"
+    },
+    "node_results": {
+      "1": {
+        "ok": false,
+        "msg": "invalid cron expression"
+      },
+      "2": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "3": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "4": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "GitHub Trigger",
+    "Sentiment Analysis",
+    "Label Issue",
+    "Email Report"
+  ]
+}
