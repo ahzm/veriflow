@@ -1,0 +1,89 @@
+W30_01
+Trigger every day at 9am, fetch the latest EUR/USD rate, and send it to me by email.
+
+W30_02
+When a webhook receives a new user registration event, send a welcome email and log the event via HTTP.
+
+W30_03
+Check weather API for humidity every hour; if humidity > 85, send a Slack alert.
+
+W30_04
+Run every Friday at 18:00, fetch the week's top 10 GitHub repos, and email me the list.
+
+W30_05
+Trigger via webhook with order data; if amount < 20, send a Slack warning, otherwise send confirmation email.
+
+W30_06
+Every morning at 7, fetch news about “AI” and email me three headlines.
+
+W30_07
+Webhook receives a JSON with “temperature”; if temperature > 30C, send heat alert via Slack.
+
+W30_08
+Run every 2 hours, check website uptime via API; if status == “down”, send urgent email.
+
+W30_09
+On webhook trigger, extract “email” and “name” and send a personalized greeting.
+
+W30_10
+Check Bitcoin price hourly; if it drops below $55k, send Slack message with chart URL.
+
+W30_11
+Fetch daily pollution index at 8am; if PM2.5 > 90, send health advisory email.
+
+W30_12
+On webhook with form submission, email the content to me and log the payload via HTTP.
+
+W30_13
+Run hourly, get API data for CO2 levels; if > 800ppm, notify Slack channel.
+
+W30_14
+Webhook receives “errorCode”; if not empty, forward error to Slack.
+
+W30_15
+Every night at midnight, back up JSON data from an API and email me the download link.
+
+W30_16
+Check rainfall probability every 3 hours; if > 70%, send rain alert by email.
+
+W30_17
+Webhook with GitHub issue data should send issue title to Slack.
+
+W30_18
+Daily at 06:30, fetch three motivational quotes and email them to me.
+
+W30_19
+When webhook receives “stockSymbol”, fetch its current price and email me.
+
+W30_20
+Every 4 hours, fetch earthquake alerts and send me a summary by email.
+
+W30_21
+Webhook with customer message should send auto-reply and log to HTTP endpoint.
+
+W30_22
+Check pollen level API every morning; if high, notify via Slack.
+
+W30_23
+Run every Monday at 8am, fetch weekly weather summary and send by email.
+
+W30_24
+Webhook receives sales data; if total > 1000, send Slack celebration message.
+
+W30_25
+Daily at 21:00, fetch crypto market summary and email me.
+
+W30_26
+Every 45 minutes, ping uptime API; if latency > 500ms, send Slack alert.
+
+W30_27
+Webhook receives JSON with “city”; fetch weather and email it to the user.
+
+W30_28
+Run hourly, fetch Air Quality Index; if AQI < 40, send Slack “good air” message.
+
+W30_29
+When webhook receives user feedback, send thank-you email.
+
+W30_30
+Every sunrise, fetch sunrise/sunset times and email the summary.

@@ -1,0 +1,89 @@
+W30_01
+Design a workflow that coordinates multi-stage recruitment: ingest job applications via webhook, enrich profiles with LinkedIn data, route candidates through screening, interview, and offer stages, update an ATS, and send personalized notifications at each step.
+
+W30_02
+Create a workflow that consolidates financial transactions from three banking APIs, normalizes currencies, flags suspicious patterns using a fraud-detection API, writes aggregated results to a ledger database, and alerts compliance officers via email.
+
+W30_03
+Build a workflow that manages SLA monitoring: pull uptime metrics from multiple services, compute rolling availability per customer, compare with SLA thresholds, generate PDF reports, email them to customers, and create incident tickets for SLA breaches.
+
+W30_04
+Define a workflow that orchestrates synchronization between an LMS and an HR system: when employees join, assign training courses, track completion via API callbacks, escalate overdue courses to managers, and produce monthly compliance summaries.
+
+W30_05
+Construct a workflow that ingests product catalog updates from an ERP via FTP, parses XML files, validates schemas, updates an e-commerce platform via REST, invalidates CDN caches, and sends a detailed change log to a monitoring Slack channel.
+
+W30_06
+Create a workflow that handles warranty claims: intake via a form webhook, verify purchase details via an order API, classify claim types, route to the appropriate support queue, generate shipping labels when approved, and keep customers informed via email.
+
+W30_07
+Design a workflow that runs every 15 minutes, checks stock levels across multiple warehouses, predicts stock-outs with a forecasting API, automatically creates replenishment orders in an ERP, and notifies the supply chain Slack channel of critical items.
+
+W30_08
+Build a workflow that manages academic conference submissions: receive papers via webhook, check formatting, anonymize PDFs, assign reviewers based on expertise, send review invitations, collect scores, and produce ranked decision lists for organizers.
+
+W30_09
+Create a workflow that synchronizes calendar events across multiple teams: listen to booking webhooks, resolve conflicts, place tentative holds in shared calendars, send confirmation or reschedule emails to participants, and log booking history in a database.
+
+W30_10
+Define a workflow that supports A/B testing: pull experiment assignments from a feature flag service, collect conversion events from a tracking API, compute statistical significance, send daily experiment summaries, and suggest winners via an analytics email.
+
+W30_11
+Construct a workflow that runs a multi-stage data quality pipeline: ingest raw CSVs from object storage, apply schema validation, run custom business rules via HTTP functions, quarantine bad rows, update a curated table, and notify data stewards with detailed logs.
+
+W30_12
+Design a workflow that automates vendor onboarding: triggered by a signed contract event, collects vendor bank details via secure form, validates them against a KYC API, creates vendor records in ERP and payment systems, and sends a checklist completion email.
+
+W30_13
+Build a workflow that manages recurring maintenance tasks: based on IoT telemetry from machines, predict maintenance windows, create tickets in a CMMS, notify technicians, update machine status after completion, and track SLA metrics over time.
+
+W30_14
+Create a workflow that orchestrates multi-channel customer surveys: schedule survey invitations via email and SMS, collect responses via webhook, compute NPS and satisfaction scores, push aggregated metrics to a BI tool, and alert managers when scores drop.
+
+W30_15
+Define a workflow that supports document lifecycle management: monitor a repository for new contracts, extract key clauses with an NLP API, store metadata in a database, set renewal reminders, and notify legal teams before important deadlines.
+
+W30_16
+Construct a workflow that automates sales territory assignment: ingest new leads from multiple CRMs, geocode addresses, match territories based on rules, assign owners, update CRM records, and send onboarding emails to assigned sales reps.
+
+W30_17
+Design a workflow that governs feature rollouts: listen to product release events, update feature flags per customer segment, notify support and marketing teams, monitor error and usage metrics post-release, and roll back flags if error rates exceed a threshold.
+
+W30_18
+Build a workflow that manages knowledge base updates: when a Git repository of documentation changes, rebuild static docs via an HTTP build API, deploy to hosting, run link validation checks, and send a change summary with changelog links to the team.
+
+W30_19
+Create a workflow that coordinates expense approvals: parse emailed receipts, match them against corporate card transactions, detect policy violations, route to managers for approval, push approved expenses into accounting, and notify employees of outcomes.
+
+W30_20
+Define a workflow that synchronizes marketing leads from webforms, webinars, and ads: deduplicate contacts, score leads using a scoring API, push high-scoring leads to CRM with tasks for sales, and send a weekly performance dashboard via email.
+
+W30_21
+Construct a workflow that automates incident response: on critical monitoring alerts via webhook, enrich incidents with configuration data, notify on-call engineers via multiple channels, create and update incident tickets, and post status updates to a status page.
+
+W30_22
+Design a workflow that supports internal audits: collect logs from various systems via HTTP, filter for security-relevant events, store them in an immutable archive, generate periodic audit reports, and email them securely to auditors.
+
+W30_23
+Build a workflow that handles multi-language content localization: when new English content is published, send it to a translation API for multiple languages, perform QA checks, update CMS entries per locale, and notify local marketing teams.
+
+W30_24
+Create a workflow that orchestrates partner data exchanges: fetch partner data from SFTP, normalize schemas, reconcile with internal records, send discrepancy reports back to partners, and track all exchanges in a compliance log.
+
+W30_25
+Define a workflow that manages subscription churn prevention: identify at-risk users via analytics API, trigger personalized win-back campaigns via email and push, track responses, update churn-risk scores, and notify success teams of recovered accounts.
+
+W30_26
+Construct a workflow that automates lab test result distribution: receive results from a lab API, validate patient identifiers, anonymize data for research storage, send secure notifications to physicians, and log all accesses for auditing.
+
+W30_27
+Design a workflow that coordinates content publishing across social media: schedule posts, adapt content formats per platform, post via APIs, monitor engagement metrics, and generate weekly cross-channel performance summaries.
+
+W30_28
+Build a workflow that manages internal access requests: intake requests via form, verify manager approval, provision access to multiple systems via APIs, log all grants and revocations, and schedule periodic reviews for least-privilege compliance.
+
+W30_29
+Create a workflow that orchestrates nightly ETL jobs: trigger upstream data pulls, run transformation steps in sequence, handle failures with retries and alerts, publish metrics on job durations, and update a dashboard with latest pipeline statuses.
+
+W30_30
+Define a workflow that automates RFP responses: ingest RFP documents, extract key requirements using NLP, map them to standard answers from a knowledge base, generate draft responses, route them to legal and sales for approval, and track submission deadlines.

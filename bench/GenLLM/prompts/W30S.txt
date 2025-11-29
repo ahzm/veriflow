@@ -1,0 +1,89 @@
+W30_01
+Design an n8n workflow that manages a full onboarding process for new employees: trigger from an HTTP webhook when HR submits a new hire form, create entries in a mock HR system and a mock identity management API, generate an initial password reset email, assign a laptop asset in an inventory API, create a Slack account and invite the user to three standard channels, and send a final confirmation email to HR summarizing all steps and their status.
+
+W30_02
+Create a workflow that coordinates a quarterly business review report: on manual trigger, query three different departmental metrics APIs (sales, support, engineering), aggregate KPIs into a single JSON structure, generate a plain-text executive summary, store the report in a "qbr_reports" collection, and send notification emails with links to the stored report to the leadership team.
+
+W30_03
+Build an n8n workflow that orchestrates a multi-step marketing campaign: on schedule, fetch a list of eligible contacts from a CRM-like API, segment them by region and industry, generate region-specific message templates, send initial campaign emails, schedule follow-up emails after 5 days only for contacts who did not open the first message (simulated via a mock "email events" API), and log all actions into a tracking table.
+
+W30_04
+Define a workflow that automates a simple procurement approval: a webhook receives purchase requests, validates required fields (requester, amount, cost center, description), routes requests above a threshold to a manager approval email, waits for an approval/decline callback via a second webhook, updates a mock procurement system over HTTP, and sends final outcome emails to the requester and finance.
+
+W30_05
+Design an n8n workflow for data synchronization between two mock CRM systems: on a scheduled basis, fetch recently updated contacts from System A, transform fields to match System B's schema, resolve conflicts using a "last-write-wins" rule, push updates into System B via HTTP, and generate a synchronization summary (created, updated, skipped) emailed to system administrators.
+
+W30_06
+Create a workflow that runs every 15 minutes, polls a mock "error logs" API for a web application, filters errors by severity and frequency, groups them by endpoint, stores aggregated error statistics in a "log_analytics" table, and posts a condensed report of new critical error patterns to a Slack channel.
+
+W30_07
+Construct an n8n workflow to manage a small-scale A/B test: trigger via manual input specifying two email templates and a target segment, split the segment into two randomized groups, send variant A and variant B emails accordingly, simulate open and click events via a mock "email tracking" API, compare performance metrics, and send a result summary email to the experiment owner.
+
+W30_08
+Build a workflow that handles partner integration monitoring: on schedule, query three partner APIs for their current integration health and daily transaction counts, detect anomalies (e.g., drop below a baseline threshold), write anomalies to a "partner_health" collection, create incidents in a mock incident-management API, and notify both internal and partner contacts by email.
+
+W30_09
+Design an n8n workflow that coordinates a simple document approval chain: when a new document metadata arrives via webhook, assign it to a first-level reviewer, send an email with approval links, wait for an "approve/reject" callback, if approved, escalate to a second-level reviewer, and finally send a consolidated decision email to the original requester with all comments.
+
+W30_10
+Create a workflow that supports a simple bug triage process: when a bug is reported via an HTTP endpoint, classify it into product area and severity based on keywords, assign it to the right team lead via a "team directory" API, log the bug into a "bug_tracker" table, send a Slack notification to the relevant team channel, and send an acknowledgement email back to the reporter.
+
+W30_11
+Define an n8n workflow for daily inventory reconciliation: every night at 02:00, fetch stock levels from a mock warehouse API and from an e-commerce API, compare quantities per SKU, detect discrepancies above a tolerance threshold, write discrepancies into an "inventory_issues" table, and email a CSV report of these issues to the operations and finance teams.
+
+W30_12
+Build a workflow that manages a recurring training reminder: maintain a list of employees and their mandatory training deadlines in a mock database node, run daily, identify employees whose training expires within 30, 7, and 1 day, send reminder emails with different messages for each interval, notify managers by Slack for overdue training, and log all reminders into a tracking collection.
+
+W30_13
+Create a workflow that coordinates a "customer churn risk" monitoring job: on schedule, query a mock analytics API for customers with rising churn risk scores, group them by account manager, send each account manager an email listing their at-risk customers, create follow-up tasks in a "task management" API, and store the results in a "churn_watch" table.
+
+W30_14
+Design an n8n workflow that handles periodic compliance checks: fetch a list of required compliance documents and their expiration dates from a mock compliance API, determine which documents are missing or expired for each business unit, send summary emails to compliance officers, create tickets in a mock ticketing system for units with critical gaps, and post a high-level summary to a Slack channel.
+
+W30_15
+Construct a workflow that orchestrates a localized notification system: receive incident events via webhook, map each incident's region and severity, look up regional contact lists from a configuration node, send targeted incident emails to affected contacts only, log each notification in a "regional_incidents" table, and send a global summary email to central operations.
+
+W30_16
+Build an n8n workflow to manage a research experiment pipeline: on manual trigger, load a configuration object describing experiment variants and sample sizes, send invitations to participants via email, record responses and completion statuses arriving via webhook, compute simple aggregate statistics (completion rate per variant), and store the results into an "experiments" table.
+
+W30_17
+Create a workflow that automates a simple "backup verification" process: every night, call a mock backup API to list completed backups, verify integrity checksums via another API endpoint, log verification results in a "backup_log" table, send an email summary of successes and failures to the infrastructure team, and raise a critical alert via Slack if any backup failed verification.
+
+W30_18
+Define an n8n workflow for event-based dynamic pricing: receive product demand events via webhook, aggregate counts per product over time windows, compute suggested price adjustments based on simple elasticity rules from a configuration node, send updated pricing recommendations via an HTTP API to a mock pricing engine, and notify a Slack channel whenever large adjustments are suggested.
+
+W30_19
+Design a workflow that coordinates an internal survey: on a scheduled date, send survey emails to all employees loaded from a mock directory API, track responses via webhook, send reminders to non-respondents after 5 days, compute participation rate per department, and email a final participation report plus basic statistics to HR and management.
+
+W30_20
+Build an n8n workflow for cross-system user deprovisioning: on receiving a "user offboarding" event via webhook, disable the user in a mock identity provider API, revoke access in a mock project management API, remove from mailing lists via another HTTP endpoint, send confirmation emails to the manager and IT, and store an audit log entry in a "deprovision_log" table.
+
+W30_21
+Create a workflow that manages invoice approval and payment notification: on arrival of a new invoice payload, validate required fields and compute tax totals, determine whether manager approval is required based on amount and cost center, send approval emails and wait for approval callbacks, once approved call a mock "payment" API, and email both the supplier and finance team with the outcome.
+
+W30_22
+Design an n8n workflow for multi-source contact enrichment: on manual trigger, read a list of contacts from a configuration node, call three different mock enrichment APIs (social profile, company data, technology stack) for each contact, merge and deduplicate attributes, store the enriched profiles into a "contact_enriched" table, and send a summary email of enrichment coverage.
+
+W30_23
+Construct a workflow that manages a knowledge base curation loop: when a support agent submits a "candidate article" via webhook, validate structure and tags, store it in a "draft_articles" table, notify a group of reviewers via Slack, wait for review decisions (approve/reject) via HTTP callbacks, move approved articles into a "published_articles" table, and email the original author about the decision.
+
+W30_24
+Build an n8n workflow for IoT fleet health monitoring: on schedule, call a mock "fleet status" API listing all devices, for each device fetch last reported metrics, classify device health into "OK", "WARNING", or "CRITICAL" based on thresholds, store the results into a "fleet_health" table, send alerts for critical devices via email, and post a daily summary to a Slack channel.
+
+W30_25
+Create a workflow that automates synchronization between a marketing signup form and a CRM: when a new signup is received via webhook, validate and normalize contact data, check whether the contact already exists in CRM via HTTP API, create or update the record accordingly, assign a lead score based on simple rules, send a welcome email, and log the operation in a "lead_sync" table.
+
+W30_26
+Define an n8n workflow that orchestrates a simple partner revenue sharing calculation: at month end, fetch transaction logs from a mock commerce API, group transactions by partner ID, compute revenue shares based on partner-specific percentages stored in a configuration node, write payout records into a "partner_payouts" table, and email payout summaries as CSV attachments to each partner contact.
+
+W30_27
+Design a workflow that manages internal incident postmortem collection: when an incident is marked as "resolved" via webhook, look up all involved teams and owners, send them emails with a postmortem template link, track responses arriving via another webhook, aggregate key data points (root cause, time to detect, time to resolve) into a "postmortems" table, and email a consolidated report to leadership.
+
+W30_28
+Build an n8n workflow for automated release notes generation: on a weekly schedule, fetch merged pull requests from a mock Git API, group them by component and label (feature, bugfix, improvement), generate a structured release notes text, store it into a "release_notes" collection, send the notes by email to an internal "releases" list, and post an abbreviated version to a Slack channel.
+
+W30_29
+Create a workflow that supports a simple learning management reminder system: sync a list of courses and enrolled users from a mock LMS API, detect users who have not started or completed required courses, send reminder emails based on course deadlines, log reminders into a "lms_reminders" table, and send a weekly compliance summary to HR.
+
+W30_30
+Construct an n8n workflow that coordinates a "VIP customer incident" protocol: when a critical incident event involving a VIP customer is received via webhook, fetch customer details from a CRM API, notify the dedicated VIP support Slack channel, send personalized apology emails to the customer contact, create tasks for follow-up actions in a "task manager" API, and store a full incident record into a "vip_incidents" table.
