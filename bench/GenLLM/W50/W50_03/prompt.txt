@@ -1,0 +1,1 @@
+Fetch humidity hourly; if > 85, send Slack alert.

@@ -1,0 +1,46 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "newuser@example.com",
+        "subject": "Welcome to Our Service!",
+        "text": "Hello and welcome! We're glad to have you."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Log Event",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new user has signed up."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

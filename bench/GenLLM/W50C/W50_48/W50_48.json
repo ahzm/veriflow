@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Campaign Summary",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Campaign Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/campaign-metrics"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Performance Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "partners@example.com",
+        "subject": "Weekly Campaign Performance Summary",
+        "text": "Here are the metrics for our recent campaigns."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Share Leads",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New leads have been generated from our latest campaign."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Coordinate Asset Approvals",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/asset-approvals"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Track Joint Events",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/joint-events"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Campaign Summary": {
+      "main": [
+        [
+          {
+            "node": "Get Campaign Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Campaign Metrics": {
+      "main": [
+        [
+          {
+            "node": "Send Performance Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Performance Summary": {
+      "main": [
+        [
+          {
+            "node": "Share Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share Leads": {
+      "main": [
+        [
+          {
+            "node": "Coordinate Asset Approvals",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Track Joint Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

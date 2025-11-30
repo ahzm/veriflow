@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check Rainfall Probability",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.weather.com/v3/wx/forecast/daily/5day?apiKey=YOUR_API_KEY&geocode=YOUR_LAT,YOUR_LON&format=json"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Email Warning",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Rainfall Warning",
+        "text": "The rainfall probability is above 70%. Please take necessary precautions."
+      }
+    }
+  ],
+  "connections": {
+    "Check Rainfall Probability": {
+      "main": [
+        [
+          {
+            "node": "Email Warning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

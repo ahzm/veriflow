@@ -1,0 +1,118 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "purchase-requests"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Holdings",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items; // Logic to check holdings"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check Budgets",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items; // Logic to check budgets"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Place Order",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://vendor-api.com/place-order",
+        "method": "POST",
+        "body": {
+          "json": {
+            "orderDetails": "{{$json[\"orderDetails\"]}}"
+          }
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Update Catalog",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items; // Logic to update catalog entries"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify Requester",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"requesterEmail\"]}}",
+        "subject": "Your Purchase Request Status",
+        "text": "Your requested item is now available."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Holdings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Holdings": {
+      "main": [
+        [
+          {
+            "node": "Check Budgets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Budgets": {
+      "main": [
+        [
+          {
+            "node": "Place Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Place Order": {
+      "main": [
+        [
+          {
+            "node": "Update Catalog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Catalog": {
+      "main": [
+        [
+          {
+            "node": "Notify Requester",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

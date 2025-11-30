@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch ETH Gas Fee",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=YourAPIKey"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check Gas Fee",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{JSON.parse($json[\"result\"][\"SafeGasPrice\"])}}",
+              "operation": "<",
+              "value2": "20"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Slack Notify",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "ETH gas fee is below 20 gwei!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch ETH Gas Fee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch ETH Gas Fee": {
+      "main": [
+        [
+          {
+            "node": "Check Gas Fee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Gas Fee": {
+      "main": [
+        [
+          {
+            "node": "Slack Notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

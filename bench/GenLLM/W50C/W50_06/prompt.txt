@@ -1,0 +1,1 @@
+Design a workflow that orchestrates a complex partner referral program: track referrals from multiple sources, validate eligibility, compute tiered rewards, trigger payouts via payment API, and send partners detailed monthly statements.

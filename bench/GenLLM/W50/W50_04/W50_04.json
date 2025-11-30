@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 18 * * 5"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch GitHub Trends",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.github.com/trending"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Weekly GitHub Trends",
+        "text": "Here are the weekly GitHub trends."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch GitHub Trends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch GitHub Trends": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

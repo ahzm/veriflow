@@ -1,0 +1,122 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Validate Coverage",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items[0].json.coverage ? [{ json: { valid: true } }] : [{ json: { valid: false } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Estimate Damage",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/estimate-damage",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "claimData": "={{$json[\"data\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Request Additional Documents",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Please provide additional documents for your claim."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Decide Payouts or Denials",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "if (items[0].json.valid && items[1].json.damageEstimate < 10000) { return [{ json: { decision: 'Payout' } }]; } else { return [{ json: { decision: 'Denial' } }]; }"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "Claim Status Update",
+        "text": "Your claim has been processed. Decision: {{$json[\"decision\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Coverage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Coverage": {
+      "main": [
+        [
+          {
+            "node": "Estimate Damage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Request Additional Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estimate Damage": {
+      "main": [
+        [
+          {
+            "node": "Decide Payouts or Denials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Additional Documents": {
+      "main": [
+        [
+          {
+            "node": "Decide Payouts or Denials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide Payouts or Denials": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

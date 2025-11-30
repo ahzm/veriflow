@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "30 6 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Quotes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.quotable.io/random?count=3"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Your Daily Motivational Quotes",
+        "text": "Here are your quotes: {{ $json[\"quotes\"] }}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get Quotes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Quotes": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

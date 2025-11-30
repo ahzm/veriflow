@@ -1,0 +1,1 @@
+Check rainfall probability; if > 70, email warning.

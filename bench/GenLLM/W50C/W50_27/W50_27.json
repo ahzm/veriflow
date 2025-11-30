@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "design-submission"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Notify Reviewers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new design submission has been made. Please review it."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Comments",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/comments"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Enforce Deadlines",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 17 * * *"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Update Design Status Board",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/update-status"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Approval Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "reviewer@example.com",
+        "subject": "Design Submission Approved",
+        "text": "The design submission has been approved."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Notify Reviewers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Reviewers": {
+      "main": [
+        [
+          {
+            "node": "Track Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Comments": {
+      "main": [
+        [
+          {
+            "node": "Enforce Deadlines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enforce Deadlines": {
+      "main": [
+        [
+          {
+            "node": "Update Design Status Board",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Design Status Board": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

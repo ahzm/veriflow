@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request CRM 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm1.com/exports/nightly"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request CRM 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm2.com/exports/nightly"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Compare Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const crm1Data = items[0].json;\nconst crm2Data = items[1].json;\n// Logic to compare data and find mismatches\nreturn mismatches;"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Auto-Fix Mismatches",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const mismatches = items[0].json;\n// Logic to attempt auto-fix based on rules\nreturn fixedItems;"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Escalate Unresolved Items",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Unresolved mismatches detected during reconciliation."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Log Statistics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const stats = items[0].json;\n// Logic to log reconciliation statistics\nreturn stats;"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request CRM 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request CRM 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request CRM 1": {
+      "main": [
+        [
+          {
+            "node": "Compare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request CRM 2": {
+      "main": [
+        [
+          {
+            "node": "Compare Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Compare Data": {
+      "main": [
+        [
+          {
+            "node": "Auto-Fix Mismatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-Fix Mismatches": {
+      "main": [
+        [
+          {
+            "node": "Escalate Unresolved Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Statistics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

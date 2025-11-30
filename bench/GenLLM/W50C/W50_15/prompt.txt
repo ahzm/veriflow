@@ -1,0 +1,1 @@
+Construct a workflow that manages content syndication: pull approved articles from a CMS, transform formats for multiple partner platforms, push updates via APIs, monitor publishing status, and reconcile views and click metrics.

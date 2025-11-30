@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Trip Request Received",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Check Policy Constraints",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Route Approvals",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Book Flights",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.flightbooking.com/book"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Book Hotels",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.hotelbooking.com/book"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Itinerary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "traveler@example.com",
+        "subject": "Your Travel Itinerary",
+        "text": "Here is your travel itinerary."
+      }
+    }
+  ],
+  "connections": {
+    "Trip Request Received": {
+      "main": [
+        [
+          {
+            "node": "Check Policy Constraints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Policy Constraints": {
+      "main": [
+        [
+          {
+            "node": "Route Approvals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Approvals": {
+      "main": [
+        [
+          {
+            "node": "Book Flights",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Book Hotels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Book Flights": {
+      "main": [
+        [
+          {
+            "node": "Send Itinerary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Book Hotels": {
+      "main": [
+        [
+          {
+            "node": "Send Itinerary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

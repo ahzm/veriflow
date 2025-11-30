@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Receive Purchase Request",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Validate Budget",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://finance.api/validate-budget"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Multi-Level Approval",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Approval needed for purchase request."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate PO",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://erp.api/generate-po"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Audit Trail",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "audit@company.com",
+        "subject": "Procurement Audit Log",
+        "text": "All steps of the procurement process have been logged."
+      }
+    }
+  ],
+  "connections": {
+    "Receive Purchase Request": {
+      "main": [
+        [
+          {
+            "node": "Validate Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Budget": {
+      "main": [
+        [
+          {
+            "node": "Multi-Level Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Multi-Level Approval": {
+      "main": [
+        [
+          {
+            "node": "Generate PO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate PO": {
+      "main": [
+        [
+          {
+            "node": "Log Audit Trail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

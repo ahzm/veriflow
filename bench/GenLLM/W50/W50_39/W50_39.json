@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 19 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Movie Recommendations",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/movies/recommendations"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Your Movie Recommendations",
+        "text": "Here are your movie recommendations!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Movie Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Movie Recommendations": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

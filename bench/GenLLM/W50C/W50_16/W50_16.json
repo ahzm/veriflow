@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Ingest Scanner Reports",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/scanner-reports"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Deduplicate Findings",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Map Vulnerabilities to Asset Owners",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Open Tickets",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send Progress Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "security@company.com",
+        "subject": "Daily Security Vulnerability Progress Report",
+        "text": "Here is the progress report for today's vulnerability handling."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Ingest Scanner Reports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Ingest Scanner Reports": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Findings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate Findings": {
+      "main": [
+        [
+          {
+            "node": "Map Vulnerabilities to Asset Owners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Vulnerabilities to Asset Owners": {
+      "main": [
+        [
+          {
+            "node": "Open Tickets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open Tickets": {
+      "main": [
+        [
+          {
+            "node": "Send Progress Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

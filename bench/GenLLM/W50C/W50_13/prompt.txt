@@ -1,0 +1,1 @@
+Build a workflow that coordinates data retention policies: periodically scan storage locations, identify data past retention thresholds, request approvals for deletion where needed, perform deletions, and log detailed retention reports.

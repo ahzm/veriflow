@@ -1,0 +1,171 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "KYC Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank.com/kyc-check"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Document Verification",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank.com/document-verification"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Create Account",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank.com/create-account"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Set Initial Limits",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank.com/set-limits"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Welcome Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank.com/schedule-call"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Track Drop-off Reasons",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank.com/track-dropoff"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "Welcome to Our Bank!",
+        "text": "Thank you for choosing our bank. Your account has been created successfully."
+      }
+    },
+    {
+      "id": "9",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "KYC Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KYC Check": {
+      "main": [
+        [
+          {
+            "node": "Document Verification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Verification": {
+      "main": [
+        [
+          {
+            "node": "Create Account",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Account": {
+      "main": [
+        [
+          {
+            "node": "Set Initial Limits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Initial Limits": {
+      "main": [
+        [
+          {
+            "node": "Schedule Welcome Call",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Welcome Call": {
+      "main": [
+        [
+          {
+            "node": "Track Drop-off Reasons",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Drop-off Reasons": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Schedule Trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

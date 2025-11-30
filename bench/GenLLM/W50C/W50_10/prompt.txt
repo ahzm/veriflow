@@ -1,0 +1,1 @@
+Construct a workflow that coordinates multi-cloud backup verification: schedule backups, fetch backup statuses from different providers, run periodic restore tests on samples, record results, and alert infrastructure teams on failed tests.

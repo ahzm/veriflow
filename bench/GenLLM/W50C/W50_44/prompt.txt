@@ -1,0 +1,1 @@
+Define a workflow that automates library acquisitions: collect purchase requests, check holdings and budgets, place orders with vendors, update catalog entries, and notify requesters of availability.

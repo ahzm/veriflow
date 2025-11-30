@@ -1,0 +1,1 @@
+Build a workflow that manages B2B contract renewals: track contract end dates, calculate renewal options, notify account managers with recommended actions, and update CRM stages based on outcomes.

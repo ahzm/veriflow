@@ -1,0 +1,1 @@
+Create a workflow that manages complex loan applications: intake forms, perform credit checks via API, calculate risk scores, route high-risk applications to manual review, auto-approve low-risk ones, and notify applicants with personalized decisions.

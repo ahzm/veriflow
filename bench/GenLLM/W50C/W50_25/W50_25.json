@@ -1,0 +1,171 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "donation"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request Payment Provider 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.paymentprovider1.com/donations"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request Payment Provider 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.paymentprovider2.com/donations"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Issue Receipt",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"donorEmail\"]}}",
+        "subject": "Thank You for Your Donation",
+        "text": "Dear {{$json[\"donorName\"]}}, thank you for your generous donation!"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Assign Donor to Campaign",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "items[0].json.campaignId = 'campaign_1'; return items;"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Compute Campaign KPIs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const totalDonations = items.reduce((sum, item) => sum + item.json.amount, 0); return [{ json: { totalDonations } }];"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Dashboard to Organizers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Campaign KPIs: Total Donations: {{$json[\"totalDonations\"]}}"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Schedule Dashboard Update",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Payment Provider 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request Payment Provider 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Payment Provider 1": {
+      "main": [
+        [
+          {
+            "node": "Issue Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assign Donor to Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Payment Provider 2": {
+      "main": [
+        [
+          {
+            "node": "Issue Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Assign Donor to Campaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Issue Receipt": {
+      "main": [
+        [
+          {
+            "node": "Compute Campaign KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Donor to Campaign": {
+      "main": [
+        [
+          {
+            "node": "Compute Campaign KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Campaign KPIs": {
+      "main": [
+        [
+          {
+            "node": "Send Dashboard to Organizers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Dashboard Update": {
+      "main": [
+        [
+          {
+            "node": "Send Dashboard to Organizers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

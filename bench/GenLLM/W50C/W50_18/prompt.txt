@@ -1,0 +1,1 @@
+Build a workflow that manages IoT fleet firmware updates: segment devices by model and region, schedule phased rollout, track update success rates via telemetry, automatically pause rollouts on failure spikes, and report outcomes.

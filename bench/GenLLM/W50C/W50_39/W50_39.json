@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Alumni Engagement",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Segment Alumni",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Send Event Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alumni@example.com",
+        "subject": "Upcoming Alumni Event",
+        "text": "Join us for our upcoming alumni event!"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Giving Campaign Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alumni@example.com",
+        "subject": "Support Our Cause",
+        "text": "Help us make a difference with your contribution!"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Responses",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-responses"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Update Engagement Scores",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Schedule Alumni Engagement": {
+      "main": [
+        [
+          {
+            "node": "Segment Alumni",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Segment Alumni": {
+      "main": [
+        [
+          {
+            "node": "Send Event Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Giving Campaign Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Event Email": {
+      "main": [
+        [
+          {
+            "node": "Track Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Giving Campaign Email": {
+      "main": [
+        [
+          {
+            "node": "Track Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Responses": {
+      "main": [
+        [
+          {
+            "node": "Update Engagement Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

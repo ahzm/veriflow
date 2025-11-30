@@ -1,0 +1,1 @@
+Define a workflow that orchestrates lab sample logistics: receive sample submissions, print barcodes, track movements across stations, update LIMS via API, and alert technicians about delayed samples relative to target timelines.

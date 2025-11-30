@@ -1,0 +1,1 @@
+Check BTC hourly; if below $55k send Slack alert.

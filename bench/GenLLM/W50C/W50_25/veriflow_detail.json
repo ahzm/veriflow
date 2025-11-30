@@ -1,0 +1,504 @@
+{
+  "S": 0.98,
+  "M": 0.92,
+  "E": 0.8,
+  "Overall": 0.9,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.17857142857142858,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 0.5,
+    "order": 1.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.7749999999999999,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": false,
+      "need_conditional_notify": false,
+      "need_db": true,
+      "need_email": true,
+      "need_form": false,
+      "need_http": true,
+      "need_schedule": false,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": true
+    },
+    "intent_chain": [
+      "The workflow involves issuing receipts, which typically requires sending emails to donors.",
+      "Integrating donation events from multiple payment providers suggests the need for HTTP requests to interact with APIs.",
+      "Managing donor data and campaign KPIs indicates the use of a database to store and compute this information.",
+      "Computing campaign KPIs implies some form of data transformation to analyze the collected data."
+    ],
+    "irrelevant_nodes": [
+      "1",
+      "7",
+      "8"
+    ],
+    "intent_caps": [
+      "db",
+      "email",
+      "http",
+      "transform"
+    ],
+    "intent_edges": [
+      [
+        "transform",
+        "db"
+      ],
+      [
+        "http",
+        "db"
+      ]
+    ],
+    "missing_capabilities": [
+      "db"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "db": false,
+        "http": true,
+        "transform": true,
+        "email": true
+      },
+      "edge_matches": [
+        {
+          "from": "transform",
+          "to": "db",
+          "ok": false,
+          "path_nodes": []
+        },
+        {
+          "from": "http",
+          "to": "db",
+          "ok": false,
+          "path_nodes": []
+        }
+      ]
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "intent_edge",
+        "from": "transform",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "5",
+          "6"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "http",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "2",
+          "3"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "http->email(required)",
+        "from": "http",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "2",
+          "3"
+        ],
+        "targets": [
+          "4"
+        ],
+        "path": [
+          "2",
+          "3",
+          "4"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "http->db(optional)",
+        "from": "http",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "2",
+          "3"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "transform->db(optional)",
+        "from": "transform",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "5",
+          "6"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "db->email(optional)",
+        "from": "db",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "4"
+        ],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "db",
+        "email",
+        "http",
+        "transform"
+      ],
+      "intent_edges": [
+        {
+          "from": "transform",
+          "to": "db",
+          "ok": false,
+          "path": []
+        },
+        {
+          "from": "http",
+          "to": "db",
+          "ok": false,
+          "path": []
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Webhook",
+          "capability": "schedule",
+          "relevant": false
+        },
+        {
+          "id": "2",
+          "label": "HTTP Request Payment Provider 1",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "3",
+          "label": "HTTP Request Payment Provider 2",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "4",
+          "label": "Issue Receipt",
+          "capability": "email",
+          "relevant": true
+        },
+        {
+          "id": "5",
+          "label": "Assign Donor to Campaign",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "6",
+          "label": "Compute Campaign KPIs",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "7",
+          "label": "Send Dashboard to Organizers",
+          "capability": "slack",
+          "relevant": false
+        },
+        {
+          "id": "8",
+          "label": "Schedule Dashboard Update",
+          "capability": "schedule",
+          "relevant": false
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "1",
+          "target": "3"
+        },
+        {
+          "source": "2",
+          "target": "4"
+        },
+        {
+          "source": "2",
+          "target": "5"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        },
+        {
+          "source": "3",
+          "target": "5"
+        },
+        {
+          "source": "4",
+          "target": "6"
+        },
+        {
+          "source": "5",
+          "target": "6"
+        },
+        {
+          "source": "6",
+          "target": "7"
+        },
+        {
+          "source": "8",
+          "target": "7"
+        }
+      ],
+      "relevant_nodes": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "irrelevant_nodes": [
+        "1",
+        "7",
+        "8"
+      ],
+      "missing_capabilities": [
+        "db"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 0.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 8
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": true,
+      "required_fields": {
+        "4": [
+          "donorEmail",
+          "donorName"
+        ],
+        "7": [
+          "totalDonations"
+        ]
+      },
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "8": [
+          "timestamp"
+        ],
+        "2": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "3": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "5": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "6": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "7": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {
+        "4": [
+          "donorEmail",
+          "donorName"
+        ],
+        "7": [
+          "totalDonations"
+        ]
+      }
+    },
+    "executed_nodes": [
+      "1",
+      "8",
+      "2",
+      "3",
+      "7",
+      "4",
+      "5",
+      "6"
+    ],
+    "executed_nodes_readable": [
+      "Webhook",
+      "Schedule Dashboard Update",
+      "HTTP Request Payment Provider 1",
+      "HTTP Request Payment Provider 2",
+      "Send Dashboard to Organizers",
+      "Issue Receipt",
+      "Assign Donor to Campaign",
+      "Compute Campaign KPIs"
+    ],
+    "name_map": {
+      "1": "Webhook",
+      "2": "HTTP Request Payment Provider 1",
+      "3": "HTTP Request Payment Provider 2",
+      "4": "Issue Receipt",
+      "5": "Assign Donor to Campaign",
+      "6": "Compute Campaign KPIs",
+      "7": "Send Dashboard to Organizers",
+      "8": "Schedule Dashboard Update"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "8": {
+        "ok": true,
+        "msg": "cron ok"
+      },
+      "2": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "3": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "7": {
+        "ok": true,
+        "msg": "slack ok (mock)"
+      },
+      "4": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      },
+      "5": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "6": {
+        "ok": true,
+        "msg": "noop"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Webhook",
+    "Schedule Dashboard Update",
+    "HTTP Request Payment Provider 1",
+    "HTTP Request Payment Provider 2",
+    "Send Dashboard to Organizers",
+    "Issue Receipt",
+    "Assign Donor to Campaign",
+    "Compute Campaign KPIs"
+  ]
+}

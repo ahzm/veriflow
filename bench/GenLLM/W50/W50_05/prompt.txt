@@ -1,0 +1,1 @@
+Webhook order data; if amount < 20, Slack warning; else email confirmation.

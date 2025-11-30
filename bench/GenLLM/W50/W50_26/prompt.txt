@@ -1,0 +1,1 @@
+Ping uptime API every 45 minutes; latency alert Slack.

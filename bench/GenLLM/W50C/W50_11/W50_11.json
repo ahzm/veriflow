@@ -1,0 +1,143 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request Product Usage",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/product-usage"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request Support Tickets",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/support-tickets"
+      }
+    },
+    {
+      "id": "4",
+      "name": "HTTP Request Billing Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/billing-data"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Compute Health Score",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const productUsage = items[0].json;\nconst supportTickets = items[1].json;\nconst billingData = items[2].json;\n\nconst healthScore = (productUsage.score + (supportTickets.count * -1) + billingData.paymentStatus) / 3;\nreturn [{ json: { healthScore } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Classify Customer Tier",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const healthScore = items[0].json.healthScore;\nlet tier;\nif (healthScore > 80) {\n    tier = 'High';\n} else if (healthScore > 50) {\n    tier = 'Medium';\n} else {\n    tier = 'Low';\n}\nreturn [{ json: { tier } }];"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Notify Success Manager",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "success.manager@example.com",
+        "subject": "Customer Health Score Update",
+        "text": "The customer has been classified into a new tier."
+      }
+    },
+    {
+      "id": "8",
+      "name": "Trigger Playbook for At-Risk Accounts",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "An account has been classified as at-risk. Please take action."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Product Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Product Usage": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Support Tickets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Support Tickets": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Billing Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Billing Data": {
+      "main": [
+        [
+          {
+            "node": "Compute Health Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Health Score": {
+      "main": [
+        [
+          {
+            "node": "Classify Customer Tier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Customer Tier": {
+      "main": [
+        [
+          {
+            "node": "Notify Success Manager",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trigger Playbook for At-Risk Accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

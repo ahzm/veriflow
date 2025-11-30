@@ -1,0 +1,1 @@
+Every 2 hours fetch air pressure; if low Slack storm alert.

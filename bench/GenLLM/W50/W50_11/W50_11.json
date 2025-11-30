@@ -1,0 +1,81 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch PM2.5",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/pm25"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check PM2.5",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"pm25\"]}}",
+              "operation": "greaterThan",
+              "value2": 90
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "health@example.com",
+        "subject": "Health Advisory: High PM2.5 Levels",
+        "text": "The PM2.5 levels have exceeded 90. Please take necessary precautions."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch PM2.5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch PM2.5": {
+      "main": [
+        [
+          {
+            "node": "Check PM2.5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check PM2.5": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

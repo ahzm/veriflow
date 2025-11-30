@@ -1,0 +1,1 @@
+Define a workflow that orchestrates procurement approvals: receive purchase requests, validate budget availability from finance API, route multi-level approvals based on amount, generate POs in ERP, and log all steps for audit.

@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 7 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch AI News",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything?q=AI&apiKey=YOUR_API_KEY"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Daily AI News Headlines",
+        "text": "Here are the top three AI news headlines."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch AI News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch AI News": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

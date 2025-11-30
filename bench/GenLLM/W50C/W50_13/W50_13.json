@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Data Scan",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Scan Storage Locations",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/scan-storage"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Identify Data for Deletion",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Request Deletion Approval",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Requesting approval for deletion of identified data."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Perform Deletion",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/delete-data"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Log Retention Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Data Retention Report",
+        "text": "Retention report details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Data Scan": {
+      "main": [
+        [
+          {
+            "node": "Scan Storage Locations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scan Storage Locations": {
+      "main": [
+        [
+          {
+            "node": "Identify Data for Deletion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identify Data for Deletion": {
+      "main": [
+        [
+          {
+            "node": "Request Deletion Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Deletion Approval": {
+      "main": [
+        [
+          {
+            "node": "Perform Deletion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perform Deletion": {
+      "main": [
+        [
+          {
+            "node": "Log Retention Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

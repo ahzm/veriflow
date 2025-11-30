@@ -1,0 +1,189 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "CMS Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "cms-trigger"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Approved Articles",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://cms.example.com/api/articles?status=approved"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Transform for Partner A",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { title: item.json.title, content: item.json.content } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Push to Partner A API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://partner-a.example.com/api/publish",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "title": "={{$json[\"title\"]}}",
+          "content": "={{$json[\"content\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Transform for Partner B",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { headline: item.json.title, body: item.json.content } }));"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Push to Partner B API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://partner-b.example.com/api/publish",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "headline": "={{$json[\"headline\"]}}",
+          "body": "={{$json[\"body\"]}}"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Monitor Publishing Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://partner-a.example.com/api/status",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Reconcile Metrics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { views: item.json.views, clicks: item.json.clicks } }));"
+      }
+    },
+    {
+      "id": "9",
+      "name": "Send Metrics Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "metrics@example.com",
+        "subject": "Daily Metrics Report",
+        "text": "Views and clicks have been reconciled."
+      }
+    }
+  ],
+  "connections": {
+    "CMS Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Approved Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Approved Articles": {
+      "main": [
+        [
+          {
+            "node": "Transform for Partner A",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Transform for Partner B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform for Partner A": {
+      "main": [
+        [
+          {
+            "node": "Push to Partner A API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push to Partner A API": {
+      "main": [
+        [
+          {
+            "node": "Monitor Publishing Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform for Partner B": {
+      "main": [
+        [
+          {
+            "node": "Push to Partner B API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push to Partner B API": {
+      "main": [
+        [
+          {
+            "node": "Monitor Publishing Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Publishing Status": {
+      "main": [
+        [
+          {
+            "node": "Reconcile Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconcile Metrics": {
+      "main": [
+        [
+          {
+            "node": "Send Metrics Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

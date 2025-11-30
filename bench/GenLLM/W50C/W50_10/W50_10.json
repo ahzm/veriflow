@@ -1,0 +1,134 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Backups",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 2 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Backup Status AWS",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://aws-backup-status-api.example.com"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch Backup Status Azure",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://azure-backup-status-api.example.com"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Fetch Backup Status GCP",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://gcp-backup-status-api.example.com"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Run Restore Test",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Record Results",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "7",
+      "name": "Alert Infrastructure Team",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Backup restore test failed!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Backups": {
+      "main": [
+        [
+          {
+            "node": "Fetch Backup Status AWS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Backup Status Azure",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Backup Status GCP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Backup Status AWS": {
+      "main": [
+        [
+          {
+            "node": "Run Restore Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Backup Status Azure": {
+      "main": [
+        [
+          {
+            "node": "Run Restore Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Backup Status GCP": {
+      "main": [
+        [
+          {
+            "node": "Run Restore Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Restore Test": {
+      "main": [
+        [
+          {
+            "node": "Record Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Results": {
+      "main": [
+        [
+          {
+            "node": "Alert Infrastructure Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

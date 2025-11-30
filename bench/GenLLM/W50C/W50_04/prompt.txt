@@ -1,0 +1,1 @@
+Define a workflow that orchestrates student enrollment: receive applications, validate prerequisites against academic records, assign advisors, create accounts in LMS and identity systems, send onboarding materials, and track enrollment funnel metrics.

@@ -1,0 +1,1 @@
+Construct a workflow that automates employee offboarding: triggered by HR events, revoke access across multiple systems, archive mailboxes, transfer ownership of resources, notify managers, and generate an offboarding completion report.

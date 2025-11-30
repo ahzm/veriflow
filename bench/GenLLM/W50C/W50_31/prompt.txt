@@ -1,0 +1,1 @@
+Design a workflow that coordinates complex returns management: accept return requests, validate policy eligibility, generate shipping labels, inspect returned items status from warehouse API, issue refunds or rejections, and log reasons.

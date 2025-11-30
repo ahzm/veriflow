@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Humidity",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/humidity"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check Humidity",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"humidity\"]}}",
+              "operation": "greaterThan",
+              "value2": 85
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Humidity is above 85%!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Humidity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Humidity": {
+      "main": [
+        [
+          {
+            "node": "Check Humidity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Humidity": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

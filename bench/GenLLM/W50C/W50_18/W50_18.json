@@ -1,0 +1,118 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Firmware Update",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Segment Devices",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { /* segmentation logic */ });"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Firmware Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/updateFirmware"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Update Success",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { /* tracking logic */ });"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Pause Rollout",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { /* pause logic */ });"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Report Outcomes",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Firmware Update Report",
+        "text": "The firmware update process has completed. Please review the outcomes."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Firmware Update": {
+      "main": [
+        [
+          {
+            "node": "Segment Devices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Segment Devices": {
+      "main": [
+        [
+          {
+            "node": "Firmware Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Firmware Update": {
+      "main": [
+        [
+          {
+            "node": "Track Update Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Update Success": {
+      "main": [
+        [
+          {
+            "node": "Pause Rollout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Report Outcomes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pause Rollout": {
+      "main": [
+        [
+          {
+            "node": "Report Outcomes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Create a workflow that manages cross-border tax calculations: ingest orders, detect jurisdictions, compute tax using a tax API, reconcile differences with accounting, and generate jurisdiction-specific tax reports.

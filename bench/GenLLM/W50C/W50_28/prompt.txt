@@ -1,0 +1,1 @@
+Build a workflow that manages subscription feature entitlements: map SKUs to entitlements, listen to subscription changes, update entitlements in a feature flag service, and notify customers of new feature access.

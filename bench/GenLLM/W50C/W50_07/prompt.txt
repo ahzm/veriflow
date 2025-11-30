@@ -1,0 +1,1 @@
+Create a workflow that automates legal hold notifications: when a legal case is opened, identify relevant custodians, send hold notices via email, track acknowledgements, suspend data deletion policies, and generate compliance reports.

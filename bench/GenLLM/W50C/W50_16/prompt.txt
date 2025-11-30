@@ -1,0 +1,1 @@
+Design a workflow that automates security vulnerability handling: ingest scanner reports, deduplicate findings, map vulnerabilities to asset owners, open tickets with severity-based SLAs, and send periodic progress reports to security management.

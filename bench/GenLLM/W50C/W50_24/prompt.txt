@@ -1,0 +1,1 @@
+Define a workflow that supports citizen service requests: intake via multiple channels, categorize topics, route to responsible departments, track status updates, and send citizens progress notifications until closure.

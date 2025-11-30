@@ -1,0 +1,127 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Receive Applications",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Validate Prerequisites",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Assign Advisors",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Create LMS Account",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://lms.example.com/api/createAccount"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create Identity Account",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://identity.example.com/api/createAccount"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Onboarding Materials",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "student@example.com",
+        "subject": "Welcome to Our Program",
+        "text": "Here are your onboarding materials."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Track Enrollment Metrics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Receive Applications": {
+      "main": [
+        [
+          {
+            "node": "Validate Prerequisites",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Prerequisites": {
+      "main": [
+        [
+          {
+            "node": "Assign Advisors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Advisors": {
+      "main": [
+        [
+          {
+            "node": "Create LMS Account",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Identity Account",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create LMS Account": {
+      "main": [
+        [
+          {
+            "node": "Send Onboarding Materials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Identity Account": {
+      "main": [
+        [
+          {
+            "node": "Send Onboarding Materials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Onboarding Materials": {
+      "main": [
+        [
+          {
+            "node": "Track Enrollment Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

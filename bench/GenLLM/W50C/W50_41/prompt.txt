@@ -1,0 +1,1 @@
+Design a workflow that manages multi-step insurance claims: collect claim data, validate coverage, estimate damage using an external API, request additional documents, and decide payouts or denials.

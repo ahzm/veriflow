@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 0"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Exchange Rate",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.exchangerate-api.com/v4/latest/USD"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Weekly Exchange Rate Summary",
+        "text": "Here is the weekly exchange rate summary."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Exchange Rate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Exchange Rate": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Each Friday at 18:00 fetch weekly GitHub trends and email.

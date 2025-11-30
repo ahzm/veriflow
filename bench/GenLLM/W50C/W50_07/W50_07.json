@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "legal-case-opened"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Identify Custodians",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { custodians: ['custodian1@example.com', 'custodian2@example.com'] } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"custodians\"]}}",
+        "subject": "Legal Hold Notification",
+        "text": "This is a notification to inform you of a legal hold."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Acknowledgements",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { acknowledged: true } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Suspend Data Deletion Policies",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/suspend-deletion"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Generate Compliance Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { report: 'Compliance report generated.' } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Identify Custodians",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identify Custodians": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Track Acknowledgements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Acknowledgements": {
+      "main": [
+        [
+          {
+            "node": "Suspend Data Deletion Policies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Suspend Data Deletion Policies": {
+      "main": [
+        [
+          {
+            "node": "Generate Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

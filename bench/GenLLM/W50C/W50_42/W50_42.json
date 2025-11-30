@@ -1,0 +1,100 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Receive Legal Notice",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "legal-notice"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Identify Affected Platforms",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const platforms = ['PlatformA', 'PlatformB', 'PlatformC'];\nreturn platforms.map(platform => ({ platform }));"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Remove Content via API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/remove-content",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "platform": "={{$json[\"platform\"]}}",
+          "contentId": "={{$json[\"contentId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Actions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const log = `Removed content from ${$json.platform}`;\nconsole.log(log);\nreturn { log };"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"requesterEmail\"]}}",
+        "subject": "Content Removal Confirmation",
+        "text": "Your content has been successfully removed from the affected platforms."
+      }
+    }
+  ],
+  "connections": {
+    "Receive Legal Notice": {
+      "main": [
+        [
+          {
+            "node": "Identify Affected Platforms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identify Affected Platforms": {
+      "main": [
+        [
+          {
+            "node": "Remove Content via API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Content via API": {
+      "main": [
+        [
+          {
+            "node": "Log Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Actions": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

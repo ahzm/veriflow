@@ -1,0 +1,1 @@
+Every 2 hours check uptime API; if “down”, email admin.

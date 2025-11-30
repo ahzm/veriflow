@@ -1,0 +1,1 @@
+Create a workflow that coordinates scholarship application processing: intake applications, verify supporting documents, compute eligibility scores, route to reviewers, aggregate decisions, and notify applicants while updating a funding dashboard.

@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "HR Event Trigger",
+      "type": "n8n-nodes-base.start",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Revoke Access",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/revoke-access"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Archive Mailbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/archive-mailbox"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Transfer Ownership",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/transfer-ownership"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Managers",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "managers@example.com",
+        "subject": "Employee Offboarding Notification",
+        "text": "An employee has been offboarded. Please take necessary actions."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/generate-report"
+      }
+    }
+  ],
+  "connections": {
+    "HR Event Trigger": {
+      "main": [
+        [
+          {
+            "node": "Revoke Access",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revoke Access": {
+      "main": [
+        [
+          {
+            "node": "Archive Mailbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive Mailbox": {
+      "main": [
+        [
+          {
+            "node": "Transfer Ownership",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transfer Ownership": {
+      "main": [
+        [
+          {
+            "node": "Notify Managers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Managers": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Define a workflow that automates subscription usage alerts: monitor usage metrics, detect nearing quota thresholds, send warning emails, offer upgrades, and notify account managers of heavy users.

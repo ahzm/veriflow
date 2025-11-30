@@ -1,0 +1,1 @@
+Create a workflow that manages referral hiring: track referrals, verify candidate stages, grant bonuses upon successful hires, notify referrers, and produce quarterly referral performance reports.

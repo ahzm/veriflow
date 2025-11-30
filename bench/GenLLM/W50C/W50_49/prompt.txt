@@ -1,0 +1,1 @@
+Define a workflow that automates travel booking approvals: reconcile trip requests, check policy constraints, route approvals, book flights and hotels via APIs once approved, and send itineraries.

@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Referral Tracking",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Candidate Stages",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/candidates/stages"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Grant Bonus",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/referrals/grant-bonus"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Referrer",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Your referral has been hired! Thank you for your support."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Quarterly Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/referrals/report"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Referral Tracking": {
+      "main": [
+        [
+          {
+            "node": "Check Candidate Stages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Candidate Stages": {
+      "main": [
+        [
+          {
+            "node": "Grant Bonus",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Grant Bonus": {
+      "main": [
+        [
+          {
+            "node": "Notify Referrer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Referrer": {
+      "main": [
+        [
+          {
+            "node": "Generate Quarterly Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

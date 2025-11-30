@@ -1,0 +1,1 @@
+Build a workflow that orchestrates cross-team release notes: collect changes from multiple repos, group them by feature area, generate human-readable notes, send drafts to product owners, and publish approved notes.

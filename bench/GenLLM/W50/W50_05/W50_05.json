@@ -1,0 +1,75 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "IF Amount < 20",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "rules": {
+          "conditions": [
+            {
+              "field": "amount",
+              "operation": "lessThan",
+              "value": 20
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Slack Warning",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Warning: Order amount is less than 20."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Email Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "Order Confirmation",
+        "text": "Thank you for your order!"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "IF Amount < 20",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Amount < 20": {
+      "main": [
+        [
+          {
+            "node": "Slack Warning",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

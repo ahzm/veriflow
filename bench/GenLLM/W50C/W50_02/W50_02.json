@@ -1,0 +1,133 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Intake Form",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "loan-intake"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Credit Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.creditcheck.com/check",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "applicantData": "={{$json[\"body\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Calculate Risk Score",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const riskScore = Math.random() * 100;\nreturn [{ json: { riskScore } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Manual Review",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "High-risk application requires manual review: {{$json[\"body\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Auto Approve",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"body\"][\"email\"]}}",
+        "subject": "Loan Application Approved",
+        "text": "Congratulations! Your loan application has been approved."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify Applicant",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"body\"][\"email\"]}}",
+        "subject": "Loan Application Status",
+        "text": "Your loan application status is: {{$json[\"riskScore\"] < 50 ? 'Approved' : 'Under Review'}}."
+      }
+    }
+  ],
+  "connections": {
+    "Intake Form": {
+      "main": [
+        [
+          {
+            "node": "Credit Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credit Check": {
+      "main": [
+        [
+          {
+            "node": "Calculate Risk Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Risk Score": {
+      "main": [
+        [
+          {
+            "node": "Manual Review",
+            "type": "main",
+            "index": 0,
+            "condition": {
+              "type": "lessThan",
+              "value": 50
+            }
+          },
+          {
+            "node": "Auto Approve",
+            "type": "main",
+            "index": 1,
+            "condition": {
+              "type": "greaterThanOrEqual",
+              "value": 50
+            }
+          }
+        ]
+      ]
+    },
+    "Auto Approve": {
+      "main": [
+        [
+          {
+            "node": "Notify Applicant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Review": {
+      "main": [
+        [
+          {
+            "node": "Notify Applicant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

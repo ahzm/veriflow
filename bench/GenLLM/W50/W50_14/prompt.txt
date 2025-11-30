@@ -1,0 +1,1 @@
+Webhook errorCode; forward to Slack.

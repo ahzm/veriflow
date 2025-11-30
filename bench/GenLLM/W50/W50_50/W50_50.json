@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 */6 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Wildfire Alerts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/wildfire-alerts"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New wildfire alerts have been fetched."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Wildfire Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Wildfire Alerts": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Design a workflow that manages multi-tenant SaaS configuration drift: periodically snapshot tenant configs, detect drifts from baseline, propose remediation steps, and notify operations.

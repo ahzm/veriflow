@@ -1,0 +1,114 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "submit-project"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Completeness",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items[0].json.complete ? items : [];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Assign Judges",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const judges = ['Judge 1', 'Judge 2', 'Judge 3'];\nreturn judges.map(judge => ({ json: { judge, project: items[0].json } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Collect Scores",
+      "type": "n8n-nodes-base.wait",
+      "parameters": {
+        "waitFor": "1",
+        "waitForType": "time",
+        "timeUnit": "minutes"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Compute Rankings",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const scores = items.map(item => item.json.score);\nscores.sort((a, b) => b - a);\nreturn scores.map((score, index) => ({ json: { rank: index + 1, score } }));"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Publish Results",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "participants@example.com",
+        "subject": "Hackathon Results",
+        "text": "The results of the hackathon are ready. Check your scores and rankings!"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Completeness",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Completeness": {
+      "main": [
+        [
+          {
+            "node": "Assign Judges",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Judges": {
+      "main": [
+        [
+          {
+            "node": "Collect Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Scores": {
+      "main": [
+        [
+          {
+            "node": "Compute Rankings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Rankings": {
+      "main": [
+        [
+          {
+            "node": "Publish Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

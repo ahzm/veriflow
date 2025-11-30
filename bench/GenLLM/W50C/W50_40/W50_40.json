@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Experiment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Sensor Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.sensors.com/data"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Run Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.analysis.com/run"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Store Results",
+      "type": "n8n-nodes-base.database",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Notify Researchers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The experiment results are ready for review."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Experiment": {
+      "main": [
+        [
+          {
+            "node": "Collect Sensor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Sensor Data": {
+      "main": [
+        [
+          {
+            "node": "Run Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Analysis": {
+      "main": [
+        [
+          {
+            "node": "Store Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Results": {
+      "main": [
+        [
+          {
+            "node": "Notify Researchers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

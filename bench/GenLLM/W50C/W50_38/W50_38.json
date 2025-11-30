@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Contract Check",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Contracts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/contracts"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Calculate Renewal Options",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Logic to calculate renewal options\n    return { json: { contractId: item.json.id, renewalOptions: ['Option 1', 'Option 2'] } };\n});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Account Managers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Contract renewal options are available for review."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Update CRM Stages",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/update-crm"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Contract Check": {
+      "main": [
+        [
+          {
+            "node": "Fetch Contracts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Contracts": {
+      "main": [
+        [
+          {
+            "node": "Calculate Renewal Options",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Renewal Options": {
+      "main": [
+        [
+          {
+            "node": "Notify Account Managers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Account Managers": {
+      "main": [
+        [
+          {
+            "node": "Update CRM Stages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

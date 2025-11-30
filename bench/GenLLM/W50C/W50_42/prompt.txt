@@ -1,0 +1,1 @@
+Create a workflow that orchestrates multi-region content takedown requests: receive legal notices, identify all affected platforms, remove content via APIs, log actions, and send confirmations to requesters.

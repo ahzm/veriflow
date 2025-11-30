@@ -1,0 +1,1 @@
+Design a workflow that manages customer health scoring: integrate product usage, support tickets, and billing data, compute composite health scores, classify customers into tiers, notify success managers, and trigger playbooks for at-risk accounts.

@@ -1,0 +1,1 @@
+AQI hourly; if < 40 Slack “good air” message.

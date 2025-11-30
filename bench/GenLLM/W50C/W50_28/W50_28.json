@@ -1,0 +1,81 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Listen to Subscription Changes",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "subscription-changes"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Map SKUs to Entitlements",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Mapping logic here\n    return { json: { sku: item.json.sku, entitlement: 'new_feature' } };\n});"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Update Feature Flags",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://feature-flag-service.com/update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "sku": "={{$json[\"sku\"]}}",
+          "entitlement": "={{$json[\"entitlement\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Customer",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"customerEmail\"]}}",
+        "subject": "New Feature Access",
+        "text": "You have been granted access to a new feature!"
+      }
+    }
+  ],
+  "connections": {
+    "Listen to Subscription Changes": {
+      "main": [
+        [
+          {
+            "node": "Map SKUs to Entitlements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map SKUs to Entitlements": {
+      "main": [
+        [
+          {
+            "node": "Update Feature Flags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Feature Flags": {
+      "main": [
+        [
+          {
+            "node": "Notify Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

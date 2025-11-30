@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook IoT Sensor",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Alert: Battery level is below 20%."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook IoT Sensor": {
+      "main": [
+        [
+          {
+            "node": "Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

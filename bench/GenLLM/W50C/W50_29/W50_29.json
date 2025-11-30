@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Ingest Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/data"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Normalize Units",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Compute ESG Metrics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Generate Reports",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Reports",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "ESG Report",
+        "text": "Please find attached the latest ESG report."
+      }
+    }
+  ],
+  "connections": {
+    "Ingest Data": {
+      "main": [
+        [
+          {
+            "node": "Normalize Units",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Units": {
+      "main": [
+        [
+          {
+            "node": "Compute ESG Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute ESG Metrics": {
+      "main": [
+        [
+          {
+            "node": "Generate Reports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Reports": {
+      "main": [
+        [
+          {
+            "node": "Send Reports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

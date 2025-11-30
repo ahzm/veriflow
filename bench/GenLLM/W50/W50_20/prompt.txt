@@ -1,0 +1,1 @@
+Fetch earthquake alerts every 4 hours and email.

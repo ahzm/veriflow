@@ -1,0 +1,1 @@
+Webhook temperature; if > 30C send Slack heat alert.

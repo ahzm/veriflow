@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Validate Eligibility",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.eligible);"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Rewards",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { partnerId: item.json.partnerId, reward: item.json.referralCount * 10 } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Trigger Payout",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.paymentprovider.com/payout",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "partnerId": "={{$json[\"partnerId\"]}}",
+          "amount": "={{$json[\"reward\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Monthly Statement",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "partners@example.com",
+        "subject": "Monthly Referral Statement",
+        "text": "Dear Partner, here is your monthly statement of referrals and rewards."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Monthly",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 1 1 * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Compute Rewards",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Rewards": {
+      "main": [
+        [
+          {
+            "node": "Trigger Payout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Payout": {
+      "main": [
+        [
+          {
+            "node": "Send Monthly Statement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Monthly": {
+      "main": [
+        [
+          {
+            "node": "Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Webhook contains “productId”; fetch price and email.

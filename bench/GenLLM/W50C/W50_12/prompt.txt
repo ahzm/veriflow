@@ -1,0 +1,1 @@
+Create a workflow that automates publication of research datasets: validate metadata, anonymize sensitive fields, generate DOIs via an external service, upload datasets to a repository, and send confirmation emails to authors.

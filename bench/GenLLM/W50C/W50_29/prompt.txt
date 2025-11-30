@@ -1,0 +1,1 @@
+Define a workflow that performs ESG reporting: ingest emissions and energy data, normalize units, compute standard ESG metrics, generate regulator-compliant reports, and send them to stakeholders.

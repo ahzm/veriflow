@@ -1,0 +1,1 @@
+Create a workflow that orchestrates digital signage content: schedule content per location, deploy via API to players, monitor playback status, and provide daily proof-of-play reports.

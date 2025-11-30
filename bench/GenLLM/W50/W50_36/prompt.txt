@@ -1,0 +1,1 @@
+Every Sunday fetch weekly exchange rate summary and email.

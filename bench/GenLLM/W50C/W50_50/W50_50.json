@@ -1,0 +1,114 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Crisis Alert Receiver",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Determine Affected Regions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const affectedRegions = []; // Logic to determine affected regions\nreturn [{ json: { affectedRegions } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "leadership@example.com",
+        "subject": "Emergency Alert",
+        "text": "An emergency has been reported. Please check the affected regions."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Emergency alert has been issued. Check affected regions."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Acknowledgements",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/acknowledge"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Compile Incident Summary",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const summary = {}; // Logic to compile incident summary\nreturn [{ json: { summary } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Crisis Alert Receiver": {
+      "main": [
+        [
+          {
+            "node": "Determine Affected Regions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Affected Regions": {
+      "main": [
+        [
+          {
+            "node": "Send Email Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Alert": {
+      "main": [
+        [
+          {
+            "node": "Track Acknowledgements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Slack Alert": {
+      "main": [
+        [
+          {
+            "node": "Track Acknowledgements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Acknowledgements": {
+      "main": [
+        [
+          {
+            "node": "Compile Incident Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

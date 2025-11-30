@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Validate Metadata",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Anonymize Fields",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Generate DOI",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://doi-service.example.com/generate"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Upload Dataset",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://repository.example.com/upload"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "authors@example.com",
+        "subject": "Dataset Publication Confirmation",
+        "text": "Your dataset has been successfully published."
+      }
+    }
+  ],
+  "connections": {
+    "Validate Metadata": {
+      "main": [
+        [
+          {
+            "node": "Anonymize Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anonymize Fields": {
+      "main": [
+        [
+          {
+            "node": "Generate DOI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate DOI": {
+      "main": [
+        [
+          {
+            "node": "Upload Dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Dataset": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

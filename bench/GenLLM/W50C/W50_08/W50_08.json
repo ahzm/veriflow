@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Capture Leads",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Enrich Leads",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.firmographics.com/enrich"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Assign Nurture Journeys",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Track Engagement Events",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Engagement event tracked."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Adapt Journeys",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send Performance Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "marketing@company.com",
+        "subject": "Performance Summary",
+        "text": "Here is the performance summary of the marketing funnels."
+      }
+    }
+  ],
+  "connections": {
+    "Capture Leads": {
+      "main": [
+        [
+          {
+            "node": "Enrich Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Leads": {
+      "main": [
+        [
+          {
+            "node": "Assign Nurture Journeys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Nurture Journeys": {
+      "main": [
+        [
+          {
+            "node": "Track Engagement Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Engagement Events": {
+      "main": [
+        [
+          {
+            "node": "Adapt Journeys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adapt Journeys": {
+      "main": [
+        [
+          {
+            "node": "Send Performance Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

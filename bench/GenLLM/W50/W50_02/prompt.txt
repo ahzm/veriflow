@@ -1,0 +1,1 @@
+Webhook receives new user data; send welcome email and log event.

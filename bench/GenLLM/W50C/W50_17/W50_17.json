@@ -1,0 +1,119 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Intake Applications",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "intake-applications"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Verify Supporting Documents",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Compute Eligibility Scores",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Route to Reviewers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New application ready for review."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Aggregate Decisions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Notify Applicants",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "applicant@example.com",
+        "subject": "Scholarship Application Update",
+        "text": "Your application status has been updated."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Update Funding Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/update-dashboard"
+      }
+    }
+  ],
+  "connections": {
+    "Intake Applications": {
+      "main": [
+        [
+          {
+            "node": "Verify Supporting Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Supporting Documents": {
+      "main": [
+        [
+          {
+            "node": "Compute Eligibility Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Eligibility Scores": {
+      "main": [
+        [
+          {
+            "node": "Route to Reviewers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to Reviewers": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Decisions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Decisions": {
+      "main": [
+        [
+          {
+            "node": "Notify Applicants",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Funding Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

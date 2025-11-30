@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule HR Data Fetch",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Regional HR Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://regional-hr-system.com/api/data"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Harmonize Employee Records",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Detect Inconsistencies",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Update Global HR Database",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://global-hr-database.com/api/update"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Discrepancy Report to HR Managers",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "hr_managers@company.com",
+        "subject": "Region-Specific Discrepancy Report",
+        "text": "Please find attached the discrepancy report for your region."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule HR Data Fetch": {
+      "main": [
+        [
+          {
+            "node": "Fetch Regional HR Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Regional HR Data": {
+      "main": [
+        [
+          {
+            "node": "Harmonize Employee Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Harmonize Employee Records": {
+      "main": [
+        [
+          {
+            "node": "Detect Inconsistencies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Inconsistencies": {
+      "main": [
+        [
+          {
+            "node": "Update Global HR Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Global HR Database": {
+      "main": [
+        [
+          {
+            "node": "Send Discrepancy Report to HR Managers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

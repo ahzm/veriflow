@@ -1,0 +1,1 @@
+Build a workflow that coordinates a bug triage process: pull new issues from GitHub, categorize them using an NLP classifier API, assign owners based on components, enforce SLAs with reminders, and summarize weekly triage outcomes to engineering leads.

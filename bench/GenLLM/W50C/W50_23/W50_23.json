@@ -1,0 +1,130 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Performance Review",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 1 * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Notify Reviewers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "It's time for the performance reviews! Please check your assigned employees."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Collect Feedback Forms",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/feedback-forms"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Consolidate Scores",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { /* logic to consolidate scores */ });"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Summaries",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { /* logic to generate summaries */ });"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Store Results in HR System",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://hr-system.example.com/store-results"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "hr@example.com",
+        "subject": "Performance Review Summaries",
+        "text": "The performance review summaries have been generated and stored."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Performance Review": {
+      "main": [
+        [
+          {
+            "node": "Notify Reviewers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Reviewers": {
+      "main": [
+        [
+          {
+            "node": "Collect Feedback Forms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Feedback Forms": {
+      "main": [
+        [
+          {
+            "node": "Consolidate Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidate Scores": {
+      "main": [
+        [
+          {
+            "node": "Generate Summaries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summaries": {
+      "main": [
+        [
+          {
+            "node": "Store Results in HR System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Results in HR System": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

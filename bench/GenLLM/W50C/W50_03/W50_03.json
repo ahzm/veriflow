@@ -1,0 +1,141 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "GitHub Issues",
+      "type": "n8n-nodes-base.github",
+      "parameters": {
+        "resource": "issue",
+        "operation": "getAll",
+        "repository": "your-repo-name",
+        "owner": "your-github-username"
+      }
+    },
+    {
+      "id": "2",
+      "name": "NLP Classifier",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your-nlp-classifier-api.com/classify",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "text": "={{$json[\"title\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Assign Owners",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const owners = { 'componentA': 'ownerA', 'componentB': 'ownerB' }; \nconst component = $json['component']; \nreturn [{ json: { owner: owners[component] || 'defaultOwner' } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "SLA Reminder",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Reminder Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "engineering-leads@example.com",
+        "subject": "Weekly Bug Triage Reminder",
+        "text": "This is a reminder to review the bug triage outcomes."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Weekly Summary",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const summary = {}; \n// Logic to summarize triage outcomes\nreturn [{ json: summary }];"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "engineering-leads@example.com",
+        "subject": "Weekly Bug Triage Summary",
+        "text": "={{JSON.stringify($json)}}"
+      }
+    }
+  ],
+  "connections": {
+    "GitHub Issues": {
+      "main": [
+        [
+          {
+            "node": "NLP Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NLP Classifier": {
+      "main": [
+        [
+          {
+            "node": "Assign Owners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Owners": {
+      "main": [
+        [
+          {
+            "node": "SLA Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SLA Reminder": {
+      "main": [
+        [
+          {
+            "node": "Send Reminder Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder Email": {
+      "main": [
+        [
+          {
+            "node": "Weekly Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "orders"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Detect Jurisdictions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Logic to detect jurisdiction based on order data\n    return { json: { jurisdiction: 'US', orderId: item.json.id } };\n});"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Tax",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.taxservice.com/calculate",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "jurisdiction": "={{$json[\"jurisdiction\"]}}",
+          "orderId": "={{$json[\"orderId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Reconcile Differences",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Logic to reconcile tax differences with accounting\n    return { json: { reconciled: true, orderId: item.json.orderId } };\n});"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Tax Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Logic to generate jurisdiction-specific tax report\n    return { json: { report: 'Tax report for order ' + item.json.orderId } };\n});"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Report via Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "tax@company.com",
+        "subject": "Jurisdiction-Specific Tax Report",
+        "text": "={{$json[\"report\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Detect Jurisdictions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Jurisdictions": {
+      "main": [
+        [
+          {
+            "node": "Compute Tax",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Tax": {
+      "main": [
+        [
+          {
+            "node": "Reconcile Differences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconcile Differences": {
+      "main": [
+        [
+          {
+            "node": "Generate Tax Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Tax Report": {
+      "main": [
+        [
+          {
+            "node": "Send Report via Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

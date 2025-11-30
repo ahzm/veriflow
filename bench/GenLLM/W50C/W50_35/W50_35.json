@@ -1,0 +1,122 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Grant Milestones",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Reminder to Researchers",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "researchers@example.com",
+        "subject": "Reminder: Upcoming Grant Milestone",
+        "text": "This is a reminder about the upcoming grant milestone. Please ensure your progress updates are submitted on time."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Reminder to Administrators",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "administrators@example.com",
+        "subject": "Reminder: Grant Reporting Deadline",
+        "text": "This is a reminder for the upcoming grant reporting deadline. Please check that all researchers have submitted their updates."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Collect Progress Updates",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/collect-progress-updates"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Compile Consolidated Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { return { json: { report: item.json.progress } }; });"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Report to Funders",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "funders@example.com",
+        "subject": "Consolidated Grant Report",
+        "text": "Attached is the consolidated report of grant progress updates."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Grant Milestones": {
+      "main": [
+        [
+          {
+            "node": "Send Reminder to Researchers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Reminder to Administrators",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder to Researchers": {
+      "main": [
+        [
+          {
+            "node": "Collect Progress Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder to Administrators": {
+      "main": [
+        [
+          {
+            "node": "Collect Progress Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Progress Updates": {
+      "main": [
+        [
+          {
+            "node": "Compile Consolidated Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compile Consolidated Report": {
+      "main": [
+        [
+          {
+            "node": "Send Report to Funders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

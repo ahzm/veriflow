@@ -1,0 +1,221 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "service-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Categorize Request",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const categories = {\n    'billing': 'Billing Department',\n    'technical': 'Technical Support',\n    'general': 'General Inquiries'\n};\n\nconst request = items[0].json;\nconst category = categories[request.topic] || 'General Inquiries';\n\nreturn [{ json: { ...request, category } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Route to Department",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"category\"]}}",
+              "operation": "equals",
+              "value2": "Billing Department"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email to Billing",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "billing@department.com",
+        "subject": "New Service Request",
+        "text": "A new service request has been received: {{$json[\"description\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email to Technical Support",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "support@department.com",
+        "subject": "New Service Request",
+        "text": "A new service request has been received: {{$json[\"description\"]}}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email to General Inquiries",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "info@department.com",
+        "subject": "New Service Request",
+        "text": "A new service request has been received: {{$json[\"description\"]}}"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Track Status Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/status-update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "requestId": "={{$json[\"id\"]}}",
+          "status": "In Progress"
+        }
+      }
+    },
+    {
+      "id": "8",
+      "name": "Send Progress Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Your service request is currently being processed. Request ID: {{$json[\"id\"]}}"
+      }
+    },
+    {
+      "id": "9",
+      "name": "Closure Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Your service request has been completed. Request ID: {{$json[\"id\"]}}"
+      }
+    },
+    {
+      "id": "10",
+      "name": "Schedule Status Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Categorize Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize Request": {
+      "main": [
+        [
+          {
+            "node": "Route to Department",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to Department": {
+      "main": [
+        [
+          {
+            "node": "Send Email to Billing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email to Technical Support",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email to General Inquiries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Billing": {
+      "main": [
+        [
+          {
+            "node": "Track Status Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Technical Support": {
+      "main": [
+        [
+          {
+            "node": "Track Status Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to General Inquiries": {
+      "main": [
+        [
+          {
+            "node": "Track Status Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Status Update": {
+      "main": [
+        [
+          {
+            "node": "Send Progress Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Progress Notification": {
+      "main": [
+        [
+          {
+            "node": "Closure Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Status Check": {
+      "main": [
+        [
+          {
+            "node": "Track Status Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

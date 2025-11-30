@@ -1,0 +1,1 @@
+Design a workflow that manages cross-channel outage communications: detect outages from monitoring, determine impacted customers, send status updates via email and SMS, update a status page, and send post-mortem summaries.

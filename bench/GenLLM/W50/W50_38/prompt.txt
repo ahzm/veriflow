@@ -1,0 +1,1 @@
+Hourly fetch ETH gas fee; if < 20gwei Slack notify.

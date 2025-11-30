@@ -1,0 +1,1 @@
+Design a workflow that coordinates multi-channel debt collection: identify overdue invoices, segment customers by risk, send sequence of reminders via email and SMS, escalate to phone agents, and update collection status in ERP.

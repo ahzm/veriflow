@@ -1,0 +1,81 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Content",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Deploy Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.digital-signage.com/deploy",
+        "method": "POST",
+        "body": {
+          "location": "Location A",
+          "content": "Content ID"
+        },
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Monitor Playback Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.digital-signage.com/status",
+        "method": "GET",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Proof of Play Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "report@example.com",
+        "subject": "Daily Proof of Play Report",
+        "text": "Here is the daily report of the content played."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Content": {
+      "main": [
+        [
+          {
+            "node": "Deploy Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deploy Content": {
+      "main": [
+        [
+          {
+            "node": "Monitor Playback Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Playback Status": {
+      "main": [
+        [
+          {
+            "node": "Send Proof of Play Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

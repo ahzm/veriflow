@@ -1,0 +1,60 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "path": "city",
+        "httpMethod": "GET"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.openweathermap.org/data/2.5/weather",
+        "method": "GET",
+        "queryParameters": {
+          "q": "={{$json[\"query\"][\"city\"]}}",
+          "appid": "YOUR_API_KEY"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Weather Update",
+        "text": "The weather data is: {{$json[\"data\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

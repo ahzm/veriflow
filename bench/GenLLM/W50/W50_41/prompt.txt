@@ -1,0 +1,1 @@
+Every 3 hours fetch NASA APOD and email title + URL.

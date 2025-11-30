@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "code-of-conduct-report"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Email to Review Committee",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "reviewcommittee@example.com",
+        "subject": "New Code of Conduct Violation Report",
+        "text": "A new report has been submitted. Please review it."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Investigation Steps",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/investigation-steps",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "reportId": "={{$json[\"id\"]}}",
+          "status": "Under Review"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Anonymized Statistics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/log-statistics",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "totalReports": "={{$json[\"totalReports\"]}}",
+          "resolvedReports": "={{$json[\"resolvedReports\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Daily Summary",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Email to Review Committee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Review Committee": {
+      "main": [
+        [
+          {
+            "node": "Track Investigation Steps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Investigation Steps": {
+      "main": [
+        [
+          {
+            "node": "Log Anonymized Statistics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Anonymized Statistics": {
+      "main": [
+        [
+          {
+            "node": "Schedule Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

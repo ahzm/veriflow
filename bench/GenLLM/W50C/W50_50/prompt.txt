@@ -1,0 +1,1 @@
+Construct a workflow that coordinates emergency notifications: receive crisis alerts, determine affected regions, send multi-channel alerts, track acknowledgements, and compile incident summaries for leadership.

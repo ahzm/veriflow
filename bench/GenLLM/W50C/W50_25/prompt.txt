@@ -1,0 +1,1 @@
+Construct a workflow that manages donation campaigns: integrate donation events from multiple payment providers, issue receipts, assign donors to campaigns, compute campaign KPIs, and send dashboards to organizers.

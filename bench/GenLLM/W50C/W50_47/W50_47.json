@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check Licenses",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request Get Licenses",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/licenses"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Content Owners",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "owner@example.com",
+        "subject": "License Expiration Notice",
+        "text": "Your license is about to expire. Please take action."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Update Content Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/update-content"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Compliance Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/generate-report"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check Licenses": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Get Licenses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Get Licenses": {
+      "main": [
+        [
+          {
+            "node": "Notify Content Owners",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Content Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

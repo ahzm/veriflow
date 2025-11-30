@@ -1,0 +1,1 @@
+Every hour check weather alerts; if storm warning email me.

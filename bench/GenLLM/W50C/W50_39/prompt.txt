@@ -1,0 +1,1 @@
+Define a workflow that automates alumni engagement: segment alumni, trigger tailored communications around events and giving campaigns, track responses, and update engagement scores.

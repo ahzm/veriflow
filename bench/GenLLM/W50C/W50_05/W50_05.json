@@ -1,0 +1,114 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Smart Meter Readings",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.smartmeter.com/readings"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Compute Time-of-Use Costs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const readings = items[0].json;\nconst costs = readings.map(reading => reading.value * 0.15);\nreturn costs;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Detect Unusual Consumption Patterns",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const costs = items[0].json;\nconst unusualPatterns = costs.filter(cost => cost > 100);\nreturn unusualPatterns;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Recommendations via Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Energy Usage Recommendations",
+        "text": "We have detected unusual consumption patterns. Please review the recommendations."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Update Dashboard with KPIs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.dashboard.com/update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "kpi": "energy_usage",
+          "value": "updated_value"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Smart Meter Readings",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Smart Meter Readings": {
+      "main": [
+        [
+          {
+            "node": "Smart Meter Readings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Smart Meter Readings": {
+      "main": [
+        [
+          {
+            "node": "Compute Time-of-Use Costs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Time-of-Use Costs": {
+      "main": [
+        [
+          {
+            "node": "Detect Unusual Consumption Patterns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Unusual Consumption Patterns": {
+      "main": [
+        [
+          {
+            "node": "Send Recommendations via Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Dashboard with KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

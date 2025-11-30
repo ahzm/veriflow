@@ -1,0 +1,132 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "return-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Policy",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items[0].json.policyEligible ? { eligible: true } : { eligible: false };"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Generate Shipping Label",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.shipping.com/generate-label",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "address": "={{$json[\"address\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Inspect Returned Items",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.warehouse.com/inspect",
+        "method": "GET",
+        "jsonParameters": true,
+        "options": {},
+        "query": {
+          "itemId": "={{$json[\"itemId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Issue Refund",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.payment.com/refund",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "amount": "={{$json[\"amount\"]}}",
+          "orderId": "={{$json[\"orderId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Log Reason",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "console.log(`Return reason: ${items[0].json.reason}`);"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Policy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Policy": {
+      "main": [
+        [
+          {
+            "node": "Generate Shipping Label",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Reason",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Shipping Label": {
+      "main": [
+        [
+          {
+            "node": "Inspect Returned Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inspect Returned Items": {
+      "main": [
+        [
+          {
+            "node": "Issue Refund",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Reason",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

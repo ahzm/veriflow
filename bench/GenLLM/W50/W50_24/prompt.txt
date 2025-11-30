@@ -1,0 +1,1 @@
+Webhook sales; if total > 1000 Slack celebration.

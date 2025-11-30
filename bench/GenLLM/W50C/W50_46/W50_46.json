@@ -1,0 +1,121 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Outage Detection",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.monitoring.com/outages"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Determine Impacted Customers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Send Email Update",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customers@example.com",
+        "subject": "Outage Update",
+        "text": "We are currently experiencing an outage. Please check our status page for updates."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send SMS Update",
+      "type": "n8n-nodes-base.smsSend",
+      "parameters": {
+        "text": "Outage detected. Check your email for more details."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Update Status Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://statuspage.com/api/update"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Post-Mortem Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Post-Mortem Summary",
+        "text": "Here is the summary of the outage and our response."
+      }
+    }
+  ],
+  "connections": {
+    "Outage Detection": {
+      "main": [
+        [
+          {
+            "node": "Determine Impacted Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Impacted Customers": {
+      "main": [
+        [
+          {
+            "node": "Send Email Update",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send SMS Update",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Update Status Page",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Send Email Update": {
+      "main": [
+        [
+          {
+            "node": "Send Post-Mortem Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS Update": {
+      "main": [
+        [
+          {
+            "node": "Send Post-Mortem Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status Page": {
+      "main": [
+        [
+          {
+            "node": "Send Post-Mortem Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

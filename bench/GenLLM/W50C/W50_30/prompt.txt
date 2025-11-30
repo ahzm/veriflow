@@ -1,0 +1,1 @@
+Construct a workflow that automates multi-stage customer onboarding for a bank: perform KYC checks, verify documents, create accounts, set initial limits, schedule welcome calls, and track drop-off reasons.

@@ -1,0 +1,1 @@
+Build a workflow that manages code-of-conduct violation reports: intake confidential reports, route to a small review committee, track investigation steps, and log anonymized statistics.

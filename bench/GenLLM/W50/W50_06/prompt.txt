@@ -1,0 +1,1 @@
+At 7am daily fetch AI news and email three headlines.

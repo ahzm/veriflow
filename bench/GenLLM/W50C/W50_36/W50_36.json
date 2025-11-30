@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Snapshot",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Snapshot Tenant Configs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/snapshot"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Detect Config Drift",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/detect-drift"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Propose Remediation Steps",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/propose-remediation"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Operations",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Configuration drift detected. Please review the proposed remediation steps."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Snapshot": {
+      "main": [
+        [
+          {
+            "node": "Snapshot Tenant Configs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Snapshot Tenant Configs": {
+      "main": [
+        [
+          {
+            "node": "Detect Config Drift",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Config Drift": {
+      "main": [
+        [
+          {
+            "node": "Propose Remediation Steps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propose Remediation Steps": {
+      "main": [
+        [
+          {
+            "node": "Notify Operations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

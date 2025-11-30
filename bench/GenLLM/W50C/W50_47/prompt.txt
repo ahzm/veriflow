@@ -1,0 +1,1 @@
+Create a workflow that orchestrates media licensing: track licenses and expirations, notify content owners ahead of expiry, remove or update content, and generate compliance reports.

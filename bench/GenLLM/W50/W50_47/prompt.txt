@@ -1,0 +1,1 @@
+Webhook new ticket; notify Slack with ticket priority.

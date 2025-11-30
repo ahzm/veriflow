@@ -1,0 +1,142 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check Overdue Invoices",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Overdue Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/overdue-invoices"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Segment Customers by Risk",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Email Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Payment Reminder",
+        "text": "This is a reminder for your overdue invoice."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send SMS Reminder",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "This is a reminder for your overdue invoice."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Escalate to Phone Agents",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "7",
+      "name": "Update Collection Status in ERP",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/update-collection-status"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check Overdue Invoices": {
+      "main": [
+        [
+          {
+            "node": "Get Overdue Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Overdue Invoices": {
+      "main": [
+        [
+          {
+            "node": "Segment Customers by Risk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Segment Customers by Risk": {
+      "main": [
+        [
+          {
+            "node": "Send Email Reminder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send SMS Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Reminder": {
+      "main": [
+        [
+          {
+            "node": "Escalate to Phone Agents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS Reminder": {
+      "main": [
+        [
+          {
+            "node": "Escalate to Phone Agents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalate to Phone Agents": {
+      "main": [
+        [
+          {
+            "node": "Update Collection Status in ERP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Collection Status in ERP": {
+      "main": [
+        [
+          {
+            "node": "Schedule Check Overdue Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

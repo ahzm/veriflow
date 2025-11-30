@@ -1,0 +1,1 @@
+Design a workflow that consolidates HR data from multiple regional systems, harmonizes employee records, detects inconsistencies, updates a global HR database, and sends region-specific discrepancy reports to HR managers.

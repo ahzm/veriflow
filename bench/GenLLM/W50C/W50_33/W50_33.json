@@ -1,0 +1,115 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Changes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/changes"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Group Changes",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.reduce((acc, item) => {\n    const feature = item.json.featureArea;\n    if (!acc[feature]) acc[feature] = [];\n    acc[feature].push(item);\n    return acc;\n}, {});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate Notes",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return Object.entries(items[0].json).map(([feature, changes]) => {\n    return { json: { feature, notes: changes.map(change => change.json.note).join('\\n') } };\n});"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Drafts",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "productowners@example.com",
+        "subject": "Draft Release Notes",
+        "text": "Please review the following draft release notes:\n{{ $json.notes }}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Publish Notes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/publish",
+        "method": "POST",
+        "body": {
+          "notes": "{{ $json.notes }}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Collect Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Changes": {
+      "main": [
+        [
+          {
+            "node": "Group Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group Changes": {
+      "main": [
+        [
+          {
+            "node": "Generate Notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Notes": {
+      "main": [
+        [
+          {
+            "node": "Send Drafts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Drafts": {
+      "main": [
+        [
+          {
+            "node": "Publish Notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

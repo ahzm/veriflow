@@ -1,0 +1,121 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Receive Sample Submission",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Print Barcode",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.barcodeprinter.com/print",
+        "method": "POST",
+        "body": {
+          "sampleId": "={{$json[\"sampleId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Movement",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.labtracking.com/movement",
+        "method": "POST",
+        "body": {
+          "sampleId": "={{$json[\"sampleId\"]}}",
+          "currentStation": "={{$json[\"currentStation\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Update LIMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.lims.com/update",
+        "method": "POST",
+        "body": {
+          "sampleId": "={{$json[\"sampleId\"]}}",
+          "status": "={{$json[\"status\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Alert Technician",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Sample {{ $json[\"sampleId\"] }} is delayed!"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Check Delays",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "if (new Date($json[\"timestamp\"]) < new Date(Date.now() - 86400000)) {\n  return [{ sampleId: $json[\"sampleId\"], status: 'delayed' }];\n}\nreturn [{ sampleId: $json[\"sampleId\"], status: 'on_time' }];"
+      }
+    }
+  ],
+  "connections": {
+    "Receive Sample Submission": {
+      "main": [
+        [
+          {
+            "node": "Print Barcode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Print Barcode": {
+      "main": [
+        [
+          {
+            "node": "Track Movement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Movement": {
+      "main": [
+        [
+          {
+            "node": "Update LIMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update LIMS": {
+      "main": [
+        [
+          {
+            "node": "Check Delays",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Delays": {
+      "main": [
+        [
+          {
+            "node": "Alert Technician",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

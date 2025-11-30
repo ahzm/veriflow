@@ -1,0 +1,1 @@
+Webhook “stockSymbol”; fetch price and email.

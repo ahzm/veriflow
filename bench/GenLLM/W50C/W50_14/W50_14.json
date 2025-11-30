@@ -1,0 +1,122 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Public Transport Feed",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.publictransport.com/feeds"
+      }
+    },
+    {
+      "id": "2",
+      "name": "City Sensor Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.citysensor.com/data"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Congestion Indicators",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const transportData = items[0].json;\nconst sensorData = items[1].json;\n// Logic to compute congestion indicators\nreturn [{ json: { congestionLevel: 'high' } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Publish Open Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.opendata.city/congestion",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "congestionLevel": "={{$json[\"congestionLevel\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify City Planners",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Congestion threshold breached! Current level: {{$json[\"congestionLevel\"]}}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Public Transport Feed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "City Sensor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Public Transport Feed": {
+      "main": [
+        [
+          {
+            "node": "Compute Congestion Indicators",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "City Sensor Data": {
+      "main": [
+        [
+          {
+            "node": "Compute Congestion Indicators",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Compute Congestion Indicators": {
+      "main": [
+        [
+          {
+            "node": "Publish Open Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Open Data": {
+      "main": [
+        [
+          {
+            "node": "Notify City Planners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

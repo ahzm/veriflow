@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 14 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Trending Papers",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/trending-papers"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "your-email@example.com",
+        "subject": "Daily Trending Research Papers",
+        "text": "Here are the trending research papers for today."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get Trending Papers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Trending Papers": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

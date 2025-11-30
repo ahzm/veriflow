@@ -1,0 +1,1 @@
+Construct a workflow that manages energy usage optimization: ingest smart meter readings, compute time-of-use costs, detect unusual consumption patterns, send recommendations via email, and update a dashboard with building-level KPIs.

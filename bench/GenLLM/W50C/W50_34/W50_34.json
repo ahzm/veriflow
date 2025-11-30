@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check Usage",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Usage Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/usage"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Detect Quota Threshold",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.usage >= item.json.quota * 0.8);"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Warning Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Usage Alert: Approaching Quota",
+        "text": "You are nearing your quota limit. Please consider upgrading your plan."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Account Managers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Alert: A user is nearing their quota limit."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check Usage": {
+      "main": [
+        [
+          {
+            "node": "Check Usage Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Usage Metrics": {
+      "main": [
+        [
+          {
+            "node": "Detect Quota Threshold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Quota Threshold": {
+      "main": [
+        [
+          {
+            "node": "Send Warning Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Account Managers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
