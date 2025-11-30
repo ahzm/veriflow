@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "your_email@example.com",
+        "subject": "Form Submission",
+        "text": "Form data received."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Log Payload",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your_logging_service.com/log",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "payload": "={{$json}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "*/15 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mockapi.com/error-logs"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Filter Errors",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.severity === 'critical' && item.json.frequency > 1);"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Group Errors",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const grouped = {}; items.forEach(item => { const endpoint = item.json.endpoint; if (!grouped[endpoint]) grouped[endpoint] = []; grouped[endpoint].push(item.json); }); return Object.entries(grouped).map(([key, value]) => ({ endpoint: key, errors: value }));"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Store in Database",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "log_analytics",
+        "columns": {
+          "endpoint": "={{$json[\"endpoint\"]}}",
+          "error_count": "={{$json[\"errors\"].length}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New critical error patterns detected: {{JSON.stringify($json[\"errors\"])}}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Filter Errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Errors": {
+      "main": [
+        [
+          {
+            "node": "Group Errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group Errors": {
+      "main": [
+        [
+          {
+            "node": "Store in Database",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

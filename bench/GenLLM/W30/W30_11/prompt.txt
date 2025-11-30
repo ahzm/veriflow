@@ -1,0 +1,1 @@
+Fetch daily pollution index at 8am; if PM2.5 > 90, send health advisory email.

@@ -1,0 +1,1 @@
+Trigger every day at 9am, fetch the latest EUR/USD rate, and send it to me by email.

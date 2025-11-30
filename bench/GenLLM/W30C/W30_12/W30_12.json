@@ -1,0 +1,121 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Contract Signed Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "contract-signed"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Vendor Bank Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://secureform.com/vendor-bank-details",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validate KYC",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://kyc-api.com/validate",
+        "method": "POST"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Create Vendor Record in ERP",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://erp-system.com/create-vendor",
+        "method": "POST"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create Vendor Record in Payment System",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://payment-system.com/create-vendor",
+        "method": "POST"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Checklist Completion Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "vendor@example.com",
+        "subject": "Vendor Onboarding Checklist Completed",
+        "text": "Your vendor onboarding checklist has been completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Contract Signed Trigger": {
+      "main": [
+        [
+          {
+            "node": "Collect Vendor Bank Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Vendor Bank Details": {
+      "main": [
+        [
+          {
+            "node": "Validate KYC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate KYC": {
+      "main": [
+        [
+          {
+            "node": "Create Vendor Record in ERP",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Vendor Record in Payment System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Vendor Record in ERP": {
+      "main": [
+        [
+          {
+            "node": "Send Checklist Completion Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Vendor Record in Payment System": {
+      "main": [
+        [
+          {
+            "node": "Send Checklist Completion Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

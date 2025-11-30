@@ -1,0 +1,1 @@
+Design a workflow that supports internal audits: collect logs from various systems via HTTP, filter for security-relevant events, store them in an immutable archive, generate periodic audit reports, and email them securely to auditors.

@@ -1,0 +1,1 @@
+Create a workflow that orchestrates nightly ETL jobs: trigger upstream data pulls, run transformation steps in sequence, handle failures with retries and alerts, publish metrics on job durations, and update a dashboard with latest pipeline statuses.

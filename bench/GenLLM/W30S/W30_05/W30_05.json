@@ -1,0 +1,119 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Contacts from System A",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.systema.com/contacts/updated"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Transform Fields",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n    item.json = {\n        id: item.json.contactId,\n        name: item.json.fullName,\n        email: item.json.emailAddress,\n        updatedAt: item.json.lastModified\n    };\n});\nreturn items;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Resolve Conflicts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const existingContacts = await getExistingContacts();\nitems.forEach(item => {\n    const existing = existingContacts.find(c => c.id === item.json.id);\n    if (existing) {\n        if (new Date(item.json.updatedAt) > new Date(existing.updatedAt)) {\n            // Update item\n        } else {\n            // Skip item\n        }\n    }\n});\nreturn items;"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Push Updates to System B",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.systemb.com/contacts/update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "id": "={{$json[\"id\"]}}",
+          "name": "={{$json[\"name\"]}}",
+          "email": "={{$json[\"email\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@system.com",
+        "subject": "CRM Synchronization Summary",
+        "text": "Created: {{ $json[\"created\"] }}\nUpdated: {{ $json[\"updated\"] }}\nSkipped: {{ $json[\"skipped\"] }}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Contacts from System A",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Contacts from System A": {
+      "main": [
+        [
+          {
+            "node": "Transform Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Fields": {
+      "main": [
+        [
+          {
+            "node": "Resolve Conflicts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Conflicts": {
+      "main": [
+        [
+          {
+            "node": "Push Updates to System B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push Updates to System B": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

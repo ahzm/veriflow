@@ -1,0 +1,1 @@
+Design a workflow that automates vendor onboarding: triggered by a signed contract event, collects vendor bank details via secure form, validates them against a KYC API, creates vendor records in ERP and payment systems, and sends a checklist completion email.

@@ -1,0 +1,1 @@
+Construct a workflow that runs a multi-stage data quality pipeline: ingest raw CSVs from object storage, apply schema validation, run custom business rules via HTTP functions, quarantine bad rows, update a curated table, and notify data stewards with detailed logs.

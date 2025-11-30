@@ -1,0 +1,147 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Bank API 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank1.com/transactions"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Bank API 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank2.com/transactions"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Bank API 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank3.com/transactions"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Normalize Currencies",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Fraud Detection API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.frauddetection.com/check"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Write to Ledger",
+      "type": "n8n-nodes-base.database",
+      "parameters": {}
+    },
+    {
+      "id": "8",
+      "name": "Alert Compliance Officers",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "compliance@company.com",
+        "subject": "Suspicious Transaction Alert",
+        "text": "Suspicious transactions have been detected and flagged."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Bank API 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bank API 1": {
+      "main": [
+        [
+          {
+            "node": "Normalize Currencies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bank API 2": {
+      "main": [
+        [
+          {
+            "node": "Normalize Currencies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bank API 3": {
+      "main": [
+        [
+          {
+            "node": "Normalize Currencies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Currencies": {
+      "main": [
+        [
+          {
+            "node": "Fraud Detection API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fraud Detection API": {
+      "main": [
+        [
+          {
+            "node": "Write to Ledger",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert Compliance Officers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write to Ledger": {
+      "main": []
+    },
+    "Alert Compliance Officers": {
+      "main": []
+    }
+  }
+}

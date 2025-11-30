@@ -1,0 +1,1 @@
+Build a workflow that manages internal access requests: intake requests via form, verify manager approval, provision access to multiple systems via APIs, log all grants and revocations, and schedule periodic reviews for least-privilege compliance.

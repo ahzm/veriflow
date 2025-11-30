@@ -1,0 +1,120 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Data Pull",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/data-pull"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Transform Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Retry Handler",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Alert Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alerts@example.com",
+        "subject": "ETL Job Failure Alert",
+        "text": "The ETL job has failed. Please check the logs."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Publish Metrics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "7",
+      "name": "Update Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://dashboard.example.com/update"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Data Pull",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Data Pull": {
+      "main": [
+        [
+          {
+            "node": "Transform Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Data": {
+      "main": [
+        [
+          {
+            "node": "Retry Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Handler": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Publish Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Metrics": {
+      "main": [
+        [
+          {
+            "node": "Update Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

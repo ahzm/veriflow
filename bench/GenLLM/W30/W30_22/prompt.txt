@@ -1,0 +1,1 @@
+Check pollen level API every morning; if high, notify via Slack.

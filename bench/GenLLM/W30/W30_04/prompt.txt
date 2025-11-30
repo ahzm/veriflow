@@ -1,0 +1,1 @@
+Run every Friday at 18:00, fetch the week's top 10 GitHub repos, and email me the list.

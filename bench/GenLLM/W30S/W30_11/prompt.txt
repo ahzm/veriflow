@@ -1,0 +1,1 @@
+Define an n8n workflow for daily inventory reconciliation: every night at 02:00, fetch stock levels from a mock warehouse API and from an e-commerce API, compare quantities per SKU, detect discrepancies above a tolerance threshold, write discrepancies into an "inventory_issues" table, and email a CSV report of these issues to the operations and finance teams.

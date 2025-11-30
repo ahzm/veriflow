@@ -1,0 +1,1 @@
+Design a workflow that coordinates an internal survey: on a scheduled date, send survey emails to all employees loaded from a mock directory API, track responses via webhook, send reminders to non-respondents after 5 days, compute participation rate per department, and email a final participation report plus basic statistics to HR and management.

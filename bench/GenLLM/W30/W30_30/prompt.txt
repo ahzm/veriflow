@@ -1,0 +1,1 @@
+Every sunrise, fetch sunrise/sunset times and email the summary.

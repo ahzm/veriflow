@@ -1,0 +1,102 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-content"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Translation API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.translation-service.com/translate",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "content": "={{$json[\"content\"]}}",
+          "languages": [
+            "es",
+            "fr",
+            "de"
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "QA Check",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Perform QA checks on translations\n    return item;\n});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Update CMS",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Update CMS entries for each locale\n    return item;\n});"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New translations have been published and updated in the CMS."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Translation API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Translation API": {
+      "main": [
+        [
+          {
+            "node": "QA Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA Check": {
+      "main": [
+        [
+          {
+            "node": "Update CMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update CMS": {
+      "main": [
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

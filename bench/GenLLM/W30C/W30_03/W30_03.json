@@ -1,0 +1,145 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule SLA Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request for Uptime Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.uptimemetrics.com/v1/metrics"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Rolling Availability",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const metrics = items[0].json;\nconst availability = metrics.reduce((acc, metric) => acc + metric.availability, 0) / metrics.length;\nreturn [{ json: { availability } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Compare with SLA Thresholds",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const availability = items[0].json.availability;\nconst slaThreshold = 99.9;\nconst breach = availability < slaThreshold;\nreturn [{ json: { breach, availability } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate PDF Report",
+      "type": "n8n-nodes-base.pdfGenerate",
+      "parameters": {
+        "content": "SLA Report: Availability is {{ $json[\"availability\"] }}%",
+        "options": {}
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email to Customers",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "SLA Report",
+        "text": "Please find attached the SLA report.",
+        "attachments": [
+          {
+            "name": "SLA_Report.pdf",
+            "data": "={{$node[\"Generate PDF Report\"].json[\"data\"]}}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "7",
+      "name": "Create Incident Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.incidentmanagement.com/v1/tickets",
+        "method": "POST",
+        "json": {
+          "title": "SLA Breach Alert",
+          "description": "SLA threshold breached. Availability was {{ $json[\"availability\"] }}%"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule SLA Check": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Uptime Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request for Uptime Metrics": {
+      "main": [
+        [
+          {
+            "node": "Compute Rolling Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Rolling Availability": {
+      "main": [
+        [
+          {
+            "node": "Compare with SLA Thresholds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare with SLA Thresholds": {
+      "main": [
+        [
+          {
+            "node": "Generate PDF Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email to Customers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Incident Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate PDF Report": {
+      "main": [
+        [
+          {
+            "node": "Send Email to Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Create a workflow that consolidates financial transactions from three banking APIs, normalizes currencies, flags suspicious patterns using a fraud-detection API, writes aggregated results to a ledger database, and alerts compliance officers via email.

@@ -1,0 +1,117 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 1 * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Transactions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-commerce-api.com/transactions"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Group Transactions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const grouped = {};\nitems.forEach(item => {\n    const partnerId = item.json.partnerId;\n    if (!grouped[partnerId]) {\n        grouped[partnerId] = [];\n    }\n    grouped[partnerId].push(item);\n});\nreturn Object.entries(grouped).map(([partnerId, transactions]) => ({ partnerId, transactions }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Calculate Revenue Shares",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const config = { 'partner1': 0.1, 'partner2': 0.15 }; // Example percentages\nreturn items.map(item => {\n    const partnerId = item.json.partnerId;\n    const totalRevenue = item.json.transactions.reduce((sum, t) => sum + t.amount, 0);\n    const share = totalRevenue * (config[partnerId] || 0);\n    return { partnerId, share };\n});"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Write Payout Records",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { partnerId: item.json.partnerId, share: item.json.share } }));"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "partner@example.com",
+        "subject": "Payout Summary",
+        "text": "Please find attached your payout summary.",
+        "attachments": [
+          {
+            "name": "payout_summary.csv",
+            "data": "partnerId,share\npartner1,100\npartner2,150"
+          }
+        ]
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Transactions": {
+      "main": [
+        [
+          {
+            "node": "Group Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group Transactions": {
+      "main": [
+        [
+          {
+            "node": "Calculate Revenue Shares",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Revenue Shares": {
+      "main": [
+        [
+          {
+            "node": "Write Payout Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Payout Records": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

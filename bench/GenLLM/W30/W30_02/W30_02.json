@@ -1,0 +1,55 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-user-registration"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "newuser@example.com",
+        "subject": "Welcome to Our Service!",
+        "text": "Thank you for registering with us!"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Log Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/log",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "event": "new_user_registration"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

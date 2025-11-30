@@ -1,0 +1,122 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Validate and Normalize Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Check Contact in CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm.com/check_contact",
+        "method": "GET",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Create or Update Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm.com/save_contact",
+        "method": "POST",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Assign Lead Score",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "new_lead@example.com",
+        "subject": "Welcome to Our Service!",
+        "text": "Thank you for signing up!"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Log Operation",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate and Normalize Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate and Normalize Data": {
+      "main": [
+        [
+          {
+            "node": "Check Contact in CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Contact in CRM": {
+      "main": [
+        [
+          {
+            "node": "Create or Update Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or Update Contact": {
+      "main": [
+        [
+          {
+            "node": "Assign Lead Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Lead Score": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Operation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Define a workflow that manages subscription churn prevention: identify at-risk users via analytics API, trigger personalized win-back campaigns via email and push, track responses, update churn-risk scores, and notify success teams of recovered accounts.

@@ -1,0 +1,140 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Survey",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "We value your feedback!",
+        "text": "Please take a moment to complete our survey."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send SMS",
+      "type": "n8n-nodes-base.smsSend",
+      "parameters": {
+        "text": "We value your feedback! Please complete our survey."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Compute NPS and Satisfaction",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const nps = calculateNPS(items); const satisfaction = calculateSatisfaction(items); return [{ json: { nps, satisfaction } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Push to BI Tool",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://bi-tool.example.com/api/metrics",
+        "method": "POST",
+        "body": {
+          "nps": "={{$json[\"nps\"]}}",
+          "satisfaction": "={{$json[\"satisfaction\"]}}"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Alert Managers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Alert: NPS or satisfaction scores have dropped!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Survey": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS": {
+      "main": [
+        [
+          {
+            "node": "Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Compute NPS and Satisfaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute NPS and Satisfaction": {
+      "main": [
+        [
+          {
+            "node": "Push to BI Tool",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push to BI Tool": {
+      "main": [
+        [
+          {
+            "node": "Alert Managers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Build an n8n workflow for cross-system user deprovisioning: on receiving a "user offboarding" event via webhook, disable the user in a mock identity provider API, revoke access in a mock project management API, remove from mailing lists via another HTTP endpoint, send confirmation emails to the manager and IT, and store an audit log entry in a "deprovision_log" table.

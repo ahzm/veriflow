@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vip-customer-incident"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Customer Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm.com/customer/{{ $json[\"customerId\"] }}",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A critical incident involving a VIP customer has been reported."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Apology Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{ $json[\"customerEmail\"] }}",
+        "subject": "We Apologize for the Incident",
+        "text": "Dear valued customer, we sincerely apologize for the incident. Our team is on it."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create Follow-up Tasks",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.taskmanager.com/tasks",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "task": "Follow up with VIP customer regarding incident",
+          "customerId": "{{ $json[\"customerId\"] }}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Store Incident Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.database.com/vip_incidents",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "incidentDetails": "{{ $json }}",
+          "customerId": "{{ $json[\"customerId\"] }}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch Customer Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Customer Details": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Apology Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Follow-up Tasks",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store Incident Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

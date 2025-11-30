@@ -1,0 +1,171 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "leads"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Deduplicate Contacts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const uniqueContacts = [...new Map(items.map(item => [item.json.email, item])).values()];\nreturn uniqueContacts;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Score Leads",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.leadscoring.com/score",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "contacts": "={{$json[\"contacts\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Filter High Scoring Leads",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.score > 75);"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Push to CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm.com/leads",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "lead": "={{$json[\"lead\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Create Sales Task",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm.com/tasks",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "task": {
+            "leadId": "={{$json[\"leadId\"]}}",
+            "description": "Follow up with high scoring lead"
+          }
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Weekly Performance Dashboard",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "marketing@company.com",
+        "subject": "Weekly Performance Dashboard",
+        "text": "Here is the performance dashboard for the week."
+      }
+    },
+    {
+      "id": "8",
+      "name": "Schedule Weekly Email",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 0"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate Contacts": {
+      "main": [
+        [
+          {
+            "node": "Score Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Leads": {
+      "main": [
+        [
+          {
+            "node": "Filter High Scoring Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter High Scoring Leads": {
+      "main": [
+        [
+          {
+            "node": "Push to CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push to CRM": {
+      "main": [
+        [
+          {
+            "node": "Create Sales Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Sales Task": {
+      "main": [
+        [
+          {
+            "node": "Schedule Weekly Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Weekly Email": {
+      "main": [
+        [
+          {
+            "node": "Send Weekly Performance Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

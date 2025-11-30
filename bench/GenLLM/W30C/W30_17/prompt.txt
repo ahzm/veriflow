@@ -1,0 +1,1 @@
+Design a workflow that governs feature rollouts: listen to product release events, update feature flags per customer segment, notify support and marketing teams, monitor error and usage metrics post-release, and roll back flags if error rates exceed a threshold.

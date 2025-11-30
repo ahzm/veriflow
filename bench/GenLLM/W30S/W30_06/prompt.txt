@@ -1,0 +1,1 @@
+Create a workflow that runs every 15 minutes, polls a mock "error logs" API for a web application, filters errors by severity and frequency, groups them by endpoint, stores aggregated error statistics in a "log_analytics" table, and posts a condensed report of new critical error patterns to a Slack channel.

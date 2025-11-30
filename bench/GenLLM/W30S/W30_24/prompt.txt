@@ -1,0 +1,1 @@
+Build an n8n workflow for IoT fleet health monitoring: on schedule, call a mock "fleet status" API listing all devices, for each device fetch last reported metrics, classify device health into "OK", "WARNING", or "CRITICAL" based on thresholds, store the results into a "fleet_health" table, send alerts for critical devices via email, and post a daily summary to a Slack channel.

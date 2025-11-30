@@ -1,0 +1,122 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Map Incident",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "items[0].json.region = items[0].json.incident.region;\nitems[0].json.severity = items[0].json.incident.severity;\nreturn items;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Lookup Contacts",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          {
+            "name": "contacts",
+            "value": "={{$json[\"region\"]}}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Incident Emails",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"contacts\"]}}",
+        "subject": "Incident Notification: {{$json[\"severity\"]}}",
+        "text": "An incident has occurred in your region. Please check the details."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Notification",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "regional_incidents",
+        "columns": {
+          "region": "={{$json[\"region\"]}}",
+          "severity": "={{$json[\"severity\"]}}",
+          "timestamp": "={{new Date().toISOString()}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Global Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "central_operations@example.com",
+        "subject": "Daily Incident Summary",
+        "text": "Here is the summary of incidents reported today."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Map Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Incident": {
+      "main": [
+        [
+          {
+            "node": "Lookup Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Contacts": {
+      "main": [
+        [
+          {
+            "node": "Send Incident Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Incident Emails": {
+      "main": [
+        [
+          {
+            "node": "Log Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Global Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

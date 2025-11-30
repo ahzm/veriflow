@@ -1,0 +1,1 @@
+Define a workflow that orchestrates synchronization between an LMS and an HR system: when employees join, assign training courses, track completion via API callbacks, escalate overdue courses to managers, and produce monthly compliance summaries.

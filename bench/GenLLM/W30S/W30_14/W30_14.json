@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Compliance Check",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Compliance Documents",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-compliance-api.com/documents"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Determine Missing or Expired Documents",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const documents = items[0].json;\nconst missingOrExpired = documents.filter(doc => doc.expirationDate < new Date() || !doc.isPresent);\nreturn [{ json: { missingOrExpired } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Summary Emails",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "compliance-officers@example.com",
+        "subject": "Compliance Check Summary",
+        "text": "Please find the summary of missing or expired compliance documents attached."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create Tickets for Critical Gaps",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-ticketing-system.com/tickets",
+        "method": "POST",
+        "body": {
+          "criticalGaps": "={{$json[\"missingOrExpired\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Post Summary to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Compliance check completed. Summary of missing or expired documents has been sent to compliance officers."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Compliance Check": {
+      "main": [
+        [
+          {
+            "node": "Fetch Compliance Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Compliance Documents": {
+      "main": [
+        [
+          {
+            "node": "Determine Missing or Expired Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Missing or Expired Documents": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Emails",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Tickets for Critical Gaps",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post Summary to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

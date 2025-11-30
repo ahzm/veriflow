@@ -1,0 +1,1 @@
+Construct a workflow that ingests product catalog updates from an ERP via FTP, parses XML files, validates schemas, updates an e-commerce platform via REST, invalidates CDN caches, and sends a detailed change log to a monitoring Slack channel.

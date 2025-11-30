@@ -1,0 +1,1 @@
+Build a workflow that manages recurring maintenance tasks: based on IoT telemetry from machines, predict maintenance windows, create tickets in a CMMS, notify technicians, update machine status after completion, and track SLA metrics over time.

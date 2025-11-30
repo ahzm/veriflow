@@ -1,0 +1,1 @@
+Trigger via webhook with order data; if amount < 20, send a Slack warning, otherwise send confirmation email.

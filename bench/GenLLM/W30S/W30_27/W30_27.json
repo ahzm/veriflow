@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook Incident Resolved",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Lookup Teams and Owners",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Send Email to Teams",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"teamsEmails\"]}}",
+        "subject": "Postmortem Template Link",
+        "text": "Please fill out the postmortem template at the following link: [Postmortem Template Link]"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Webhook Response Tracking",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Aggregate Data Points",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send Consolidated Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "leadership@example.com",
+        "subject": "Consolidated Postmortem Report",
+        "text": "Here is the consolidated report of the postmortems."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Incident Resolved": {
+      "main": [
+        [
+          {
+            "node": "Lookup Teams and Owners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Teams and Owners": {
+      "main": [
+        [
+          {
+            "node": "Send Email to Teams",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Teams": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Response Tracking": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Data Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Data Points": {
+      "main": [
+        [
+          {
+            "node": "Send Consolidated Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

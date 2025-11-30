@@ -1,0 +1,1 @@
+Construct an n8n workflow to manage a small-scale A/B test: trigger via manual input specifying two email templates and a target segment, split the segment into two randomized groups, send variant A and variant B emails accordingly, simulate open and click events via a mock "email tracking" API, compare performance metrics, and send a result summary email to the experiment owner.

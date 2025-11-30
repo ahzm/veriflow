@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "conference-submissions"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Formatting",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.formatting === 'correct');"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Anonymize PDFs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { item.json.anonymized = true; return item; });"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Assign Reviewers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { item.json.reviewer = 'reviewer@example.com'; return item; });"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Review Invitations",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "reviewer@example.com",
+        "subject": "Review Invitation",
+        "text": "You have been invited to review a paper."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Collect Scores",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { item.json.score = Math.random() * 10; return item; });"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Produce Ranked Decision Lists",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.sort((a, b) => b.json.score - a.json.score);"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Formatting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Formatting": {
+      "main": [
+        [
+          {
+            "node": "Anonymize PDFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anonymize PDFs": {
+      "main": [
+        [
+          {
+            "node": "Assign Reviewers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Reviewers": {
+      "main": [
+        [
+          {
+            "node": "Send Review Invitations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Review Invitations": {
+      "main": [
+        [
+          {
+            "node": "Collect Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Scores": {
+      "main": [
+        [
+          {
+            "node": "Produce Ranked Decision Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

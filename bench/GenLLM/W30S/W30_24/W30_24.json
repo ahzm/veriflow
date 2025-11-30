@@ -1,0 +1,142 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Fleet Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.mock.com/fleet-status"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request - Device Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.mock.com/device-metrics"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Classify Device Health",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "items.forEach(item => {\n  if (item.json.metric < 50) {\n    item.json.health = 'OK';\n  } else if (item.json.metric < 80) {\n    item.json.health = 'WARNING';\n  } else {\n    item.json.health = 'CRITICAL';\n  }\n});\nreturn items;"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Database - Store Fleet Health",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "fleet_health",
+        "columns": {
+          "device_id": "={{$json[\"device_id\"]}}",
+          "health": "={{$json[\"health\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Email Alert for Critical Devices",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alerts@example.com",
+        "subject": "Critical Device Alert",
+        "text": "A device has reported a critical health status."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Slack Daily Summary",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Daily fleet health summary has been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Fleet Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Fleet Status": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Device Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Device Metrics": {
+      "main": [
+        [
+          {
+            "node": "Classify Device Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Device Health": {
+      "main": [
+        [
+          {
+            "node": "Database - Store Fleet Health",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Alert for Critical Devices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Database - Store Fleet Health": {
+      "main": [
+        [
+          {
+            "node": "Slack Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Alert for Critical Devices": {
+      "main": [
+        [
+          {
+            "node": "Slack Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

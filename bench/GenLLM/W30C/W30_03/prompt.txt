@@ -1,0 +1,1 @@
+Build a workflow that manages SLA monitoring: pull uptime metrics from multiple services, compute rolling availability per customer, compare with SLA thresholds, generate PDF reports, email them to customers, and create incident tickets for SLA breaches.

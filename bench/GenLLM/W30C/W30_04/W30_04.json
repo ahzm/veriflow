@@ -1,0 +1,120 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "employee-joined"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Assign Training Courses",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://lms.example.com/api/assign-courses",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "employeeId": "={{$json[\"employeeId\"]}}",
+          "courses": [
+            "Course1",
+            "Course2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Completion",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://lms.example.com/api/track-completion",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "employeeId": "={{$json[\"employeeId\"]}}",
+          "courseId": "={{$json[\"courseId\"]}}",
+          "status": "completed"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Escalate Overdue Courses",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Overdue training courses for employee ID: {{$json[\"employeeId\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Monthly Compliance Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://hr.example.com/api/compliance-summary",
+        "method": "GET",
+        "jsonParameters": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Monthly Summary",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 1 * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Assign Training Courses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Training Courses": {
+      "main": [
+        [
+          {
+            "node": "Track Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Completion": {
+      "main": [
+        [
+          {
+            "node": "Escalate Overdue Courses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Monthly Summary": {
+      "main": [
+        [
+          {
+            "node": "Monthly Compliance Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

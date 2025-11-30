@@ -1,0 +1,172 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Query Partner API 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.partner1.com/health"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Query Partner API 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.partner2.com/health"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Query Partner API 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.partner3.com/health"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Detect Anomalies",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const anomalies = [];\nconst baselineThreshold = 100;\n\nif (items[0].json.transactionCount < baselineThreshold) {\n    anomalies.push({ partner: 'Partner 1', status: 'below baseline' });\n}\nif (items[1].json.transactionCount < baselineThreshold) {\n    anomalies.push({ partner: 'Partner 2', status: 'below baseline' });\n}\nif (items[2].json.transactionCount < baselineThreshold) {\n    anomalies.push({ partner: 'Partner 3', status: 'below baseline' });\n}\nreturn [{ json: { anomalies } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Write Anomalies to Database",
+      "type": "n8n-nodes-base.mongodb",
+      "parameters": {
+        "operation": "insert",
+        "collection": "partner_health",
+        "document": "={{$json[\"anomalies\"]}}"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Create Incident",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.incidentmanagement.com/create",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "anomalies": "={{$json[\"anomalies\"]}}"
+        }
+      }
+    },
+    {
+      "id": "8",
+      "name": "Notify Internal Contacts",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "internal@example.com",
+        "subject": "Partner Integration Anomalies Detected",
+        "text": "Anomalies detected in partner integrations: {{$json[\"anomalies\"]}}"
+      }
+    },
+    {
+      "id": "9",
+      "name": "Notify Partner Contacts",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "partners@example.com",
+        "subject": "Integration Health Alert",
+        "text": "Attention: Anomalies detected in your integration: {{$json[\"anomalies\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Query Partner API 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Partner API 1": {
+      "main": [
+        [
+          {
+            "node": "Query Partner API 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Partner API 2": {
+      "main": [
+        [
+          {
+            "node": "Query Partner API 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Partner API 3": {
+      "main": [
+        [
+          {
+            "node": "Detect Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Anomalies": {
+      "main": [
+        [
+          {
+            "node": "Write Anomalies to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Anomalies to Database": {
+      "main": [
+        [
+          {
+            "node": "Create Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Incident": {
+      "main": [
+        [
+          {
+            "node": "Notify Internal Contacts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Partner Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

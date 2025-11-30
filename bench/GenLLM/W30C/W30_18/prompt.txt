@@ -1,0 +1,1 @@
+Build a workflow that manages knowledge base updates: when a Git repository of documentation changes, rebuild static docs via an HTTP build API, deploy to hosting, run link validation checks, and send a change summary with changelog links to the team.

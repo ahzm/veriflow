@@ -1,0 +1,1 @@
+Webhook with GitHub issue data should send issue title to Slack.

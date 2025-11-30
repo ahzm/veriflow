@@ -1,0 +1,1 @@
+Construct a workflow that automates incident response: on critical monitoring alerts via webhook, enrich incidents with configuration data, notify on-call engineers via multiple channels, create and update incident tickets, and post status updates to a status page.

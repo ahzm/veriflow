@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Ingest CSV",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/raw-csv"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Schema Validation",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Run Business Rules",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/business-rules"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Quarantine Bad Rows",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Update Curated Table",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Notify Data Stewards",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "data.stewards@example.com",
+        "subject": "Data Quality Pipeline Notification",
+        "text": "The data quality pipeline has completed. Please review the logs for details."
+      }
+    }
+  ],
+  "connections": {
+    "Ingest CSV": {
+      "main": [
+        [
+          {
+            "node": "Schema Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schema Validation": {
+      "main": [
+        [
+          {
+            "node": "Run Business Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Business Rules": {
+      "main": [
+        [
+          {
+            "node": "Quarantine Bad Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quarantine Bad Rows": {
+      "main": [
+        [
+          {
+            "node": "Update Curated Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Curated Table": {
+      "main": [
+        [
+          {
+            "node": "Notify Data Stewards",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

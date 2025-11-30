@@ -1,0 +1,1 @@
+Create a workflow that orchestrates multi-channel customer surveys: schedule survey invitations via email and SMS, collect responses via webhook, compute NPS and satisfaction scores, push aggregated metrics to a BI tool, and alert managers when scores drop.

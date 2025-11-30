@@ -1,0 +1,119 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Backup Verification",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "List Backups",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-backup-api.com/list"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Verify Backup Integrity",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-backup-api.com/verify"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Verification Results",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "backup_log",
+        "columns": {
+          "backup_id": "={{$json[\"id\"]}}",
+          "status": "={{$json[\"status\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "infrastructure-team@example.com",
+        "subject": "Backup Verification Summary",
+        "text": "={{$json[\"summary\"]}}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Raise Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Critical Alert: One or more backups failed verification!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Backup Verification": {
+      "main": [
+        [
+          {
+            "node": "List Backups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Backups": {
+      "main": [
+        [
+          {
+            "node": "Verify Backup Integrity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Backup Integrity": {
+      "main": [
+        [
+          {
+            "node": "Log Verification Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email Summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Raise Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Verification Results": {
+      "main": [
+        [
+          {
+            "node": "Send Email Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

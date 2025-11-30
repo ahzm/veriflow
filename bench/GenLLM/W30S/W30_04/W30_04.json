@@ -1,0 +1,151 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook Purchase Request",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "purchase-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Fields",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const requiredFields = ['requester', 'amount', 'costCenter', 'description'];\nconst missingFields = requiredFields.filter(field => !items[0].json[field]);\nif (missingFields.length > 0) {\n    throw new Error('Missing fields: ' + missingFields.join(', '));\n}\nreturn items;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check Amount",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const amount = items[0].json.amount;\nif (amount > 1000) {\n    return [{ json: { approvalNeeded: true } }];\n}\nreturn [{ json: { approvalNeeded: false } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Approval Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "manager@example.com",
+        "subject": "Approval Needed for Purchase Request",
+        "text": "A purchase request requires your approval."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Webhook Approval Callback",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "approval-callback"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Update Procurement System",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-procurement-system.com/update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "requester": "={{$json[\"requester\"]}}",
+          "amount": "={{$json[\"amount\"]}}",
+          "costCenter": "={{$json[\"costCenter\"]}}",
+          "description": "={{$json[\"description\"]}}",
+          "status": "={{$json[\"status\"]}}"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Final Outcome Emails",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "finance@example.com, {{$json[\"requester\"]}}",
+        "subject": "Procurement Request Outcome",
+        "text": "Your procurement request has been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Purchase Request": {
+      "main": [
+        [
+          {
+            "node": "Validate Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Fields": {
+      "main": [
+        [
+          {
+            "node": "Check Amount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Amount": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Procurement System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Email": {
+      "main": [
+        [
+          {
+            "node": "Webhook Approval Callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Approval Callback": {
+      "main": [
+        [
+          {
+            "node": "Update Procurement System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Procurement System": {
+      "main": [
+        [
+          {
+            "node": "Send Final Outcome Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Run every 2 hours, check website uptime via API; if status == “down”, send urgent email.

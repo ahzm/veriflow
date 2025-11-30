@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "IF Temperature Check",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "field": "json.temperature",
+              "operation": "greaterThan",
+              "value": 30
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Heat alert! The temperature has exceeded 30C."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "IF Temperature Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Temperature Check": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

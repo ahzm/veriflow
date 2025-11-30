@@ -1,0 +1,1 @@
+Run hourly, get API data for CO2 levels; if > 800ppm, notify Slack channel.

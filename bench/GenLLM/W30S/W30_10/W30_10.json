@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/report-bug"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Classify Bug",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const keywords = { productArea: 'UI', severity: 'high' }; // Logic to classify based on input\nreturn [{ json: { productArea: keywords.productArea, severity: keywords.severity } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Team Directory API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/team-directory",
+        "method": "GET",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Bug",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const bugData = { productArea: $json.productArea, severity: $json.severity }; // Logic to log bug\nreturn [{ json: { success: true } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new bug has been reported in the {{ $json.productArea }} area with {{ $json.severity }} severity."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Acknowledgement Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "reporter@example.com",
+        "subject": "Bug Report Acknowledgement",
+        "text": "Thank you for reporting the bug. We are looking into it."
+      }
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Classify Bug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Bug": {
+      "main": [
+        [
+          {
+            "node": "Team Directory API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Team Directory API": {
+      "main": [
+        [
+          {
+            "node": "Log Bug",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Bug": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Acknowledgement Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

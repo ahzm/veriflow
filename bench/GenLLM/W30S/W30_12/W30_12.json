@@ -1,0 +1,95 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Employees",
+      "type": "n8n-nodes-base.mockDatabase",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Filter Training Deadlines",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const now = new Date();\nconst reminders = [];\nconst thresholds = [30, 7, 1];\n\nitems.forEach(item => {\n    const deadline = new Date(item.json.deadline);\n    const diffDays = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));\n    if (thresholds.includes(diffDays)) {\n        reminders.push({\n            ...item.json,\n            reminderDays: diffDays\n        });\n    }\n});\n\nreturn reminders;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Training Reminder",
+        "text": "={{$json[\"reminderDays\"] === 30 ? 'Your training is due in 30 days.' : $json[\"reminderDays\"] === 7 ? 'Your training is due in 7 days.' : 'Your training is due tomorrow!'}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Managers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Employee {{$json[\"name\"]}} has overdue training!"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Log Reminder",
+      "type": "n8n-nodes-base.mockDatabase",
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get Employees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Employees": {
+      "main": [
+        [
+          {
+            "node": "Filter Training Deadlines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Training Deadlines": {
+      "main": [
+        [
+          {
+            "node": "Send Email Reminder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Managers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

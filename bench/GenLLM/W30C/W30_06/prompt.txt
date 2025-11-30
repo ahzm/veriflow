@@ -1,0 +1,1 @@
+Create a workflow that handles warranty claims: intake via a form webhook, verify purchase details via an order API, classify claim types, route to the appropriate support queue, generate shipping labels when approved, and keep customers informed via email.

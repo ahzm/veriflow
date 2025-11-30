@@ -1,0 +1,1 @@
+Design a workflow that coordinates multi-stage recruitment: ingest job applications via webhook, enrich profiles with LinkedIn data, route candidates through screening, interview, and offer stages, update an ATS, and send personalized notifications at each step.

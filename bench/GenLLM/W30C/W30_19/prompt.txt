@@ -1,0 +1,1 @@
+Create a workflow that coordinates expense approvals: parse emailed receipts, match them against corporate card transactions, detect policy violations, route to managers for approval, push approved expenses into accounting, and notify employees of outcomes.

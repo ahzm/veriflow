@@ -1,0 +1,100 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Git Trigger",
+      "type": "n8n-nodes-base.gitTrigger",
+      "parameters": {
+        "repository": "your-repo-url",
+        "event": "push",
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Build Docs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your-build-api-url",
+        "method": "POST",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Deploy to Hosting",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your-deploy-api-url",
+        "method": "POST",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Link Validation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your-link-validation-api-url",
+        "method": "GET",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Documentation Update Summary",
+        "text": "The documentation has been updated. Please find the changelog links attached."
+      }
+    }
+  ],
+  "connections": {
+    "Git Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Docs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Docs": {
+      "main": [
+        [
+          {
+            "node": "Deploy to Hosting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deploy to Hosting": {
+      "main": [
+        [
+          {
+            "node": "Link Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Link Validation": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

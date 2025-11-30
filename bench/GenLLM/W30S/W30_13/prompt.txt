@@ -1,0 +1,1 @@
+Create a workflow that coordinates a "customer churn risk" monitoring job: on schedule, query a mock analytics API for customers with rising churn risk scores, group them by account manager, send each account manager an email listing their at-risk customers, create follow-up tasks in a "task management" API, and store the results in a "churn_watch" table.

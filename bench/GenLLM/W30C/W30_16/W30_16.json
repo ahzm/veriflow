@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "new-lead"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Geocode Address",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.geocoding.com/geocode",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "address": "={{$json[\"address\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Match Territories",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const territories = [{region: 'North', criteria: 'criteria1'}, {region: 'South', criteria: 'criteria2'}];\nconst address = $json[\"address\"];\nconst matchedTerritory = territories.find(t => address.includes(t.criteria));\nreturn [{ territory: matchedTerritory ? matchedTerritory.region : 'Unassigned' }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Assign Owner",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const owners = {North: 'owner1@example.com', South: 'owner2@example.com'};\nconst territory = $json[\"territory\"];\nreturn [{ owner: owners[territory] || 'defaultOwner@example.com' }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Update CRM Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm.com/update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "leadId": "={{$json[\"leadId\"]}}",
+          "territory": "={{$json[\"territory\"]}}",
+          "owner": "={{$json[\"owner\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Onboarding Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"owner\"]}}",
+        "subject": "Welcome to the Team!",
+        "text": "Hello, you have been assigned a new lead. Please check the CRM for details."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Geocode Address",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geocode Address": {
+      "main": [
+        [
+          {
+            "node": "Match Territories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Territories": {
+      "main": [
+        [
+          {
+            "node": "Assign Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Owner": {
+      "main": [
+        [
+          {
+            "node": "Update CRM Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update CRM Record": {
+      "main": [
+        [
+          {
+            "node": "Send Onboarding Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "warranty-claim"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Verify Purchase",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/verify-purchase",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParameters": {
+          "claimData": "={{$json[\"body\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Classify Claim",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const claimData = $json;\n\nif (claimData.type === 'defective') {\n  return [{ json: { queue: 'defective-claims' } }];\n} else {\n  return [{ json: { queue: 'general-claims' } }];\n}"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Route to Support Queue",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New warranty claim routed to {{$json[\"queue\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Shipping Label",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/generate-label",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParameters": {
+          "claimData": "={{$json[\"body\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"body\"].customerEmail}}",
+        "subject": "Warranty Claim Update",
+        "text": "Your warranty claim has been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Verify Purchase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Verify Purchase": {
+      "main": [
+        [
+          {
+            "node": "Classify Claim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Claim": {
+      "main": [
+        [
+          {
+            "node": "Route to Support Queue",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Shipping Label",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to Support Queue": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Shipping Label": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

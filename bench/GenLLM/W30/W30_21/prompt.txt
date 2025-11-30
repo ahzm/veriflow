@@ -1,0 +1,1 @@
+Webhook with customer message should send auto-reply and log to HTTP endpoint.

@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Product Release Event",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Update Feature Flags",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/update-feature-flags"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Support Team",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new product feature has been released. Please check the details."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Marketing Team",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new product feature has been released. Prepare marketing materials."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Monitor Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/monitor-metrics"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Rollback Feature Flags",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/rollback-feature-flags"
+      }
+    }
+  ],
+  "connections": {
+    "Product Release Event": {
+      "main": [
+        [
+          {
+            "node": "Update Feature Flags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Feature Flags": {
+      "main": [
+        [
+          {
+            "node": "Notify Support Team",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Marketing Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Support Team": {
+      "main": [
+        [
+          {
+            "node": "Monitor Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Marketing Team": {
+      "main": [
+        [
+          {
+            "node": "Monitor Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Metrics": {
+      "main": [
+        [
+          {
+            "node": "Rollback Feature Flags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

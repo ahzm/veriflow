@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "*/15 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Stock Levels",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/check-stock"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Predict Stock-Outs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/predict-stock-outs"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Create Replenishment Orders",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/create-replenishment"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Critical stock levels detected, replenishment orders have been created."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Check Stock Levels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Stock Levels": {
+      "main": [
+        [
+          {
+            "node": "Predict Stock-Outs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Predict Stock-Outs": {
+      "main": [
+        [
+          {
+            "node": "Create Replenishment Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Replenishment Orders": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

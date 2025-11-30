@@ -1,0 +1,144 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Get Courses and Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-lms-api.com/courses-and-users"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Function - Detect Inactive Users",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const users = items[0].json.users;\nconst courses = items[0].json.courses;\nconst inactiveUsers = users.filter(user => !user.completedCourses.length);\nreturn inactiveUsers.map(user => ({ json: user }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Email - Send Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Course Reminder",
+        "text": "Dear {{$json[\"name\"]}},\n\nThis is a reminder to start or complete your required courses.\n\nBest,\nLMS Team"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Database - Log Reminder",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "lms_reminders",
+        "columns": {
+          "user_id": "={{$json[\"id\"]}}",
+          "reminder_sent": true
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "HTTP Request - Compliance Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-lms-api.com/compliance-summary"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Email - Send Compliance Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "hr@company.com",
+        "subject": "Weekly Compliance Summary",
+        "text": "Attached is the weekly compliance summary for the courses."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Get Courses and Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Get Courses and Users": {
+      "main": [
+        [
+          {
+            "node": "Function - Detect Inactive Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - Detect Inactive Users": {
+      "main": [
+        [
+          {
+            "node": "Email - Send Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Database - Log Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email - Send Reminder": {
+      "main": [
+        [
+          {
+            "node": "Database - Log Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Database - Log Reminder": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Compliance Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Compliance Summary": {
+      "main": [
+        [
+          {
+            "node": "Email - Send Compliance Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

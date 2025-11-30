@@ -1,0 +1,136 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Validate Structure and Tags",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Store in Draft Articles",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "draft_articles",
+        "columns": {
+          "article": "{{$json[\"article\"]}}",
+          "tags": "{{$json[\"tags\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Reviewers via Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new candidate article has been submitted for review."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Wait for Review Decisions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/review-callback"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Move to Published Articles",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "published_articles",
+        "columns": {
+          "article": "{{$json[\"article\"]}}",
+          "tags": "{{$json[\"tags\"]}}"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Email Author",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"authorEmail\"]}}",
+        "subject": "Your Article Submission Status",
+        "text": "Your article has been reviewed and has been approved."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Structure and Tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Structure and Tags": {
+      "main": [
+        [
+          {
+            "node": "Store in Draft Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Draft Articles": {
+      "main": [
+        [
+          {
+            "node": "Notify Reviewers via Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Reviewers via Slack": {
+      "main": [
+        [
+          {
+            "node": "Wait for Review Decisions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Review Decisions": {
+      "main": [
+        [
+          {
+            "node": "Move to Published Articles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move to Published Articles": {
+      "main": [
+        [
+          {
+            "node": "Email Author",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

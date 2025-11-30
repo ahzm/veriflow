@@ -1,0 +1,1 @@
+Webhook receives JSON with “city”; fetch weather and email it to the user.

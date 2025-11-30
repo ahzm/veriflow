@@ -1,0 +1,174 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Read Contacts",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          {
+            "name": "contacts",
+            "value": "[{\"name\": \"John Doe\", \"email\": \"john@example.com\"}, {\"name\": \"Jane Smith\", \"email\": \"jane@example.com\"}]"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3",
+      "name": "Social Profile Enrichment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.mockenrichment.com/social",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "contacts": "={{$json[\"contacts\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Company Data Enrichment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.mockenrichment.com/company",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "contacts": "={{$json[\"contacts\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Technology Stack Enrichment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.mockenrichment.com/technology",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "contacts": "={{$json[\"contacts\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Merge and Deduplicate",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const contacts = items.map(item => item.json);\nconst mergedContacts = {}; \n\ncontacts.forEach(contact => {\n    const email = contact.email;\n    if (!mergedContacts[email]) {\n        mergedContacts[email] = contact;\n    } else {\n        Object.assign(mergedContacts[email], contact);\n    }\n});\n\nreturn Object.values(mergedContacts).map(contact => ({ json: contact }));"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Store Enriched Profiles",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "contact_enriched",
+        "columns": "={{$json[\"name\"]}}, {{$json[\"email\"]}}, {{$json[\"socialProfile\"]}}, {{$json[\"companyData\"]}}, {{$json[\"technologyStack\"]}}"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Enrichment Coverage Summary",
+        "text": "Enrichment process completed. Check the contact_enriched table for details."
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Contacts": {
+      "main": [
+        [
+          {
+            "node": "Social Profile Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Social Profile Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Company Data Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Company Data Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Technology Stack Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Technology Stack Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Merge and Deduplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge and Deduplicate": {
+      "main": [
+        [
+          {
+            "node": "Store Enriched Profiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Enriched Profiles": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

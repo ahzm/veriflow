@@ -1,0 +1,1 @@
+Define a workflow that supports document lifecycle management: monitor a repository for new contracts, extract key clauses with an NLP API, store metadata in a database, set renewal reminders, and notify legal teams before important deadlines.

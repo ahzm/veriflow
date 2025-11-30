@@ -1,0 +1,1 @@
+Build a workflow that manages academic conference submissions: receive papers via webhook, check formatting, anonymize PDFs, assign reviewers based on expertise, send review invitations, collect scores, and produce ranked decision lists for organizers.

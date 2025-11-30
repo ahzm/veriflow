@@ -1,0 +1,170 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Manual Input",
+      "type": "n8n-nodes-base.manualTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Split Segment",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const segment = $input.item.json.segment;\nconst groupA = segment.slice(0, Math.ceil(segment.length / 2));\nconst groupB = segment.slice(Math.ceil(segment.length / 2));\nreturn [{ json: { groupA, groupB } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Variant A Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"groupA\"][0][\"email\"]}}",
+        "subject": "Variant A",
+        "text": "This is the content of Variant A."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Variant B Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"groupB\"][0][\"email\"]}}",
+        "subject": "Variant B",
+        "text": "This is the content of Variant B."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Simulate Email Tracking A",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-email-tracking-api.com/track",
+        "method": "POST",
+        "body": {
+          "variant": "A",
+          "emails": "{{$json[\"groupA\"]}}"
+        },
+        "json": true
+      }
+    },
+    {
+      "id": "6",
+      "name": "Simulate Email Tracking B",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-email-tracking-api.com/track",
+        "method": "POST",
+        "body": {
+          "variant": "B",
+          "emails": "{{$json[\"groupB\"]}}"
+        },
+        "json": true
+      }
+    },
+    {
+      "id": "7",
+      "name": "Compare Performance Metrics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const metricsA = $input.item.json.metricsA;\nconst metricsB = $input.item.json.metricsB;\nreturn [{ json: { winner: metricsA.openRate > metricsB.openRate ? 'A' : 'B' } }];"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Send Result Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "experiment_owner@example.com",
+        "subject": "A/B Test Results",
+        "text": "The winner of the A/B test is variant {{$json[\"winner\"]}}."
+      }
+    }
+  ],
+  "connections": {
+    "Manual Input": {
+      "main": [
+        [
+          {
+            "node": "Split Segment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Segment": {
+      "main": [
+        [
+          {
+            "node": "Send Variant A Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Variant B Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Variant A Email": {
+      "main": [
+        [
+          {
+            "node": "Simulate Email Tracking A",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Variant B Email": {
+      "main": [
+        [
+          {
+            "node": "Simulate Email Tracking B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simulate Email Tracking A": {
+      "main": [
+        [
+          {
+            "node": "Compare Performance Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simulate Email Tracking B": {
+      "main": [
+        [
+          {
+            "node": "Compare Performance Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare Performance Metrics": {
+      "main": [
+        [
+          {
+            "node": "Send Result Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

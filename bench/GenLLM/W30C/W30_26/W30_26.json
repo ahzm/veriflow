@@ -1,0 +1,78 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Lab API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.labresults.com/results"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Patient Identifiers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Anonymize Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Notification to Physicians",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New lab test results are available for review."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Access",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Lab API": {
+      "main": [
+        [
+          {
+            "node": "Validate Patient Identifiers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Patient Identifiers": {
+      "main": [
+        [
+          {
+            "node": "Anonymize Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anonymize Data": {
+      "main": [
+        [
+          {
+            "node": "Send Notification to Physicians",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Access",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

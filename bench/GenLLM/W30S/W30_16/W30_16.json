@@ -1,0 +1,128 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Load Configuration",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          {
+            "name": "config",
+            "value": "{\"variants\": [{\"name\": \"A\", \"sampleSize\": 100}, {\"name\": \"B\", \"sampleSize\": 100}]}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Invitations",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "participants@example.com",
+        "subject": "Invitation to Participate in Research Experiment",
+        "text": "You are invited to participate in our research experiment. Please respond to the webhook with your completion status."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "path": "experiment-response",
+        "httpMethod": "POST"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Compute Statistics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const responses = items.map(item => item.json);\nconst completionRates = {};\nresponses.forEach(response => {\n    const variant = response.variant;\n    if (!completionRates[variant]) {\n        completionRates[variant] = { completed: 0, total: 0 };\n    }\n    completionRates[variant].total++;\n    if (response.status === 'completed') {\n        completionRates[variant].completed++;\n    }\n});\nreturn Object.keys(completionRates).map(variant => ({\n    variant,\n    completionRate: completionRates[variant].completed / completionRates[variant].total\n}));"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Store Results",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "experiments",
+        "columns": [
+          {
+            "name": "variant",
+            "value": "={{$json[\"variant\"]}}"
+          },
+          {
+            "name": "completion_rate",
+            "value": "={{$json[\"completionRate\"]}}"
+          }
+        ]
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Load Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Configuration": {
+      "main": [
+        [
+          {
+            "node": "Send Invitations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Invitations": {
+      "main": [
+        [
+          {
+            "node": "Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Compute Statistics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Statistics": {
+      "main": [
+        [
+          {
+            "node": "Store Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

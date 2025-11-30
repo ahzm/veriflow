@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.coindesk.com/v1/bpi/currentprice/BTC.json"
+      }
+    },
+    {
+      "id": "3",
+      "name": "IF Condition",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "field": "body.bpi.USD.rate_float",
+              "operation": "less",
+              "value": 55000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Bitcoin price has dropped below $55k! Check the chart here: https://www.example.com/chart"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "IF Condition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Condition": {
+      "main": [
+        [
+          {
+            "node": "Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Design an n8n workflow for data synchronization between two mock CRM systems: on a scheduled basis, fetch recently updated contacts from System A, transform fields to match System B's schema, resolve conflicts using a "last-write-wins" rule, push updates into System B via HTTP, and generate a synchronization summary (created, updated, skipped) emailed to system administrators.

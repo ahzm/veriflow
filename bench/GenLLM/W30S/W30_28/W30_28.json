@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 0"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Merged PRs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-git-api.com/merged-pull-requests"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Group PRs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const grouped = {};\nitems.forEach(item => {\n    const component = item.json.component;\n    const label = item.json.label;\n    if (!grouped[component]) grouped[component] = {};\n    if (!grouped[component][label]) grouped[component][label] = [];\n    grouped[component][label].push(item);\n});\nreturn [{ json: grouped }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate Release Notes",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const notes = [];\nconst grouped = items[0].json;\nfor (const component in grouped) {\n    notes.push(`## ${component}`);\n    for (const label in grouped[component]) {\n        notes.push(`### ${label}`);\n        grouped[component][label].forEach(pr => {\n            notes.push(`- ${pr.json.title}`);\n        });\n    }\n}\nreturn [{ json: { releaseNotes: notes.join('\\n') } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Store Release Notes",
+      "type": "n8n-nodes-base.mongodb",
+      "parameters": {
+        "operation": "insert",
+        "collection": "release_notes",
+        "document": {
+          "notes": "={{$json[\"releaseNotes\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "releases@example.com",
+        "subject": "Weekly Release Notes",
+        "text": "={{$json[\"releaseNotes\"]}}"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "={{$json[\"releaseNotes\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Merged PRs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Merged PRs": {
+      "main": [
+        [
+          {
+            "node": "Group PRs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group PRs": {
+      "main": [
+        [
+          {
+            "node": "Generate Release Notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Release Notes": {
+      "main": [
+        [
+          {
+            "node": "Store Release Notes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Post to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

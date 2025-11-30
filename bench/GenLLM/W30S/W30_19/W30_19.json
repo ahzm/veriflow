@@ -1,0 +1,132 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Survey",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Load Employees",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-directory-api/employees"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Survey Emails",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Please complete the internal survey",
+        "text": "Dear Employee, please take a moment to complete our internal survey. Thank you!"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Webhook for Responses",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Reminders",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Reminder: Please complete the internal survey",
+        "text": "This is a friendly reminder to complete the internal survey. Your feedback is important!"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Compute Participation Rate",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const totalEmployees = items.length;\nconst totalResponses = items.filter(item => item.json.response).length;\nconst participationRate = (totalResponses / totalEmployees) * 100;\nreturn [{ json: { participationRate } }];"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Final Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "hr@company.com, management@company.com",
+        "subject": "Final Participation Report",
+        "text": "The participation rate for the internal survey is: {{$json[\"participationRate\"]}}%"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Survey": {
+      "main": [
+        [
+          {
+            "node": "Load Employees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Employees": {
+      "main": [
+        [
+          {
+            "node": "Send Survey Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Survey Emails": {
+      "main": [
+        [
+          {
+            "node": "Webhook for Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook for Responses": {
+      "main": [
+        [
+          {
+            "node": "Send Reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminders": {
+      "main": [
+        [
+          {
+            "node": "Compute Participation Rate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Participation Rate": {
+      "main": [
+        [
+          {
+            "node": "Send Final Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

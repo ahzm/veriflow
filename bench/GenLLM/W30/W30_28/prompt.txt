@@ -1,0 +1,1 @@
+Run hourly, fetch Air Quality Index; if AQI < 40, send Slack “good air” message.

@@ -1,0 +1,1 @@
+Design a workflow that coordinates content publishing across social media: schedule posts, adapt content formats per platform, post via APIs, monitor engagement metrics, and generate weekly cross-channel performance summaries.

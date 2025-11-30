@@ -1,0 +1,100 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "SFTP Read",
+      "type": "n8n-nodes-base.sftpRead",
+      "parameters": {
+        "path": "/partner_data",
+        "options": {}
+      }
+    },
+    {
+      "id": "2",
+      "name": "Normalize Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Normalization logic here\n    return item;\n});"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Reconcile Records",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Reconciliation logic here\n    return item;\n});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Discrepancy Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "partner@example.com",
+        "subject": "Discrepancy Report",
+        "text": "Please find attached the discrepancy report."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Compliance Log",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Logging logic here\n    return item;\n});"
+      }
+    }
+  ],
+  "connections": {
+    "SFTP Read": {
+      "main": [
+        [
+          {
+            "node": "Normalize Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Data": {
+      "main": [
+        [
+          {
+            "node": "Reconcile Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconcile Records": {
+      "main": [
+        [
+          {
+            "node": "Send Discrepancy Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Compliance Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Discrepancy Report": {
+      "main": [
+        [
+          {
+            "node": "Compliance Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

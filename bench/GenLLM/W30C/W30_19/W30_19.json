@@ -1,0 +1,130 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Email Trigger",
+      "type": "n8n-nodes-base.emailRead",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Parse Receipt",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { receiptData: 'parsed data from email' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Match Transactions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { matchedTransactions: 'matched data' } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Detect Policy Violations",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { violations: 'detected violations' } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Route to Manager",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Expense requires your approval."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Push to Accounting",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.accounting.com/expenses",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "expenseData": "{{$json[\"matchedTransactions\"]}}"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Notify Employee",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "employee@example.com",
+        "subject": "Expense Approval Outcome",
+        "text": "Your expense has been approved."
+      }
+    }
+  ],
+  "connections": {
+    "Email Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Receipt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Receipt": {
+      "main": [
+        [
+          {
+            "node": "Match Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Transactions": {
+      "main": [
+        [
+          {
+            "node": "Detect Policy Violations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Policy Violations": {
+      "main": [
+        [
+          {
+            "node": "Route to Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to Manager": {
+      "main": [
+        [
+          {
+            "node": "Push to Accounting",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

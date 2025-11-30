@@ -1,0 +1,117 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "FTP Trigger",
+      "type": "n8n-nodes-base.ftpTrigger",
+      "parameters": {
+        "path": "/path/to/catalog",
+        "polling": true,
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "XML Parse",
+      "type": "n8n-nodes-base.xmlParse",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Schema Validator",
+      "type": "n8n-nodes-base.schemaValidator",
+      "parameters": {
+        "schema": {}
+      }
+    },
+    {
+      "id": "4",
+      "name": "HTTP Request to E-commerce",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://ecommerce-platform.com/api/update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {}
+      }
+    },
+    {
+      "id": "5",
+      "name": "Invalidate CDN Cache",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://cdn-provider.com/api/invalidate",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {}
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Product catalog updated successfully."
+      }
+    }
+  ],
+  "connections": {
+    "FTP Trigger": {
+      "main": [
+        [
+          {
+            "node": "XML Parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML Parse": {
+      "main": [
+        [
+          {
+            "node": "Schema Validator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schema Validator": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to E-commerce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to E-commerce": {
+      "main": [
+        [
+          {
+            "node": "Invalidate CDN Cache",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Invalidate CDN Cache": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

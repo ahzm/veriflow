@@ -1,0 +1,91 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Aggregate Counts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const counts = {}; items.forEach(item => {\n    const productId = item.json.productId;\n    counts[productId] = (counts[productId] || 0) + 1;\n});\nreturn Object.entries(counts).map(([productId, count]) => ({ json: { productId, count } }));"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Price Adjustments",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const adjustments = {};\nconst elasticityConfig = { elasticity: 0.1 }; // Example configuration\nitems.forEach(item => {\n    const suggestedPrice = item.json.count * elasticityConfig.elasticity;\n    adjustments[item.json.productId] = suggestedPrice;\n});\nreturn Object.entries(adjustments).map(([productId, price]) => ({ json: { productId, price } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Pricing Recommendations",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-pricing-engine.com/api/pricing",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "productId": "={{$json[\"productId\"]}}",
+          "suggestedPrice": "={{$json[\"price\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Large price adjustments suggested for products: {{$json[\"productId\"]}} with new price {{$json[\"price\"]}}."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Counts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Counts": {
+      "main": [
+        [
+          {
+            "node": "Compute Price Adjustments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Price Adjustments": {
+      "main": [
+        [
+          {
+            "node": "Send Pricing Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

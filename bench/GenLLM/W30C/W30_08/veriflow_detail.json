@@ -1,0 +1,558 @@
+{
+  "S": 0.98,
+  "M": 0.85,
+  "E": 1.0,
+  "Overall": 0.94,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.14285714285714285,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.14285714285714285,
+    "penalty": 0.14285714285714285,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 0.5,
+    "support": 0.5,
+    "order": 1.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.7666666666666666,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": true,
+      "need_conditional_notify": false,
+      "need_db": true,
+      "need_email": true,
+      "need_form": true,
+      "need_http": true,
+      "need_schedule": false,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": true
+    },
+    "intent_chain": [
+      "rule: matched need_form keywords",
+      "rule: matched need_transform keywords",
+      "The workflow involves receiving papers via webhook, indicating the need for HTTP integration.",
+      "Sending review invitations suggests the need for email notifications.",
+      "Collecting scores and producing ranked decision lists implies the use of a database to store and manage data.",
+      "The process of checking formatting and anonymizing PDFs indicates a need for transformation of the data.",
+      "Receiving submissions through a form is necessary for collecting papers."
+    ],
+    "irrelevant_nodes": [],
+    "intent_caps": [
+      "condition",
+      "db",
+      "email",
+      "form",
+      "http",
+      "transform"
+    ],
+    "intent_edges": [
+      [
+        "form",
+        "transform"
+      ],
+      [
+        "transform",
+        "db"
+      ],
+      [
+        "http",
+        "db"
+      ],
+      [
+        "condition",
+        "email"
+      ]
+    ],
+    "missing_capabilities": [
+      "db",
+      "http",
+      "condition"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "db": false,
+        "transform": true,
+        "form": true,
+        "http": false,
+        "email": true,
+        "condition": false
+      },
+      "edge_matches": [
+        {
+          "from": "form",
+          "to": "transform",
+          "ok": true,
+          "path_nodes": [
+            "1",
+            "2"
+          ]
+        },
+        {
+          "from": "transform",
+          "to": "db",
+          "ok": false,
+          "path_nodes": []
+        },
+        {
+          "from": "http",
+          "to": "db",
+          "ok": false,
+          "path_nodes": []
+        },
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": false,
+          "path_nodes": []
+        }
+      ]
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "intent_edge",
+        "from": "form",
+        "to": "transform",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1",
+          "2"
+        ],
+        "targets": [
+          "2",
+          "3",
+          "4",
+          "6",
+          "7"
+        ],
+        "path": [
+          "1",
+          "2"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "transform",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "2",
+          "3",
+          "4",
+          "6",
+          "7"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "http",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "5"
+        ],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "http->email(required)",
+        "from": "http",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "5"
+        ],
+        "path": [],
+        "note": "not applicable (sources/targets empty or graph missing)"
+      },
+      {
+        "rule": "http->db(optional)",
+        "from": "http",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "form->transform(required)",
+        "from": "form",
+        "to": "transform",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1",
+          "2"
+        ],
+        "targets": [
+          "2",
+          "3",
+          "4",
+          "6",
+          "7"
+        ],
+        "path": [
+          "1",
+          "2"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "form->db(optional)",
+        "from": "form",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "1",
+          "2"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "transform->db(optional)",
+        "from": "transform",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "2",
+          "3",
+          "4",
+          "6",
+          "7"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "condition->email(required)",
+        "from": "condition",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "5"
+        ],
+        "path": [],
+        "note": "not applicable (sources/targets empty or graph missing)"
+      },
+      {
+        "rule": "db->email(optional)",
+        "from": "db",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "5"
+        ],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "note": "no candidate nodes to boost"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "condition",
+        "db",
+        "email",
+        "form",
+        "http",
+        "transform"
+      ],
+      "intent_edges": [
+        {
+          "from": "form",
+          "to": "transform",
+          "ok": true,
+          "path": [
+            "1",
+            "2"
+          ]
+        },
+        {
+          "from": "transform",
+          "to": "db",
+          "ok": false,
+          "path": []
+        },
+        {
+          "from": "http",
+          "to": "db",
+          "ok": false,
+          "path": []
+        },
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": false,
+          "path": []
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Webhook",
+          "capability": "schedule",
+          "relevant": true
+        },
+        {
+          "id": "2",
+          "label": "Check Formatting",
+          "capability": "form",
+          "relevant": true
+        },
+        {
+          "id": "3",
+          "label": "Anonymize PDFs",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "4",
+          "label": "Assign Reviewers",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "5",
+          "label": "Send Review Invitations",
+          "capability": "email",
+          "relevant": true
+        },
+        {
+          "id": "6",
+          "label": "Collect Scores",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "7",
+          "label": "Produce Ranked Decision Lists",
+          "capability": "transform",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        },
+        {
+          "source": "4",
+          "target": "5"
+        },
+        {
+          "source": "5",
+          "target": "6"
+        },
+        {
+          "source": "6",
+          "target": "7"
+        }
+      ],
+      "relevant_nodes": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "irrelevant_nodes": [],
+      "missing_capabilities": [
+        "db",
+        "http",
+        "condition"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 1.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 7
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": false,
+      "required_fields": {},
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "timestamp"
+        ],
+        "3": [
+          "timestamp"
+        ],
+        "4": [
+          "timestamp"
+        ],
+        "5": [
+          "timestamp"
+        ],
+        "6": [
+          "timestamp"
+        ],
+        "7": [
+          "timestamp"
+        ]
+      },
+      "missing_fields": {}
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "executed_nodes_readable": [
+      "Webhook",
+      "Check Formatting",
+      "Anonymize PDFs",
+      "Assign Reviewers",
+      "Send Review Invitations",
+      "Collect Scores",
+      "Produce Ranked Decision Lists"
+    ],
+    "name_map": {
+      "1": "Webhook",
+      "2": "Check Formatting",
+      "3": "Anonymize PDFs",
+      "4": "Assign Reviewers",
+      "5": "Send Review Invitations",
+      "6": "Collect Scores",
+      "7": "Produce Ranked Decision Lists"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "2": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "3": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "4": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "5": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      },
+      "6": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "7": {
+        "ok": true,
+        "msg": "noop"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Webhook",
+    "Check Formatting",
+    "Anonymize PDFs",
+    "Assign Reviewers",
+    "Send Review Invitations",
+    "Collect Scores",
+    "Produce Ranked Decision Lists"
+  ]
+}

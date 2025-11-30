@@ -1,0 +1,1 @@
+Construct a workflow that automates sales territory assignment: ingest new leads from multiple CRMs, geocode addresses, match territories based on rules, assign owners, update CRM records, and send onboarding emails to assigned sales reps.

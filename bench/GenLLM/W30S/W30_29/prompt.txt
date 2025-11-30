@@ -1,0 +1,1 @@
+Create a workflow that supports a simple learning management reminder system: sync a list of courses and enrolled users from a mock LMS API, detect users who have not started or completed required courses, send reminder emails based on course deadlines, log reminders into a "lms_reminders" table, and send a weekly compliance summary to HR.

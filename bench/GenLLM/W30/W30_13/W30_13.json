@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get CO2 Levels",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/co2levels"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check CO2 Levels",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"ppm\"]}}",
+              "operation": "greaterThan",
+              "value2": 800
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "CO2 levels are above 800ppm!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get CO2 Levels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get CO2 Levels": {
+      "main": [
+        [
+          {
+            "node": "Check CO2 Levels",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check CO2 Levels": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

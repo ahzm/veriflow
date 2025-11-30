@@ -1,0 +1,1 @@
+Create a workflow that orchestrates partner data exchanges: fetch partner data from SFTP, normalize schemas, reconcile with internal records, send discrepancy reports back to partners, and track all exchanges in a compliance log.

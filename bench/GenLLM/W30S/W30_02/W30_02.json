@@ -1,0 +1,151 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Sales Metrics API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/sales-metrics"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Support Metrics API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/support-metrics"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Engineering Metrics API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/engineering-metrics"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Aggregate KPIs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const sales = items[0].json;\nconst support = items[1].json;\nconst engineering = items[2].json;\n\nreturn [{ json: { sales, support, engineering } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Generate Executive Summary",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const kpis = items[0].json;\nconst summary = `Quarterly Business Review Summary:\\nSales: ${kpis.sales.kpi}\\nSupport: ${kpis.support.kpi}\\nEngineering: ${kpis.engineering.kpi}`;\nreturn [{ json: { summary } }];"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Store Report",
+      "type": "n8n-nodes-base.mongodb",
+      "parameters": {
+        "operation": "insert",
+        "collection": "qbr_reports",
+        "document": "={{$json[\"summary\"]}}"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Send Notification Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "leadership@example.com",
+        "subject": "Quarterly Business Review Report",
+        "text": "The QBR report has been generated. You can view it here: [link to report]"
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sales Metrics API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Metrics API": {
+      "main": [
+        [
+          {
+            "node": "Support Metrics API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Support Metrics API": {
+      "main": [
+        [
+          {
+            "node": "Engineering Metrics API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Engineering Metrics API": {
+      "main": [
+        [
+          {
+            "node": "Aggregate KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate KPIs": {
+      "main": [
+        [
+          {
+            "node": "Generate Executive Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Executive Summary": {
+      "main": [
+        [
+          {
+            "node": "Store Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Report": {
+      "main": [
+        [
+          {
+            "node": "Send Notification Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

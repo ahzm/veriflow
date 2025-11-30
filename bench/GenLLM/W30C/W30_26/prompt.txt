@@ -1,0 +1,1 @@
+Construct a workflow that automates lab test result distribution: receive results from a lab API, validate patient identifiers, anonymize data for research storage, send secure notifications to physicians, and log all accesses for auditing.

@@ -1,0 +1,1 @@
+Construct a workflow that orchestrates a localized notification system: receive incident events via webhook, map each incident's region and severity, look up regional contact lists from a configuration node, send targeted incident emails to affected contacts only, log each notification in a "regional_incidents" table, and send a global summary email to central operations.

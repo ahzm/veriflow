@@ -1,0 +1,1 @@
+Define a workflow that supports A/B testing: pull experiment assignments from a feature flag service, collect conversion events from a tracking API, compute statistical significance, send daily experiment summaries, and suggest winners via an analytics email.

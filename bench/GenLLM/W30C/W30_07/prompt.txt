@@ -1,0 +1,1 @@
+Design a workflow that runs every 15 minutes, checks stock levels across multiple warehouses, predicts stock-outs with a forecasting API, automatically creates replenishment orders in an ERP, and notifies the supply chain Slack channel of critical items.

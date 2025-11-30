@@ -1,0 +1,135 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check At-Risk Users",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request to Analytics API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/analytics/at-risk-users"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Win-Back Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "We Miss You!",
+        "text": "We noticed you haven't been active. Come back and enjoy a special offer!"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Push Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Hey! We have a special offer for you to come back!"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Responses",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track/responses"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Update Churn-Risk Scores",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/update/churn-risk"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Notify Success Team",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A user has returned! Update the account status."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check At-Risk Users": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to Analytics API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to Analytics API": {
+      "main": [
+        [
+          {
+            "node": "Send Win-Back Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Push Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Win-Back Email": {
+      "main": [
+        [
+          {
+            "node": "Track Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Push Notification": {
+      "main": [
+        [
+          {
+            "node": "Track Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Responses": {
+      "main": [
+        [
+          {
+            "node": "Update Churn-Risk Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Churn-Risk Scores": {
+      "main": [
+        [
+          {
+            "node": "Notify Success Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

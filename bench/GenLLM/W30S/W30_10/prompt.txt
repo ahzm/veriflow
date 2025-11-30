@@ -1,0 +1,1 @@
+Create a workflow that supports a simple bug triage process: when a bug is reported via an HTTP endpoint, classify it into product area and severity based on keywords, assign it to the right team lead via a "team directory" API, log the bug into a "bug_tracker" table, send a Slack notification to the relevant team channel, and send an acknowledgement email back to the reporter.

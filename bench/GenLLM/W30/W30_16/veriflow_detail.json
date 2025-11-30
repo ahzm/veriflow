@@ -1,0 +1,357 @@
+{
+  "S": 0.99,
+  "M": 0.69,
+  "E": 1.0,
+  "Overall": 0.89,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.3333333333333333,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.97,
+    "final_S": 0.99,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 0.0,
+    "order": 1.0,
+    "conditional": 0.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.9,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": true,
+      "need_conditional_notify": true,
+      "need_db": false,
+      "need_email": true,
+      "need_form": false,
+      "need_http": false,
+      "need_schedule": true,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": false
+    },
+    "intent_chain": [
+      "rule: matched email keywords",
+      "rule: matched need_condition keywords",
+      "The task involves checking rainfall probability every 3 hours, indicating a need for scheduling.",
+      "An email alert is explicitly mentioned, confirming the need for email functionality.",
+      "The condition of rainfall probability being greater than 70% indicates a need for a conditional check.",
+      "The phrase 'send rain alert' suggests a notification mechanism, which aligns with conditional notifications."
+    ],
+    "irrelevant_nodes": [],
+    "intent_caps": [
+      "condition",
+      "email",
+      "schedule"
+    ],
+    "intent_edges": [
+      [
+        "schedule",
+        "email"
+      ],
+      [
+        "condition",
+        "email"
+      ],
+      [
+        "condition",
+        "action"
+      ]
+    ],
+    "missing_capabilities": [
+      "condition"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "email": true,
+        "condition": false,
+        "schedule": true
+      },
+      "edge_matches": [
+        {
+          "from": "schedule",
+          "to": "email",
+          "ok": true,
+          "path_nodes": [
+            "1",
+            "2",
+            "3"
+          ]
+        },
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": false,
+          "path_nodes": []
+        },
+        {
+          "from": "condition",
+          "to": "action",
+          "ok": false,
+          "path_nodes": []
+        }
+      ]
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "intent_edge",
+        "from": "schedule",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "3"
+        ],
+        "targets": [
+          "2"
+        ],
+        "path": [
+          "1",
+          "2",
+          "3"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "2"
+        ],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "action",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "2"
+        ],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "schedule->email(required)",
+        "from": "schedule",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "3"
+        ],
+        "targets": [
+          "2"
+        ],
+        "path": [
+          "1",
+          "2",
+          "3"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "condition->email(required)",
+        "from": "condition",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "2"
+        ],
+        "path": [],
+        "note": "not applicable (sources/targets empty or graph missing)"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "note": "no candidate nodes to boost"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "condition",
+        "email",
+        "schedule"
+      ],
+      "intent_edges": [
+        {
+          "from": "schedule",
+          "to": "email",
+          "ok": true,
+          "path": [
+            "1",
+            "2",
+            "3"
+          ]
+        },
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": false,
+          "path": []
+        },
+        {
+          "from": "condition",
+          "to": "action",
+          "ok": false,
+          "path": []
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Check Rainfall Probability",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "2",
+          "label": "Send Email Alert",
+          "capability": "email",
+          "relevant": true
+        },
+        {
+          "id": "3",
+          "label": "Schedule Check",
+          "capability": "schedule",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "3",
+          "target": "1"
+        }
+      ],
+      "relevant_nodes": [
+        "1",
+        "2",
+        "3"
+      ],
+      "irrelevant_nodes": [],
+      "missing_capabilities": [
+        "condition"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 1.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 3
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": false,
+      "required_fields": {},
+      "available_fields": {
+        "3": [
+          "timestamp"
+        ],
+        "1": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "2": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {}
+    },
+    "executed_nodes": [
+      "3",
+      "1",
+      "2"
+    ],
+    "executed_nodes_readable": [
+      "Schedule Check",
+      "Check Rainfall Probability",
+      "Send Email Alert"
+    ],
+    "name_map": {
+      "1": "Check Rainfall Probability",
+      "2": "Send Email Alert",
+      "3": "Schedule Check"
+    },
+    "node_results": {
+      "3": {
+        "ok": true,
+        "msg": "cron ok"
+      },
+      "1": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "2": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Schedule Check",
+    "Check Rainfall Probability",
+    "Send Email Alert"
+  ]
+}

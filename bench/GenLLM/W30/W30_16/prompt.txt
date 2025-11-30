@@ -1,0 +1,1 @@
+Check rainfall probability every 3 hours; if > 70%, send rain alert by email.

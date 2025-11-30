@@ -1,0 +1,1 @@
+Check Bitcoin price hourly; if it drops below $55k, send Slack message with chart URL.

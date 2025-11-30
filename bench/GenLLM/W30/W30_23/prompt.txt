@@ -1,0 +1,1 @@
+Run every Monday at 8am, fetch weekly weather summary and send by email.

@@ -1,0 +1,162 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Contacts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm.com/contacts"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Segment Contacts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.reduce((acc, item) => {\n    const region = item.json.region;\n    const industry = item.json.industry;\n    if (!acc[region]) acc[region] = {};\n    if (!acc[region][industry]) acc[region][industry] = [];\n    acc[region][industry].push(item);\n    return acc;\n}, {});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate Message Templates",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return Object.keys(items[0].json).map(region => {\n    return Object.keys(items[0].json[region]).map(industry => {\n        return {\n            region,\n            industry,\n            message: `Hello ${industry} in ${region}, we have an offer for you!`\n        };\n    });\n}).flat();"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Initial Emails",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Exciting Offer Just for You!",
+        "text": "={{$json[\"message\"]}}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Check Email Events",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.mockemail.com/events"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Follow-Up Emails",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Did You See Our Offer?",
+        "text": "Just following up on our previous email regarding our exciting offer!"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Log Actions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    return {\n        json: {\n            action: 'Email Sent',\n            email: item.json.email,\n            timestamp: new Date().toISOString()\n        }\n    };\n});"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Contacts": {
+      "main": [
+        [
+          {
+            "node": "Segment Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Segment Contacts": {
+      "main": [
+        [
+          {
+            "node": "Generate Message Templates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Message Templates": {
+      "main": [
+        [
+          {
+            "node": "Send Initial Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Initial Emails": {
+      "main": [
+        [
+          {
+            "node": "Check Email Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Email Events": {
+      "main": [
+        [
+          {
+            "node": "Send Follow-Up Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Follow-Up Emails": {
+      "main": [
+        [
+          {
+            "node": "Log Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Actions": {
+      "main": [
+        [
+          {
+            "node": "Log Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

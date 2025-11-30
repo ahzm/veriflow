@@ -1,0 +1,1 @@
+Daily at 21:00, fetch crypto market summary and email me.

@@ -1,0 +1,1 @@
+Webhook receives sales data; if total > 1000, send Slack celebration message.

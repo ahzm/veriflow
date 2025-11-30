@@ -1,0 +1,1 @@
+Daily at 06:30, fetch three motivational quotes and email them to me.

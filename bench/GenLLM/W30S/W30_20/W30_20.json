@@ -1,0 +1,175 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "user-offboarding"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Disable User",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-identity-provider.com/api/disable-user",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "userId": "={{$json[\"userId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Revoke Access",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-project-management.com/api/revoke-access",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "userId": "={{$json[\"userId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Remove from Mailing Lists",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-mailing-list.com/api/remove",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "email": "={{$json[\"email\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Confirmation Email to Manager",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "manager@example.com",
+        "subject": "User Offboarding Confirmation",
+        "text": "The user has been successfully offboarded."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Confirmation Email to IT",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "it@example.com",
+        "subject": "User Offboarding Confirmation",
+        "text": "The user has been successfully offboarded."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Store Audit Log",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-database.com/api/deprovision_log",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "userId": "={{$json[\"userId\"]}}",
+          "timestamp": "={{$now}}",
+          "action": "deprovisioned"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Disable User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disable User": {
+      "main": [
+        [
+          {
+            "node": "Revoke Access",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revoke Access": {
+      "main": [
+        [
+          {
+            "node": "Remove from Mailing Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove from Mailing Lists": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email to Manager",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Confirmation Email to IT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation Email to Manager": {
+      "main": [
+        [
+          {
+            "node": "Store Audit Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation Email to IT": {
+      "main": [
+        [
+          {
+            "node": "Store Audit Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Audit Log": {
+      "main": [
+        [
+          {
+            "node": "Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Get Experiment Assignments",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://feature-flag-service.com/api/experiments"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request - Collect Conversion Events",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://tracking-api.com/api/conversions"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Compute Statistical Significance",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items;"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Daily Experiment Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Daily Experiment Summary",
+        "text": "Here is the summary of today's experiments."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Suggest Winners",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "analytics@example.com",
+        "subject": "A/B Test Winners",
+        "text": "The winners of the A/B tests have been determined."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Get Experiment Assignments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Get Experiment Assignments": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Collect Conversion Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Collect Conversion Events": {
+      "main": [
+        [
+          {
+            "node": "Compute Statistical Significance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Statistical Significance": {
+      "main": [
+        [
+          {
+            "node": "Send Daily Experiment Summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Suggest Winners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

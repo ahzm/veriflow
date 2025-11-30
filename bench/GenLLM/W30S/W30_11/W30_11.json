@@ -1,0 +1,117 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 2 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Warehouse Stock",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-warehouse-api.com/stock"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch E-commerce Stock",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-ecommerce-api.com/stock"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Compare Stocks",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const warehouseStock = items[0].json;\nconst ecommerceStock = items[1].json;\nconst discrepancies = [];\n\nfor (const sku in warehouseStock) {\n    if (ecommerceStock[sku] && Math.abs(warehouseStock[sku] - ecommerceStock[sku]) > 10) { // Assuming 10 is the tolerance threshold\n        discrepancies.push({ sku, warehouse: warehouseStock[sku], ecommerce: ecommerceStock[sku] });\n    }\n}\n\nreturn [{ json: { discrepancies } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Write Discrepancies to DB",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "inventory_issues",
+        "columns": {
+          "sku": "={{$json[\"discrepancies\"][0][\"sku\"]}}",
+          "warehouse_stock": "={{$json[\"discrepancies\"][0][\"warehouse\"]}}",
+          "ecommerce_stock": "={{$json[\"discrepancies\"][0][\"ecommerce\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "operations@example.com, finance@example.com",
+        "subject": "Daily Inventory Discrepancies Report",
+        "text": "Please find attached the CSV report of inventory discrepancies."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Warehouse Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Warehouse Stock": {
+      "main": [
+        [
+          {
+            "node": "Fetch E-commerce Stock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch E-commerce Stock": {
+      "main": [
+        [
+          {
+            "node": "Compare Stocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare Stocks": {
+      "main": [
+        [
+          {
+            "node": "Write Discrepancies to DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Discrepancies to DB": {
+      "main": [
+        [
+          {
+            "node": "Send Email Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

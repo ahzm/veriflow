@@ -1,0 +1,132 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Resolve Conflicts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const conflicts = []; // Logic to resolve conflicts\nreturn { conflicts };"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Tentative Hold",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.sharedcalendar.com/tentative-hold",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "event": "{{$json[\"event\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"participantEmail\"]}}",
+        "subject": "Booking Confirmation",
+        "text": "Your booking has been confirmed."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Reschedule Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"participantEmail\"]}}",
+        "subject": "Booking Rescheduled",
+        "text": "Your booking has been rescheduled."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Log Booking History",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bookinghistory.com/log",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "event": "{{$json[\"event\"]}}",
+          "status": "{{$json[\"status\"]}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Resolve Conflicts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Conflicts": {
+      "main": [
+        [
+          {
+            "node": "Tentative Hold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tentative Hold": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Reschedule Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "Log Booking History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reschedule Email": {
+      "main": [
+        [
+          {
+            "node": "Log Booking History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

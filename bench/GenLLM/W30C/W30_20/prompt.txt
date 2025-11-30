@@ -1,0 +1,1 @@
+Define a workflow that synchronizes marketing leads from webforms, webinars, and ads: deduplicate contacts, score leads using a scoring API, push high-scoring leads to CRM with tasks for sales, and send a weekly performance dashboard via email.

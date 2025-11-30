@@ -1,0 +1,140 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Posts",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Adapt Content",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Post to Facebook",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://graph.facebook.com/v10.0/me/feed",
+        "method": "POST",
+        "body": {
+          "message": "Your adapted content for Facebook"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Post to Twitter",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.twitter.com/2/tweets",
+        "method": "POST",
+        "body": {
+          "text": "Your adapted content for Twitter"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Monitor Engagement",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.socialmedia.com/engagement",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Generate Weekly Summary",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "7",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Weekly Performance Summary",
+        "text": "Here is the summary of the week's performance across channels."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Posts": {
+      "main": [
+        [
+          {
+            "node": "Adapt Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adapt Content": {
+      "main": [
+        [
+          {
+            "node": "Post to Facebook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post to Twitter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Facebook": {
+      "main": [
+        [
+          {
+            "node": "Monitor Engagement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Twitter": {
+      "main": [
+        [
+          {
+            "node": "Monitor Engagement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Engagement": {
+      "main": [
+        [
+          {
+            "node": "Generate Weekly Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Weekly Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

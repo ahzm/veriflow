@@ -1,0 +1,831 @@
+{
+  "S": 0.98,
+  "M": 0.9,
+  "E": 0.8,
+  "Overall": 0.89,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.14285714285714285,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 0.6666666666666666,
+    "support": 0.6666666666666666,
+    "order": 1.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.73125,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": true,
+      "need_conditional_notify": true,
+      "need_db": true,
+      "need_email": true,
+      "need_form": false,
+      "need_http": true,
+      "need_schedule": true,
+      "need_slack": true,
+      "need_telegram": false,
+      "need_transform": true
+    },
+    "intent_chain": [
+      "Recurring maintenance tasks imply a need for scheduling.",
+      "Creating tickets in a CMMS suggests the need for email notifications to technicians.",
+      "Predicting maintenance windows and updating machine status indicates the use of HTTP for data exchange.",
+      "Notifying technicians can involve Slack for communication.",
+      "Tracking SLA metrics over time requires database interactions.",
+      "Conditionally notifying based on telemetry data suggests the need for conditions.",
+      "Transforming data from IoT telemetry to actionable insights indicates a need for data transformation."
+    ],
+    "irrelevant_nodes": [],
+    "intent_caps": [
+      "condition",
+      "db",
+      "email",
+      "http",
+      "schedule",
+      "slack",
+      "transform"
+    ],
+    "intent_edges": [
+      [
+        "schedule",
+        "http"
+      ],
+      [
+        "schedule",
+        "email"
+      ],
+      [
+        "schedule",
+        "slack"
+      ],
+      [
+        "transform",
+        "db"
+      ],
+      [
+        "http",
+        "db"
+      ],
+      [
+        "condition",
+        "email"
+      ],
+      [
+        "condition",
+        "slack"
+      ],
+      [
+        "condition",
+        "action"
+      ]
+    ],
+    "missing_capabilities": [
+      "db",
+      "email"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "slack": true,
+        "schedule": true,
+        "db": false,
+        "transform": true,
+        "http": true,
+        "email": false,
+        "condition": true
+      },
+      "edge_matches": [
+        {
+          "from": "schedule",
+          "to": "http",
+          "ok": true,
+          "path_nodes": [
+            "1",
+            "2"
+          ]
+        },
+        {
+          "from": "schedule",
+          "to": "email",
+          "ok": false,
+          "path_nodes": []
+        },
+        {
+          "from": "schedule",
+          "to": "slack",
+          "ok": true,
+          "path_nodes": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ]
+        },
+        {
+          "from": "transform",
+          "to": "db",
+          "ok": false,
+          "path_nodes": []
+        },
+        {
+          "from": "http",
+          "to": "db",
+          "ok": false,
+          "path_nodes": []
+        },
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": false,
+          "path_nodes": []
+        },
+        {
+          "from": "condition",
+          "to": "slack",
+          "ok": true,
+          "path_nodes": [
+            "5"
+          ]
+        },
+        {
+          "from": "condition",
+          "to": "action",
+          "ok": true,
+          "path_nodes": [
+            "5"
+          ]
+        }
+      ]
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "intent_edge",
+        "from": "schedule",
+        "to": "http",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1"
+        ],
+        "targets": [
+          "2",
+          "4",
+          "6",
+          "7"
+        ],
+        "path": [
+          "1",
+          "2"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "schedule",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "1"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "schedule",
+        "to": "slack",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1"
+        ],
+        "targets": [
+          "5"
+        ],
+        "path": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "transform",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "3"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "http",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "2",
+          "4",
+          "6",
+          "7"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "5"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "slack",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "5"
+        ],
+        "targets": [
+          "5"
+        ],
+        "path": [
+          "5"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "action",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "5"
+        ],
+        "targets": [
+          "5"
+        ],
+        "path": [
+          "5"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "schedule->http(required)",
+        "from": "schedule",
+        "to": "http",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1"
+        ],
+        "targets": [
+          "2",
+          "4",
+          "6",
+          "7"
+        ],
+        "path": [
+          "1",
+          "2"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "schedule->email(required)",
+        "from": "schedule",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "1"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (sources/targets empty or graph missing)"
+      },
+      {
+        "rule": "schedule->slack(required)",
+        "from": "schedule",
+        "to": "slack",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1"
+        ],
+        "targets": [
+          "5"
+        ],
+        "path": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "http->email(required)",
+        "from": "http",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "2",
+          "4",
+          "6",
+          "7"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (sources/targets empty or graph missing)"
+      },
+      {
+        "rule": "http->slack(required)",
+        "from": "http",
+        "to": "slack",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "2",
+          "4",
+          "6",
+          "7"
+        ],
+        "targets": [
+          "5"
+        ],
+        "path": [
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "http->db(optional)",
+        "from": "http",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "2",
+          "4",
+          "6",
+          "7"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "transform->db(optional)",
+        "from": "transform",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "3"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "condition->slack(required)",
+        "from": "condition",
+        "to": "slack",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "5"
+        ],
+        "targets": [
+          "5"
+        ],
+        "path": [
+          "5"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "condition->email(required)",
+        "from": "condition",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "5"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (sources/targets empty or graph missing)"
+      },
+      {
+        "rule": "db->email(optional)",
+        "from": "db",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "db->slack(optional)",
+        "from": "db",
+        "to": "slack",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "5"
+        ],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "note": "no candidate nodes to boost"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "condition",
+        "db",
+        "email",
+        "http",
+        "schedule",
+        "slack",
+        "transform"
+      ],
+      "intent_edges": [
+        {
+          "from": "schedule",
+          "to": "http",
+          "ok": true,
+          "path": [
+            "1",
+            "2"
+          ]
+        },
+        {
+          "from": "schedule",
+          "to": "email",
+          "ok": false,
+          "path": []
+        },
+        {
+          "from": "schedule",
+          "to": "slack",
+          "ok": true,
+          "path": [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ]
+        },
+        {
+          "from": "transform",
+          "to": "db",
+          "ok": false,
+          "path": []
+        },
+        {
+          "from": "http",
+          "to": "db",
+          "ok": false,
+          "path": []
+        },
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": false,
+          "path": []
+        },
+        {
+          "from": "condition",
+          "to": "slack",
+          "ok": true,
+          "path": [
+            "5"
+          ]
+        },
+        {
+          "from": "condition",
+          "to": "action",
+          "ok": true,
+          "path": [
+            "5"
+          ]
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Schedule Maintenance Check",
+          "capability": "schedule",
+          "relevant": true
+        },
+        {
+          "id": "2",
+          "label": "Get IoT Telemetry",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "3",
+          "label": "Predict Maintenance Windows",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "4",
+          "label": "Create CMMS Ticket",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "5",
+          "label": "Notify Technicians",
+          "capability": "slack",
+          "relevant": true
+        },
+        {
+          "id": "6",
+          "label": "Update Machine Status",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "7",
+          "label": "Track SLA Metrics",
+          "capability": "http",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        },
+        {
+          "source": "4",
+          "target": "5"
+        },
+        {
+          "source": "5",
+          "target": "6"
+        },
+        {
+          "source": "6",
+          "target": "7"
+        }
+      ],
+      "relevant_nodes": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "irrelevant_nodes": [],
+      "missing_capabilities": [
+        "db",
+        "email"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 0.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 7
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": true,
+      "required_fields": {
+        "4": [
+          "machineId",
+          "maintenanceWindow"
+        ],
+        "5": [
+          "machineId",
+          "maintenanceWindow"
+        ],
+        "6": [
+          "machineId"
+        ],
+        "7": [
+          "machineId"
+        ]
+      },
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "3": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "5": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "6": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "7": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {
+        "4": [
+          "machineId",
+          "maintenanceWindow"
+        ],
+        "5": [
+          "machineId",
+          "maintenanceWindow"
+        ],
+        "6": [
+          "machineId"
+        ],
+        "7": [
+          "machineId"
+        ]
+      }
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7"
+    ],
+    "executed_nodes_readable": [
+      "Schedule Maintenance Check",
+      "Get IoT Telemetry",
+      "Predict Maintenance Windows",
+      "Create CMMS Ticket",
+      "Notify Technicians",
+      "Update Machine Status",
+      "Track SLA Metrics"
+    ],
+    "name_map": {
+      "1": "Schedule Maintenance Check",
+      "2": "Get IoT Telemetry",
+      "3": "Predict Maintenance Windows",
+      "4": "Create CMMS Ticket",
+      "5": "Notify Technicians",
+      "6": "Update Machine Status",
+      "7": "Track SLA Metrics"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "cron ok"
+      },
+      "2": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "3": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "4": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "5": {
+        "ok": true,
+        "msg": "slack ok (mock)"
+      },
+      "6": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "7": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Schedule Maintenance Check",
+    "Get IoT Telemetry",
+    "Predict Maintenance Windows",
+    "Create CMMS Ticket",
+    "Notify Technicians",
+    "Update Machine Status",
+    "Track SLA Metrics"
+  ]
+}

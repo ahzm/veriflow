@@ -1,0 +1,142 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Maintenance Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get IoT Telemetry",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.iot-telemetry.com/machines"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Predict Maintenance Windows",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { maintenanceWindow: '2023-10-01T10:00:00Z', machineId: item.json.id } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Create CMMS Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.cmms.com/tickets",
+        "method": "POST",
+        "body": {
+          "machineId": "={{$json[\"machineId\"]}}",
+          "maintenanceWindow": "={{$json[\"maintenanceWindow\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Technicians",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Maintenance task scheduled for machine {{$json[\"machineId\"]}} at {{$json[\"maintenanceWindow\"]}}."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Update Machine Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.iot-telemetry.com/machines/{{$json[\"machineId\"]}}/status",
+        "method": "PATCH",
+        "body": {
+          "status": "Maintenance Completed"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Track SLA Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.sla-metrics.com/track",
+        "method": "POST",
+        "body": {
+          "machineId": "={{$json[\"machineId\"]}}",
+          "completionTime": "={{new Date().toISOString()}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Maintenance Check": {
+      "main": [
+        [
+          {
+            "node": "Get IoT Telemetry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get IoT Telemetry": {
+      "main": [
+        [
+          {
+            "node": "Predict Maintenance Windows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Predict Maintenance Windows": {
+      "main": [
+        [
+          {
+            "node": "Create CMMS Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create CMMS Ticket": {
+      "main": [
+        [
+          {
+            "node": "Notify Technicians",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Technicians": {
+      "main": [
+        [
+          {
+            "node": "Update Machine Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Machine Status": {
+      "main": [
+        [
+          {
+            "node": "Track SLA Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

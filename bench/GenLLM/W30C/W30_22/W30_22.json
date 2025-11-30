@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Audit",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Logs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/api/logs"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Filter Security Events",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.type === 'security');"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Store Logs",
+      "type": "n8n-nodes-base.file",
+      "parameters": {
+        "filePath": "/path/to/immutable/archive.json",
+        "data": "={{JSON.stringify($json)}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Audit Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { report: 'Audit report generated with ' + items.length + ' security events.' } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Email Audit Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "auditor@example.com",
+        "subject": "Periodic Audit Report",
+        "text": "Please find the attached audit report."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Audit": {
+      "main": [
+        [
+          {
+            "node": "Collect Logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Logs": {
+      "main": [
+        [
+          {
+            "node": "Filter Security Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Security Events": {
+      "main": [
+        [
+          {
+            "node": "Store Logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Logs": {
+      "main": [
+        [
+          {
+            "node": "Generate Audit Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Audit Report": {
+      "main": [
+        [
+          {
+            "node": "Email Audit Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

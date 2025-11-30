@@ -1,0 +1,140 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rfp-receive"
+      }
+    },
+    {
+      "id": "2",
+      "name": "NLP Extract Requirements",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return { requirements: extractRequirementsFromRFP(items[0].json.document) };"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Map to Standard Answers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return { mappedAnswers: mapRequirementsToAnswers(items[0].json.requirements) };"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate Draft Response",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return { draftResponse: generateDraftResponse(items[0].json.mappedAnswers) };"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send to Legal for Approval",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "legal@example.com",
+        "subject": "RFP Response Approval Needed",
+        "text": "Please review the draft response: {{ $json.draftResponse }}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send to Sales for Approval",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "sales@example.com",
+        "subject": "RFP Response Approval Needed",
+        "text": "Please review the draft response: {{ $json.draftResponse }}"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Track Submission Deadline",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "NLP Extract Requirements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NLP Extract Requirements": {
+      "main": [
+        [
+          {
+            "node": "Map to Standard Answers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map to Standard Answers": {
+      "main": [
+        [
+          {
+            "node": "Generate Draft Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Draft Response": {
+      "main": [
+        [
+          {
+            "node": "Send to Legal for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send to Sales for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Legal for Approval": {
+      "main": [
+        [
+          {
+            "node": "Track Submission Deadline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Sales for Approval": {
+      "main": [
+        [
+          {
+            "node": "Track Submission Deadline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

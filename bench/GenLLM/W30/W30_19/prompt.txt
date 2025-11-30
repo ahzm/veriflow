@@ -1,0 +1,1 @@
+When webhook receives “stockSymbol”, fetch its current price and email me.

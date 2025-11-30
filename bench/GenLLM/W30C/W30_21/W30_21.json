@@ -1,0 +1,154 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "incident-alert"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Enrich Incident",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/configuration",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Critical incident alert received. Please check the details."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "oncall@example.com",
+        "subject": "Critical Incident Alert",
+        "text": "A critical incident has been reported. Please respond immediately."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create Incident Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/tickets",
+        "method": "POST",
+        "body": {
+          "incident": "New critical incident reported"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Update Incident Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/tickets/update",
+        "method": "PUT",
+        "body": {
+          "status": "In Progress"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Post Status Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://statuspage.example.com/api/update",
+        "method": "POST",
+        "body": {
+          "status": "Incident reported"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Enrich Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Enrich Incident": {
+      "main": [
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Create Incident Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Notification": {
+      "main": [
+        [
+          {
+            "node": "Create Incident Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Incident Ticket": {
+      "main": [
+        [
+          {
+            "node": "Update Incident Ticket",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post Status Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Incident Ticket": {
+      "main": [
+        [
+          {
+            "node": "Post Status Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

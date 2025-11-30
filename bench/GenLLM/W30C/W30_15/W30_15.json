@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Monitor Repository",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Extract Key Clauses",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.nlp-service.com/extract"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Store Metadata",
+      "type": "n8n-nodes-base.database",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Set Renewal Reminders",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Legal Teams",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Reminder: Important contract renewal deadlines are approaching."
+      }
+    }
+  ],
+  "connections": {
+    "Monitor Repository": {
+      "main": [
+        [
+          {
+            "node": "Extract Key Clauses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Key Clauses": {
+      "main": [
+        [
+          {
+            "node": "Store Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Metadata": {
+      "main": [
+        [
+          {
+            "node": "Set Renewal Reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Renewal Reminders": {
+      "main": [
+        [
+          {
+            "node": "Notify Legal Teams",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

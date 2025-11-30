@@ -1,0 +1,145 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Create HR Entry",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-hr-system.com/api/employees",
+        "method": "POST",
+        "bodyParameters": {
+          "name": "={{$json[\"name\"]}}",
+          "email": "={{$json[\"email\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Create Identity Management Entry",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-identity-management.com/api/users",
+        "method": "POST",
+        "bodyParameters": {
+          "email": "={{$json[\"email\"]}}",
+          "initialPassword": "={{$json[\"initialPassword\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Password Reset Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Password Reset Instructions",
+        "text": "Please reset your password using the following link."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Assign Laptop Asset",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-inventory-api.com/api/assets",
+        "method": "POST",
+        "bodyParameters": {
+          "employeeEmail": "={{$json[\"email\"]}}",
+          "assetType": "Laptop"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Create Slack Account",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Creating Slack account for {{$json[\"email\"]}} and inviting to channels."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "hr@company.com",
+        "subject": "Onboarding Confirmation for {{$json[\"name\"]}}",
+        "text": "Onboarding steps completed for {{$json[\"name\"]}}."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Create HR Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create HR Entry": {
+      "main": [
+        [
+          {
+            "node": "Create Identity Management Entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Identity Management Entry": {
+      "main": [
+        [
+          {
+            "node": "Send Password Reset Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Password Reset Email": {
+      "main": [
+        [
+          {
+            "node": "Assign Laptop Asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Laptop Asset": {
+      "main": [
+        [
+          {
+            "node": "Create Slack Account",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Slack Account": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

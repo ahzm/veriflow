@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"total\"]}}",
+              "operation": "greaterThan",
+              "value2": 1000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Slack Celebration",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "🎉 Congratulations! Sales exceeded $1000! 🎉"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Slack Celebration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

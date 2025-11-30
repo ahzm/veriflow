@@ -1,0 +1,1 @@
+Design an n8n workflow that coordinates a simple document approval chain: when a new document metadata arrives via webhook, assign it to a first-level reviewer, send an email with approval links, wait for an "approve/reject" callback, if approved, escalate to a second-level reviewer, and finally send a consolidated decision email to the original requester with all comments.

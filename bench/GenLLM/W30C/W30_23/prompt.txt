@@ -1,0 +1,1 @@
+Build a workflow that handles multi-language content localization: when new English content is published, send it to a translation API for multiple languages, perform QA checks, update CMS entries per locale, and notify local marketing teams.

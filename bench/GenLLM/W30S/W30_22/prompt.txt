@@ -1,0 +1,1 @@
+Design an n8n workflow for multi-source contact enrichment: on manual trigger, read a list of contacts from a configuration node, call three different mock enrichment APIs (social profile, company data, technology stack) for each contact, merge and deduplicate attributes, store the enriched profiles into a "contact_enriched" table, and send a summary email of enrichment coverage.

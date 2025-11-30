@@ -1,0 +1,1 @@
+Build a workflow that handles partner integration monitoring: on schedule, query three partner APIs for their current integration health and daily transaction counts, detect anomalies (e.g., drop below a baseline threshold), write anomalies to a "partner_health" collection, create incidents in a mock incident-management API, and notify both internal and partner contacts by email.

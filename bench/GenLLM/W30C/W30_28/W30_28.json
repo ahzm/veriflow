@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "access-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Manager Approval",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "{{$json[\"managerApproved\"]}}",
+              "operation": "isTrue"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Provision Access",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/provision",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "userId": "{{$json[\"userId\"]}}",
+          "accessLevel": "{{$json[\"accessLevel\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Grant",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const log = `Access granted to user ${item.userId} for level ${item.accessLevel}`;\nreturn [{ json: { log } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Revocation",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const log = `Access revoked from user ${item.userId}`;\nreturn [{ json: { log } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Periodic Review",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 1 * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Manager Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manager Approval": {
+      "main": [
+        [
+          {
+            "node": "Provision Access",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Revocation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Provision Access": {
+      "main": [
+        [
+          {
+            "node": "Log Grant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Grant": {
+      "main": [
+        [
+          {
+            "node": "Periodic Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Revocation": {
+      "main": [
+        [
+          {
+            "node": "Periodic Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

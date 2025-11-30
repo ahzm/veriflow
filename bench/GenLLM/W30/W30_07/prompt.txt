@@ -1,0 +1,1 @@
+Webhook receives a JSON with “temperature”; if temperature > 30C, send heat alert via Slack.

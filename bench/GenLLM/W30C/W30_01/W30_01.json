@@ -1,0 +1,118 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "LinkedIn Data Enrichment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.linkedin.com/v2/me"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Screening Stage",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Interview Stage",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Offer Stage",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Update ATS",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.ats.com/update"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "candidate@example.com",
+        "subject": "Your Application Update",
+        "text": "Thank you for your application. You are currently in the screening stage."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "LinkedIn Data Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn Data Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Screening Stage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Screening Stage": {
+      "main": [
+        [
+          {
+            "node": "Interview Stage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Interview Stage": {
+      "main": [
+        [
+          {
+            "node": "Offer Stage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Offer Stage": {
+      "main": [
+        [
+          {
+            "node": "Update ATS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

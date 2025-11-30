@@ -1,0 +1,185 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "invoice"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Invoice",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const requiredFields = ['amount', 'costCenter', 'supplierEmail'];\nconst missingFields = requiredFields.filter(field => !items[0].json[field]);\nif (missingFields.length > 0) {\n    throw new Error('Missing fields: ' + missingFields.join(', '));\n}\nreturn items;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Tax",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const taxRate = 0.2;\nconst amount = items[0].json.amount;\nitems[0].json.taxTotal = amount * taxRate;\nreturn items;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Check Approval Requirement",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const amount = items[0].json.amount;\nconst costCenter = items[0].json.costCenter;\nif (amount > 1000 && costCenter === 'HR') {\n    items[0].json.approvalRequired = true;\n} else {\n    items[0].json.approvalRequired = false;\n}\nreturn items;"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Approval Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "manager@example.com",
+        "subject": "Invoice Approval Required",
+        "text": "Please approve the invoice for amount: {{$json[\"amount\"]}}."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Wait for Approval",
+      "type": "n8n-nodes-base.wait",
+      "parameters": {
+        "timeout": 3600,
+        "timeoutAction": "continue",
+        "waitForWebhook": true
+      }
+    },
+    {
+      "id": "7",
+      "name": "Call Payment API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-payment-api.com/pay",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "amount": "={{$json[\"amount\"]}}",
+          "taxTotal": "={{$json[\"taxTotal\"]}}"
+        }
+      }
+    },
+    {
+      "id": "8",
+      "name": "Notify Supplier",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"supplierEmail\"]}}",
+        "subject": "Invoice Payment Notification",
+        "text": "Your invoice has been processed and payment is on the way."
+      }
+    },
+    {
+      "id": "9",
+      "name": "Notify Finance Team",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "finance@example.com",
+        "subject": "Invoice Payment Processed",
+        "text": "The invoice for amount {{$json[\"amount\"]}} has been paid."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Invoice": {
+      "main": [
+        [
+          {
+            "node": "Compute Tax",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Tax": {
+      "main": [
+        [
+          {
+            "node": "Check Approval Requirement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Approval Requirement": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Payment API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Email": {
+      "main": [
+        [
+          {
+            "node": "Wait for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Approval": {
+      "main": [
+        [
+          {
+            "node": "Call Payment API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Payment API": {
+      "main": [
+        [
+          {
+            "node": "Notify Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Finance Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Define a workflow that automates RFP responses: ingest RFP documents, extract key requirements using NLP, map them to standard answers from a knowledge base, generate draft responses, route them to legal and sales for approval, and track submission deadlines.

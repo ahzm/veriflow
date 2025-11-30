@@ -1,0 +1,138 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-analytics-api.com/churn-risk"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Group by Account Manager",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const grouped = {};\nitems.forEach(item => {\n    const manager = item.json.accountManager;\n    if (!grouped[manager]) {\n        grouped[manager] = [];\n    }\n    grouped[manager].push(item);\n});\nreturn Object.entries(grouped).map(([manager, customers]) => ({ json: { manager, customers } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"manager\"]}}",
+        "subject": "At-Risk Customers Notification",
+        "text": "Dear Account Manager,\\n\\nThe following customers are at risk of churn:\\n={{JSON.stringify($json[\"customers\"])}}\\n\\nBest regards,\\nChurn Monitoring Team"
+      }
+    },
+    {
+      "id": "5",
+      "name": "HTTP Request (Create Tasks)",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://task-management-api.com/create-task",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "manager": "={{$json[\"manager\"]}}",
+          "tasks": "={{$json[\"customers\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Store in Churn Watch",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://database-api.com/churn_watch",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "data": "={{$json[\"customers\"]}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Group by Account Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group by Account Manager": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request (Create Tasks)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Store in Churn Watch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request (Create Tasks)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request (Create Tasks)": {
+      "main": [
+        [
+          {
+            "node": "Store in Churn Watch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

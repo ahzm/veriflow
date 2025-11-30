@@ -1,0 +1,385 @@
+{
+  "S": 0.98,
+  "M": 0.82,
+  "E": 1.0,
+  "Overall": 0.93,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.16666666666666669,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 0.5,
+    "order": 1.0,
+    "conditional": 0.35,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.9875,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": false,
+      "need_conditional_notify": false,
+      "need_db": false,
+      "need_email": false,
+      "need_form": true,
+      "need_http": true,
+      "need_schedule": false,
+      "need_slack": true,
+      "need_telegram": false,
+      "need_transform": true
+    },
+    "intent_chain": [
+      "rule: matched need_slack keywords",
+      "rule: matched need_form keywords",
+      "rule: matched need_transform keywords",
+      "The workflow involves updating an e-commerce platform via REST, indicating the need for HTTP.",
+      "A detailed change log is sent to a monitoring Slack channel, confirming the need for Slack.",
+      "The process includes parsing XML files and validating schemas, which suggests the need for a form to handle the data.",
+      "The workflow requires transforming data from the ERP to the e-commerce platform, indicating a need for transformation."
+    ],
+    "irrelevant_nodes": [
+      "1",
+      "3"
+    ],
+    "intent_caps": [
+      "form",
+      "http",
+      "slack",
+      "transform"
+    ],
+    "intent_edges": [
+      [
+        "form",
+        "transform"
+      ]
+    ],
+    "missing_capabilities": [
+      "form"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "form": false,
+        "transform": true,
+        "slack": true,
+        "http": true
+      },
+      "edge_matches": [
+        {
+          "from": "form",
+          "to": "transform",
+          "ok": false,
+          "path_nodes": []
+        }
+      ]
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "intent_edge",
+        "from": "form",
+        "to": "transform",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "2",
+          "5"
+        ],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "http->slack(required)",
+        "from": "http",
+        "to": "slack",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "4",
+          "5"
+        ],
+        "targets": [
+          "6"
+        ],
+        "path": [
+          "4",
+          "5",
+          "6"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "form->transform(required)",
+        "from": "form",
+        "to": "transform",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "2",
+          "5"
+        ],
+        "path": [],
+        "note": "not applicable (sources/targets empty or graph missing)"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      },
+      {
+        "rule": "extra_conditional_notify",
+        "from": "condition",
+        "to": "action",
+        "applicable": true,
+        "ok": false,
+        "sources": [
+          "6"
+        ],
+        "targets": [
+          "6"
+        ],
+        "path": [
+          "6"
+        ],
+        "note": "workflow has conditional notify but intent does not require it"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "form",
+        "http",
+        "slack",
+        "transform"
+      ],
+      "intent_edges": [
+        {
+          "from": "form",
+          "to": "transform",
+          "ok": false,
+          "path": []
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "FTP Trigger",
+          "capability": "schedule",
+          "relevant": false
+        },
+        {
+          "id": "2",
+          "label": "XML Parse",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "3",
+          "label": "Schema Validator",
+          "capability": null,
+          "relevant": false
+        },
+        {
+          "id": "4",
+          "label": "HTTP Request to E-commerce",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "5",
+          "label": "Invalidate CDN Cache",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "6",
+          "label": "Send Slack Notification",
+          "capability": "slack",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        },
+        {
+          "source": "4",
+          "target": "5"
+        },
+        {
+          "source": "5",
+          "target": "6"
+        }
+      ],
+      "relevant_nodes": [
+        "2",
+        "4",
+        "5",
+        "6"
+      ],
+      "irrelevant_nodes": [
+        "1",
+        "3"
+      ],
+      "missing_capabilities": [
+        "form"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 1.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 6
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": false,
+      "required_fields": {},
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "timestamp"
+        ],
+        "3": [
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "5": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "6": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {}
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "executed_nodes_readable": [
+      "FTP Trigger",
+      "XML Parse",
+      "Schema Validator",
+      "HTTP Request to E-commerce",
+      "Invalidate CDN Cache",
+      "Send Slack Notification"
+    ],
+    "name_map": {
+      "1": "FTP Trigger",
+      "2": "XML Parse",
+      "3": "Schema Validator",
+      "4": "HTTP Request to E-commerce",
+      "5": "Invalidate CDN Cache",
+      "6": "Send Slack Notification"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "cron ok"
+      },
+      "2": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "3": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "4": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "5": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "6": {
+        "ok": true,
+        "msg": "slack ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "FTP Trigger",
+    "XML Parse",
+    "Schema Validator",
+    "HTTP Request to E-commerce",
+    "Invalidate CDN Cache",
+    "Send Slack Notification"
+  ]
+}

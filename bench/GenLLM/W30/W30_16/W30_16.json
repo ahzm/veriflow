@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check Rainfall Probability",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.weather.com/v3/wx/forecast/daily/5day"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Email Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alert@example.com",
+        "subject": "Rain Alert",
+        "text": "There is a high probability of rain."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 */3 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Check Rainfall Probability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Rainfall Probability": {
+      "main": [
+        [
+          {
+            "node": "Send Email Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
