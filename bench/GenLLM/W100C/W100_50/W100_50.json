@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "change-order"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Proposal Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "New Change Order Proposal",
+        "text": "A new change order proposal has been submitted. Please review it."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new change order proposal has been submitted. Check your email for details."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Approval Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.approval-system.com/request",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "proposalId": "={{$json[\"id\"]}}",
+          "stakeholders": [
+            "stakeholder1@example.com",
+            "stakeholder2@example.com"
+          ]
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Implement Change Order",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.construction-project.com/implement",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "changeOrderId": "={{$json[\"id\"]}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Proposal Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Proposal Email": {
+      "main": [
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Approval Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Implement Change Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

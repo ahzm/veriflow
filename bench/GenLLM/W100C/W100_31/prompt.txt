@@ -1,0 +1,1 @@
+Design a workflow that manages multi-utility outage coordination: detect and coordinate responses across electricity, water, and telecom.

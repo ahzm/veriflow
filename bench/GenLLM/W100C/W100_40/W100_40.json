@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Proposal Collection",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Proposals",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.researchinfrastructure.org/proposals"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Allocate Resources",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.researchinfrastructure.org/allocate"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Collect Usage Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.researchinfrastructure.org/usage"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@researchinfrastructure.org",
+        "subject": "Daily Research Infrastructure Summary",
+        "text": "Proposals collected, resources allocated, and usage metrics gathered."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Daily summary of research infrastructure activities has been completed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Proposal Collection": {
+      "main": [
+        [
+          {
+            "node": "Collect Proposals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Proposals": {
+      "main": [
+        [
+          {
+            "node": "Allocate Resources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allocate Resources": {
+      "main": [
+        [
+          {
+            "node": "Collect Usage Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Usage Metrics": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

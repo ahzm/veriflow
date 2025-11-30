@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Billing",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Customer Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/customers"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Calculate Pricing",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const customers = items.map(item => item.json);\nreturn customers.map(customer => {\n    const tieredPricing = calculateTieredPricing(customer);\n    const discounts = calculateDiscounts(customer);\n    const adjustments = calculateAdjustments(customer);\n    return {\n        json: {\n            customerId: customer.id,\n            total: tieredPricing - discounts + adjustments\n        }\n    };\n});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Invoice",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "billing@example.com",
+        "subject": "Monthly Invoice",
+        "text": "Please find attached the invoice for this month."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Billing": {
+      "main": [
+        [
+          {
+            "node": "Fetch Customer Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Customer Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Pricing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Pricing": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

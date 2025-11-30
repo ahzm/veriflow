@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Deployment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Deploy Observers",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.electionobservations.com/deploy"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Collect Reports",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.electionobservations.com/reports"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Analyze Findings",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Findings Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "Election Observation Findings",
+        "text": "The findings from the recent election observation missions are ready for review."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify via Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The election observation findings have been compiled and sent via email."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Deployment": {
+      "main": [
+        [
+          {
+            "node": "Deploy Observers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deploy Observers": {
+      "main": [
+        [
+          {
+            "node": "Collect Reports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Reports": {
+      "main": [
+        [
+          {
+            "node": "Analyze Findings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Findings": {
+      "main": [
+        [
+          {
+            "node": "Send Findings Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify via Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

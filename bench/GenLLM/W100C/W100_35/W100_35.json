@@ -1,0 +1,82 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Air Traffic Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.airtrafficdata.com/fetch"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Constraints Update",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "constraints@airtraffic.com",
+        "subject": "Air Traffic Constraints Update",
+        "text": "New constraints have been fetched."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Plans Update",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New air traffic plans have been shared."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Updates Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "updates@airtraffic.com",
+        "subject": "Air Traffic Updates Notification",
+        "text": "Updates have been made to the air traffic flow management."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Air Traffic Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Air Traffic Data": {
+      "main": [
+        [
+          {
+            "node": "Send Constraints Update",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Plans Update",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Updates Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Campaign",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Vaccine Supply",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.vaccinesupply.com/check"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Outreach Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "outreach@healthcampaign.org",
+        "subject": "Vaccine Outreach Campaign",
+        "text": "We are starting our vaccine outreach campaign. Please prepare the necessary materials."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Monitor Campaign Progress",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Monitoring the progress of the vaccine outreach campaign."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Campaign": {
+      "main": [
+        [
+          {
+            "node": "Check Vaccine Supply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Vaccine Supply": {
+      "main": [
+        [
+          {
+            "node": "Send Outreach Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Outreach Email": {
+      "main": [
+        [
+          {
+            "node": "Monitor Campaign Progress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

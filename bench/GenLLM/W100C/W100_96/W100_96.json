@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Report Generation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Water Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.waterdata.com/fetch"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { report: 'Water Resource Management Report', data: items } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "Daily Water Resource Management Report",
+        "text": "Please find attached the daily report on water resource management."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The daily water resource management report has been generated and sent to stakeholders."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Report Generation": {
+      "main": [
+        [
+          {
+            "node": "Fetch Water Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Water Data": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Send Email Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

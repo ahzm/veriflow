@@ -1,0 +1,1 @@
+Create a workflow that orchestrates large-scale political debate fact-checking operations: ingest claims, assign checks, and publish verdicts.

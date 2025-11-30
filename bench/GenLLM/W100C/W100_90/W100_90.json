@@ -1,0 +1,120 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Submission",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request for Submission",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.environmental-submissions.com/submit"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Submission Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "submitter@example.com",
+        "subject": "Submission Confirmation",
+        "text": "Your environmental impact assessment submission has been received."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Slack Notification for Review",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new environmental impact assessment submission is ready for review."
+      }
+    },
+    {
+      "id": "5",
+      "name": "HTTP Request for Review",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.environmental-submissions.com/review"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Review Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "reviewer@example.com",
+        "subject": "Review Confirmation",
+        "text": "You have a new environmental impact assessment submission to review."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request for Submission": {
+      "main": [
+        [
+          {
+            "node": "Send Submission Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Notification for Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Submission Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Notification for Review": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request for Review": {
+      "main": [
+        [
+          {
+            "node": "Send Review Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

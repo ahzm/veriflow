@@ -1,0 +1,80 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Onboarding",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Onboarding Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "new.relyingparty@example.com",
+        "subject": "Welcome to Digital Identity Federation",
+        "text": "Dear Relying Party, welcome aboard! Please follow the onboarding instructions."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new relying party has been onboarded. Check your email for details."
+      }
+    },
+    {
+      "id": "4",
+      "name": "HTTP Request to Onboarding API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.onboarding.example.com/start"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Onboarding": {
+      "main": [
+        [
+          {
+            "node": "Send Onboarding Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Onboarding Email": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request to Onboarding API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Slack Channel": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to Onboarding API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

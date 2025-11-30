@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Heatwave Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Heatwave Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.weather.com/v3/heatwave/status"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Alert Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "emergency@city.gov",
+        "subject": "Heatwave Alert",
+        "text": "A heatwave has been detected. Please activate response plans."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Attention: A heatwave is occurring. Response teams, please prepare."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Heatwave Check": {
+      "main": [
+        [
+          {
+            "node": "Check Heatwave Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Heatwave Status": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

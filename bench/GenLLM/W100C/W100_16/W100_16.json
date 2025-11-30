@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Evacuation Planning",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Model Routes",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Assess Capacities",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Assign Responsibilities",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "emergency@agency.gov",
+        "subject": "Emergency Evacuation Planning Update",
+        "text": "The evacuation planning has been updated with new routes, capacities, and responsibilities."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Emergency evacuation planning has been updated. Check your email for details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Evacuation Planning": {
+      "main": [
+        [
+          {
+            "node": "Model Routes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model Routes": {
+      "main": [
+        [
+          {
+            "node": "Assess Capacities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assess Capacities": {
+      "main": [
+        [
+          {
+            "node": "Assign Responsibilities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Responsibilities": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

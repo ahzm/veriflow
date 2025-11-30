@@ -1,0 +1,1 @@
+Create a workflow that orchestrates climate finance project pipelines: proposals, due diligence, approvals, and monitoring.

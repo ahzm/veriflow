@@ -1,0 +1,1 @@
+Create a workflow that orchestrates pan-university course equivalency evaluations: collect proposals, route to committees, record decisions, and update catalogs.

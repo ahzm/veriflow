@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Incident Report",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Incident Reports",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.foodsafety.gov/incidents"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New food safety incident reported. Please check the details."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Follow-up Inspection",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "inspector@foodsafety.gov",
+        "subject": "Follow-up Inspection Required",
+        "text": "A follow-up inspection is required for a reported food safety incident."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Incident Report": {
+      "main": [
+        [
+          {
+            "node": "Fetch Incident Reports",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Incident Reports": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Notification": {
+      "main": [
+        [
+          {
+            "node": "Follow-up Inspection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

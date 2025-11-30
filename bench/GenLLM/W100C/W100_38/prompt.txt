@@ -1,0 +1,1 @@
+Build a workflow that manages global product taxonomy governance: proposals, approvals, and rollout.

@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Start Exam Item Lifecycle",
+      "type": "n8n-nodes-base.start",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Author Exam Item",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/author-item"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Review Exam Item",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "An exam item is ready for review."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Calibrate Exam Item",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/calibrate-item"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Retire Exam Item",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Retirement of Exam Item",
+        "text": "An exam item has been retired."
+      }
+    }
+  ],
+  "connections": {
+    "Start Exam Item Lifecycle": {
+      "main": [
+        [
+          {
+            "node": "Author Exam Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Author Exam Item": {
+      "main": [
+        [
+          {
+            "node": "Review Exam Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Exam Item": {
+      "main": [
+        [
+          {
+            "node": "Calibrate Exam Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calibrate Exam Item": {
+      "main": [
+        [
+          {
+            "node": "Retire Exam Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Create a workflow that orchestrates global marketing asset localization: requests, translations, QA, and publishing.

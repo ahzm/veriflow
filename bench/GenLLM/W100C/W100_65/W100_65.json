@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Assessment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Assessment Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "agency@example.com",
+        "subject": "Digital Service Standard Compliance Assessment",
+        "text": "Please complete the compliance assessment by the end of the week."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Receive Assessment Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/assessment/results"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Create Action Plan",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Action Plan Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "agency@example.com",
+        "subject": "Action Plan for Compliance",
+        "text": "Here is the action plan based on your assessment results."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Follow-up Reminder",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Reminder: Please follow up on your action plan for compliance."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Assessment": {
+      "main": [
+        [
+          {
+            "node": "Send Assessment Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Assessment Email": {
+      "main": [
+        [
+          {
+            "node": "Receive Assessment Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive Assessment Results": {
+      "main": [
+        [
+          {
+            "node": "Create Action Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Action Plan": {
+      "main": [
+        [
+          {
+            "node": "Send Action Plan Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Action Plan Email": {
+      "main": [
+        [
+          {
+            "node": "Follow-up Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

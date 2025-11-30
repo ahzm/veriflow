@@ -1,0 +1,19 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Email Exchange",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "example@example.com",
+        "subject": "Exchange Email",
+        "text": "This is a test email for exchange."
+      }
+    }
+  ],
+  "connections": {
+    "Email Exchange": {
+      "main": []
+    }
+  }
+}

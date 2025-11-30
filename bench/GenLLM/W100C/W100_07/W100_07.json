@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Get Sensor Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.smartbuilding.com/sensors"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request - Get Booking Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.smartbuilding.com/bookings"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Evaluate Policies",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const sensorData = items[0].json;\nconst bookingData = items[1].json;\n// Logic to evaluate policies based on sensor and booking data\nreturn [{ json: { optimized: true } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@smartbuilding.com",
+        "subject": "Occupancy Optimization Update",
+        "text": "The occupancy optimization process has been evaluated and updated."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Occupancy optimization has been successfully updated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Get Sensor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Get Sensor Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Get Booking Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Get Booking Data": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Policies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Policies": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

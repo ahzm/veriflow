@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Evaluation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Placements",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/placements"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Evaluate Placements",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Please evaluate the current placements."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Completion Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Apprenticeship Program Completion",
+        "text": "The apprenticeship program has been completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Get Placements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Placements": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Placements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Placements": {
+      "main": [
+        [
+          {
+            "node": "Send Completion Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

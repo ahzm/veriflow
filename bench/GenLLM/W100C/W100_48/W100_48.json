@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Data Ingestion",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Ingest Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.maritime-data.com/ingest"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Detect Violations",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.data.violations.length > 0);"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Alert Authorities",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Violation detected in maritime monitoring data!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Data Ingestion": {
+      "main": [
+        [
+          {
+            "node": "Ingest Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ingest Data": {
+      "main": [
+        [
+          {
+            "node": "Detect Violations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Violations": {
+      "main": [
+        [
+          {
+            "node": "Alert Authorities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

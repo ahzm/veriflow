@@ -1,0 +1,1 @@
+Create a workflow that orchestrates global clinical data standardization for multi-sponsor consortia.

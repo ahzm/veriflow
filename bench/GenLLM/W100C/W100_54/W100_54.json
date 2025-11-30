@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Data Aggregation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.energydata.com/aggregate"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Netting",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Post Settlement",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Settlement completed for energy futures contracts."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "settlement@energycompany.com",
+        "subject": "Energy Futures Settlement Notification",
+        "text": "The settlement for today's energy futures contracts has been completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Data Aggregation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Aggregation": {
+      "main": [
+        [
+          {
+            "node": "Netting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Netting": {
+      "main": [
+        [
+          {
+            "node": "Post Settlement",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

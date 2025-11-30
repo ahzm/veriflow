@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Evidence Collection",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Evidence",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.evidence-collection.org/collect"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Review Evidence",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New evidence collected. Please review the updates."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Distribute Changes",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "clinical-team@example.com",
+        "subject": "Updated Clinical Guidelines",
+        "text": "The clinical guidelines have been updated based on the latest evidence."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Evidence Collection": {
+      "main": [
+        [
+          {
+            "node": "Collect Evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Evidence": {
+      "main": [
+        [
+          {
+            "node": "Review Evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Evidence": {
+      "main": [
+        [
+          {
+            "node": "Distribute Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

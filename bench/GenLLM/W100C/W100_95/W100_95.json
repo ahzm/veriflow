@@ -1,0 +1,102 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "research-integrity"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "research-team@example.com",
+        "subject": "New Research Integrity Case",
+        "text": "A new case has been reported. Please review the details."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Log Investigation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/log-investigation",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "caseId": "={{$json[\"caseId\"]}}",
+          "status": "Investigation Started"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Slack Update",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Investigation for case ID {{$json[\"caseId\"]}} has started."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Outcome Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "Research Integrity Case Outcome",
+        "text": "The investigation for case ID {{$json[\"caseId\"]}} has concluded."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Notification": {
+      "main": [
+        [
+          {
+            "node": "Log Investigation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Investigation": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Slack Update": {
+      "main": [
+        [
+          {
+            "node": "Outcome Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

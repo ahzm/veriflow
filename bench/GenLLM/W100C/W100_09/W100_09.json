@@ -1,0 +1,95 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vat-refund"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Receipts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.receiptValid);"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Refunds",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { refundAmount: item.json.amount * 0.2 } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "finance@example.com",
+        "subject": "VAT Refund Processed",
+        "text": "The VAT refunds have been computed and are ready for payout."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Pay Out",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.paymentgateway.com/refund",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "refunds": "={{$json[\"refundAmount\"]}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Receipts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Receipts": {
+      "main": [
+        [
+          {
+            "node": "Compute Refunds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Refunds": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pay Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

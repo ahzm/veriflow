@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule HR Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Roles",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/roles"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch Candidates",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/candidates"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send HR Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "hr@example.com",
+        "subject": "Weekly HR Succession Planning Report",
+        "text": "Please find the attached report on roles, candidates, readiness, and development plans."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "HR succession planning report has been generated and sent to HR."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule HR Check": {
+      "main": [
+        [
+          {
+            "node": "Fetch Roles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Roles": {
+      "main": [
+        [
+          {
+            "node": "Fetch Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Candidates": {
+      "main": [
+        [
+          {
+            "node": "Send HR Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send HR Report": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Approval Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Approvals",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/check-approvals"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Approval Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "approvals@example.com",
+        "subject": "New Approval Request",
+        "text": "There are new approval requests to review."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate Invoice",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/generate-invoice"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Invoice Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "finance@example.com",
+        "subject": "New Invoice Generated",
+        "text": "A new invoice has been generated."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Report to Funder",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/report-funder"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Funder Report Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The funder report has been sent successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Approval Check": {
+      "main": [
+        [
+          {
+            "node": "Check Approvals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Approvals": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Notification": {
+      "main": [
+        [
+          {
+            "node": "Generate Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Invoice": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Invoice Notification": {
+      "main": [
+        [
+          {
+            "node": "Report to Funder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report to Funder": {
+      "main": [
+        [
+          {
+            "node": "Send Funder Report Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

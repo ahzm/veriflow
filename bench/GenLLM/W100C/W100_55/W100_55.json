@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Traffic Sensor Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.trafficdata.com/sensors"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Traffic Optimization Plan",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { plan: 'Optimize traffic signals based on sensor data' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Deploy Traffic Signals",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.trafficcontrol.com/deploy"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Stakeholders",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "Traffic Signal Optimization Update",
+        "text": "The traffic signal optimization plan has been deployed successfully."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Optimization Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Optimization Check": {
+      "main": [
+        [
+          {
+            "node": "Traffic Sensor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Traffic Sensor Data": {
+      "main": [
+        [
+          {
+            "node": "Traffic Optimization Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Traffic Optimization Plan": {
+      "main": [
+        [
+          {
+            "node": "Deploy Traffic Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deploy Traffic Signals": {
+      "main": [
+        [
+          {
+            "node": "Notify Stakeholders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

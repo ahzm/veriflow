@@ -1,0 +1,1 @@
+Design a workflow that manages transnational environmental permit compliance: track permits, obligations, and reporting.

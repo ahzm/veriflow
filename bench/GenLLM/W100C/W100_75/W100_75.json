@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Capacity Allocation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.energy.com/capacity/allocation"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Nominations",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.energy.com/nominations"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Settlements",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.energy.com/settlements"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@energy.com",
+        "subject": "Daily Energy Operations Report",
+        "text": "The daily operations for capacity allocations, nominations, and settlements have been completed."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Daily energy operations completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Capacity Allocation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capacity Allocation": {
+      "main": [
+        [
+          {
+            "node": "Nominations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nominations": {
+      "main": [
+        [
+          {
+            "node": "Settlements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Settlements": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

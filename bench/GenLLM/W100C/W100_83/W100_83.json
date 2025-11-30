@@ -1,0 +1,94 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Proposal",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Proposal Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "New Marine Protected Area Proposal",
+        "text": "A new proposal for zoning changes has been created. Please review."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Consultation Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/consultation"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Consultation Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "Reminder: Marine Protected Area Consultation",
+        "text": "This is a reminder for the upcoming consultation regarding the zoning changes."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Approval Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The proposal for zoning changes has been approved."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Proposal": {
+      "main": [
+        [
+          {
+            "node": "Send Proposal Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Proposal Email": {
+      "main": [
+        [
+          {
+            "node": "Consultation Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultation Request": {
+      "main": [
+        [
+          {
+            "node": "Send Consultation Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Consultation Reminder": {
+      "main": [
+        [
+          {
+            "node": "Approval Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Ingest",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.insurance.com/ingest"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Reconcile Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Email - Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "report@insurance.com",
+        "subject": "Daily Bordereaux Report",
+        "text": "The bordereaux processing has been completed successfully."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Bordereaux processing completed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Ingest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Ingest": {
+      "main": [
+        [
+          {
+            "node": "Reconcile Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconcile Data": {
+      "main": [
+        [
+          {
+            "node": "Send Email - Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

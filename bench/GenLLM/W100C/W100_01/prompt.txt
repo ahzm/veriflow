@@ -1,0 +1,1 @@
+Design a workflow that manages comprehensive enterprise architecture inventory updates: ingest system metadata, map dependencies, detect changes, and notify architects.

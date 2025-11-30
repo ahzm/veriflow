@@ -1,0 +1,117 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Transactions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/transactions"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch Entities",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/entities"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Fetch Alerts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/alerts"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create Case",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/cases",
+        "method": "POST",
+        "body": {
+          "transactions": "={{$json[\"transactions\"]}}",
+          "entities": "={{$json[\"entities\"]}}",
+          "alerts": "={{$json[\"alerts\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "investigator@example.com",
+        "subject": "New Financial Crime Case Created",
+        "text": "A new case has been created with linked transactions, entities, and alerts."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Transactions": {
+      "main": [
+        [
+          {
+            "node": "Fetch Entities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Entities": {
+      "main": [
+        [
+          {
+            "node": "Fetch Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Alerts": {
+      "main": [
+        [
+          {
+            "node": "Create Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Case": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

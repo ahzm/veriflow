@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Exposure Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/exposure"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch Hazard Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/hazard"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Fetch Loss Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/loss"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Insurance Catastrophe Modeling Summary",
+        "text": "The data flows for exposure, hazard, and loss have been successfully fetched."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Insurance catastrophe modeling data has been updated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Exposure Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Exposure Data": {
+      "main": [
+        [
+          {
+            "node": "Fetch Hazard Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Hazard Data": {
+      "main": [
+        [
+          {
+            "node": "Fetch Loss Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Loss Data": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

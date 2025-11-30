@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Outage Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Electricity Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.electricitystatus.com/check"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check Water Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.waterstatus.com/check"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Check Telecom Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.telecomstatus.com/check"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Coordination Team",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "coordination@utilities.com",
+        "subject": "Utility Outage Coordination Required",
+        "text": "There is an outage detected in one or more utilities. Please coordinate the response."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Attention: Outage detected in utilities. Check your email for details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Outage Check": {
+      "main": [
+        [
+          {
+            "node": "Check Electricity Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Electricity Status": {
+      "main": [
+        [
+          {
+            "node": "Check Water Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Water Status": {
+      "main": [
+        [
+          {
+            "node": "Check Telecom Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Telecom Status": {
+      "main": [
+        [
+          {
+            "node": "Notify Coordination Team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

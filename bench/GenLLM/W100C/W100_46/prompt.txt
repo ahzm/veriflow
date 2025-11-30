@@ -1,0 +1,1 @@
+Design a workflow that manages international trade finance document flows: LCs, invoices, and transport documents.

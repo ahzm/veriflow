@@ -1,0 +1,1 @@
+Define a workflow that automates complex energy futures contract settlement: data aggregation, netting, and posting.

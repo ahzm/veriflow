@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Start Migration",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Map Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/map-data"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Trial Run",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/trial-run"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Cutover",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/cutover"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Validate Migration",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/validate"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Data Migration Status",
+        "text": "The data migration process has been completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Start Migration": {
+      "main": [
+        [
+          {
+            "node": "Map Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Data": {
+      "main": [
+        [
+          {
+            "node": "Trial Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trial Run": {
+      "main": [
+        [
+          {
+            "node": "Cutover",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cutover": {
+      "main": [
+        [
+          {
+            "node": "Validate Migration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Migration": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

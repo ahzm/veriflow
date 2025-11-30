@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Allocate Room",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.hospital.com/allocate-room"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Monitor Usage",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.hospital.com/monitor-usage"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Reassign Room",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.hospital.com/reassign-room"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "staff@hospital.com",
+        "subject": "Operating Room Schedule Update",
+        "text": "The operating room schedule has been updated."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Operating room allocation and usage monitoring completed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Allocate Room",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allocate Room": {
+      "main": [
+        [
+          {
+            "node": "Monitor Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Usage": {
+      "main": [
+        [
+          {
+            "node": "Reassign Room",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reassign Room": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

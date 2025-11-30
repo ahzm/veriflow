@@ -1,0 +1,106 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "referral"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Intake",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { status: 'Intake completed', referralData: $input.item.json } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Triage",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { status: 'Triage completed', referralData: $input.item.json } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Placement",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { status: 'Placement completed', referralData: $input.item.json } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "refugee@example.com",
+        "subject": "Referral Process Update",
+        "text": "Your referral has been processed."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new refugee case referral has been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Intake",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intake": {
+      "main": [
+        [
+          {
+            "node": "Triage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Triage": {
+      "main": [
+        [
+          {
+            "node": "Placement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Placement": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

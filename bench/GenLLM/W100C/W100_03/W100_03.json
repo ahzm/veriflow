@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Patients",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/patients"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch Providers",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/providers"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Match Patients to Providers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const patients = items[0].json;\nconst providers = items[1].json;\n\nconst matches = patients.map(patient => {\n    return providers.filter(provider => \n        provider.specialty === patient.specialty && \n        provider.language === patient.language && \n        provider.available);\n});\n\nreturn matches.flat();"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Patients",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "patient@example.com",
+        "subject": "Your Provider Match",
+        "text": "You have been matched with a provider. Please check your dashboard for details."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify Providers",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new patient has been matched to you. Please check the patient details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Fetch Patients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Patients": {
+      "main": [
+        [
+          {
+            "node": "Fetch Providers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Providers": {
+      "main": [
+        [
+          {
+            "node": "Match Patients to Providers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Patients to Providers": {
+      "main": [
+        [
+          {
+            "node": "Notify Patients",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Providers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

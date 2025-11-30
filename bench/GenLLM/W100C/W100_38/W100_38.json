@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Proposal",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Create Proposal",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/create-proposal"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Approval Request",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "approver@example.com",
+        "subject": "Approval Needed for Product Taxonomy Proposal",
+        "text": "A new product taxonomy proposal has been created and needs your approval."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Approval Received",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The product taxonomy proposal has been approved."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Rollout Proposal",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/rollout-proposal"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Proposal": {
+      "main": [
+        [
+          {
+            "node": "Create Proposal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Proposal": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Approval Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Received": {
+      "main": [
+        [
+          {
+            "node": "Rollout Proposal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

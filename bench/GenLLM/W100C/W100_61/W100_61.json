@@ -1,0 +1,113 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Assessment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Assessment Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "employee@example.com",
+        "subject": "Skills Assessment",
+        "text": "Please complete your skills assessment."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Receive Assessment Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/assessment/results"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate Recommendations",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { recommendations: 'Upskill in JavaScript and Python' } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Recommendations to Employee",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "employee@example.com",
+        "subject": "Upskilling Recommendations",
+        "text": "Based on your assessment, we recommend the following upskilling: Upskill in JavaScript and Python."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Track Progress",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Employee has started the upskilling program."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Assessment": {
+      "main": [
+        [
+          {
+            "node": "Send Assessment Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Assessment Email": {
+      "main": [
+        [
+          {
+            "node": "Receive Assessment Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive Assessment Results": {
+      "main": [
+        [
+          {
+            "node": "Generate Recommendations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Recommendations": {
+      "main": [
+        [
+          {
+            "node": "Send Recommendations to Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Recommendations to Employee": {
+      "main": [
+        [
+          {
+            "node": "Track Progress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

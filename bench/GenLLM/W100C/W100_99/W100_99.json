@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Notification",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Incident Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/incidents"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "security@example.com",
+        "subject": "Cross-Border Cybersecurity Incident Notification",
+        "text": "A new cybersecurity incident has been reported. Please review the details."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new cybersecurity incident has been reported. Check your email for details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Notification": {
+      "main": [
+        [
+          {
+            "node": "Fetch Incident Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Incident Data": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

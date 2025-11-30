@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "film-festival-submission"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Review Submission",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { status: 'under review' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Select Films",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { selectedFilms: ['Film A', 'Film B'] } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Build Program",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { program: 'Film A, Film B scheduled' } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "organizer@example.com",
+        "subject": "Film Festival Program Ready",
+        "text": "The film festival program has been built and is ready for review."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New film submissions have been received and are under review."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Schedule Review",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Review Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Submission": {
+      "main": [
+        [
+          {
+            "node": "Select Films",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Films": {
+      "main": [
+        [
+          {
+            "node": "Build Program",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Program": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Review": {
+      "main": [
+        [
+          {
+            "node": "Review Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

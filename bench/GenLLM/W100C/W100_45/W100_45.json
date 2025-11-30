@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Publication Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request for Publications",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/publications"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request for Datasets",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/datasets"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Check Compliance",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Compliance Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "compliance@example.com",
+        "subject": "Compliance Report",
+        "text": "The compliance report has been generated."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New publications and datasets have been checked for compliance."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Publication Check": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Publications",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request for Publications": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Datasets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request for Datasets": {
+      "main": [
+        [
+          {
+            "node": "Check Compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Compliance": {
+      "main": [
+        [
+          {
+            "node": "Send Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

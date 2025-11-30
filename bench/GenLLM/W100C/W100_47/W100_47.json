@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Request Localization",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/request-localization"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Translate Asset",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/translate"
+      }
+    },
+    {
+      "id": "3",
+      "name": "QA Translation",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Please review the translation for accuracy."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Publish Asset",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "marketing@example.com",
+        "subject": "Localized Asset Ready for Use",
+        "text": "The localized asset has been published successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Request Localization": {
+      "main": [
+        [
+          {
+            "node": "Translate Asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate Asset": {
+      "main": [
+        [
+          {
+            "node": "QA Translation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA Translation": {
+      "main": [
+        [
+          {
+            "node": "Publish Asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Permits",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/check-permits"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Permit Compliance Update",
+        "text": "Please review the latest permit compliance status."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Compliance Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/log-compliance"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Check Permits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Permits": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Compliance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

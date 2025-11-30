@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Policy Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Policy Limits",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.insurance.com/check-limits"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Evaluate Exposures",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.insurance.com/evaluate-exposures"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Process Claims",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.insurance.com/process-claims"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@insurance.com",
+        "subject": "Daily Policy Update",
+        "text": "The policy limits, exposures, and claims have been processed."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Daily policy check completed. Please review the updates."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Policy Check": {
+      "main": [
+        [
+          {
+            "node": "Check Policy Limits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Policy Limits": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Exposures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Exposures": {
+      "main": [
+        [
+          {
+            "node": "Process Claims",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Claims": {
+      "main": [
+        [
+          {
+            "node": "Send Notification Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Create a workflow that orchestrates global research funding call management: announce calls, manage submissions, and track awards.

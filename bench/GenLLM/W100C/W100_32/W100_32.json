@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Announcement",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Announcement Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "researchers@example.com",
+        "subject": "New Research Funding Call",
+        "text": "We are excited to announce a new research funding call. Please check the details on our website."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Manage Submissions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/manage-submissions"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Awards",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New awards have been granted. Check the dashboard for details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Announcement": {
+      "main": [
+        [
+          {
+            "node": "Send Announcement Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Announcement Email": {
+      "main": [
+        [
+          {
+            "node": "Manage Submissions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manage Submissions": {
+      "main": [
+        [
+          {
+            "node": "Track Awards",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

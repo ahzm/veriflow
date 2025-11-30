@@ -1,0 +1,80 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Map Clauses",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { clause: 'Clause 1', change: 'Change 1' } }, { json: { clause: 'Clause 2', change: 'Change 2' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Completion",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-completion",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "clause": "={{$json[\"clause\"]}}",
+          "change": "={{$json[\"change\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Union Contract Implementation Update",
+        "text": "The union contract implementation has been updated. Please check the changes."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Map Clauses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Clauses": {
+      "main": [
+        [
+          {
+            "node": "Track Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Completion": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

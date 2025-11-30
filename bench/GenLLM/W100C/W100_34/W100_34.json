@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Inventory Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request for License Inventory",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/license-inventory"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Analyze License Usage",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { /* analyze usage logic */ return item; });"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Compliance Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "compliance@example.com",
+        "subject": "License Compliance Report",
+        "text": "Attached is the license compliance report."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Remediate Non-Compliance",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Non-compliance detected in license usage. Immediate action required."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Inventory Check": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for License Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request for License Inventory": {
+      "main": [
+        [
+          {
+            "node": "Analyze License Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze License Usage": {
+      "main": [
+        [
+          {
+            "node": "Send Compliance Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Remediate Non-Compliance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

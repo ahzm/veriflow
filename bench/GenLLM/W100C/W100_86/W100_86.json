@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Assessment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Pilot Project Evaluation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/pilot-evaluation"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Rollout Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The rollout of the new assessment system is scheduled for next week."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Evaluation Results",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Pilot Project Evaluation Results",
+        "text": "The evaluation results for the pilot project are ready for review."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Assessment": {
+      "main": [
+        [
+          {
+            "node": "Pilot Project Evaluation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pilot Project Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Send Evaluation Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rollout Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

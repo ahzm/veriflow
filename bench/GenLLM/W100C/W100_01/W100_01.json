@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Metadata Ingestion",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Ingest System Metadata",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/metadata"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Map Dependencies",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Detect Changes",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Notify Architects",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Enterprise architecture inventory has been updated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Metadata Ingestion": {
+      "main": [
+        [
+          {
+            "node": "Ingest System Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ingest System Metadata": {
+      "main": [
+        [
+          {
+            "node": "Map Dependencies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Dependencies": {
+      "main": [
+        [
+          {
+            "node": "Detect Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Changes": {
+      "main": [
+        [
+          {
+            "node": "Notify Architects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

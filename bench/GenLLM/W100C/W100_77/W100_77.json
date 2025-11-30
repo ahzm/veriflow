@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Tax Calculation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch In-Scope Revenues",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/revenues"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Calculate Tax Liabilities",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const revenues = items[0].json;\nconst liabilities = revenues.map(revenue => revenue.amount * 0.2);\nreturn liabilities.map((liability, index) => ({ json: { revenue: revenues[index], liability } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Tax Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "finance@example.com",
+        "subject": "Monthly Tax Liabilities Report",
+        "text": "The tax liabilities have been calculated successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Tax Calculation": {
+      "main": [
+        [
+          {
+            "node": "Fetch In-Scope Revenues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch In-Scope Revenues": {
+      "main": [
+        [
+          {
+            "node": "Calculate Tax Liabilities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Tax Liabilities": {
+      "main": [
+        [
+          {
+            "node": "Send Tax Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

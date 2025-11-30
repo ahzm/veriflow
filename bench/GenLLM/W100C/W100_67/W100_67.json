@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Data Collection",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Indicators",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/collect-indicators"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validate Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Submit Data",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "submissions@example.com",
+        "subject": "Academic Ranking Data Submission",
+        "text": "Please find the attached academic ranking data."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Data Collection": {
+      "main": [
+        [
+          {
+            "node": "Collect Indicators",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Indicators": {
+      "main": [
+        [
+          {
+            "node": "Validate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Data": {
+      "main": [
+        [
+          {
+            "node": "Submit Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

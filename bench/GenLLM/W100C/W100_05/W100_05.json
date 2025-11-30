@@ -1,0 +1,76 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "collect-documents"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Documents",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Validate documents logic\n    item.json.valid = true; // Assume validation is successful\n    return item;\n});"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "student@example.com",
+        "subject": "Document Validation Status",
+        "text": "Your documents have been validated successfully."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-status",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "status": "validated"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Documents": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Track Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

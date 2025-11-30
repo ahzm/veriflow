@@ -1,0 +1,93 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "art-loan-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Approval Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "approver@example.com",
+        "subject": "Art Loan Request Approval",
+        "text": "A new art loan request has been submitted and requires your approval."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Request Insurance",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://insurance-api.example.com/request"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Logistics Coordination",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Logistics team, please prepare for the art loan delivery."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Approval Confirmation",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The art loan request has been approved."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Email": {
+      "main": [
+        [
+          {
+            "node": "Request Insurance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Insurance": {
+      "main": [
+        [
+          {
+            "node": "Logistics Coordination",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Logistics Coordination": {
+      "main": [
+        [
+          {
+            "node": "Approval Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

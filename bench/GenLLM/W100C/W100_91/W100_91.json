@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Metrics Collection",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Device Distribution Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/device-distribution"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch Training Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/training"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Fetch Impact Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/impact"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "National Digital Inclusion Program Metrics",
+        "text": "Here are the latest metrics for device distribution, training, and impact."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Metrics collection completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Metrics Collection": {
+      "main": [
+        [
+          {
+            "node": "Fetch Device Distribution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Device Distribution Data": {
+      "main": [
+        [
+          {
+            "node": "Fetch Training Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Training Data": {
+      "main": [
+        [
+          {
+            "node": "Fetch Impact Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Impact Data": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

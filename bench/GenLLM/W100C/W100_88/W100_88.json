@@ -1,0 +1,101 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Exercise",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Create Scenario",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.cybersecurity.gov/scenarios",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "scenario": "National Cybersecurity Exercise"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Participants",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "participants@cybersecurity.gov",
+        "subject": "Upcoming National Cybersecurity Exercise",
+        "text": "You are invited to participate in the upcoming national cybersecurity exercise."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Collect Findings",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.cybersecurity.gov/findings",
+        "method": "GET",
+        "jsonParameters": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Findings Report",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The findings from the national cybersecurity exercise have been collected and are ready for review."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Exercise": {
+      "main": [
+        [
+          {
+            "node": "Create Scenario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Scenario": {
+      "main": [
+        [
+          {
+            "node": "Notify Participants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Participants": {
+      "main": [
+        [
+          {
+            "node": "Collect Findings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Findings": {
+      "main": [
+        [
+          {
+            "node": "Send Findings Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

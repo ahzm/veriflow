@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Pressure Sensor",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/pressure-sensor"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Abnormal pressure detected!"
+      }
+    }
+  ],
+  "connections": {
+    "Pressure Sensor": {
+      "main": [
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

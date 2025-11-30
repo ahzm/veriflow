@@ -1,0 +1,1 @@
+Create a workflow that orchestrates cross-border student mobility analytics: collect flows, analyze, and publish insights.

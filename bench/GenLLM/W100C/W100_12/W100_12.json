@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Payroll Monitoring",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Map Local Processes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/map-local-processes"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Monitor Changes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/monitor-changes"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Milestones",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-milestones"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Payroll Harmonization Update",
+        "text": "The payroll harmonization project has been updated. Please check the latest changes."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New updates on the payroll harmonization project are available."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Payroll Monitoring": {
+      "main": [
+        [
+          {
+            "node": "Map Local Processes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Local Processes": {
+      "main": [
+        [
+          {
+            "node": "Monitor Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Changes": {
+      "main": [
+        [
+          {
+            "node": "Track Milestones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Milestones": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

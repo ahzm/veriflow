@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Track Usage",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.transit.com/usage"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Caps",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Adjust Charges",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Charges have been adjusted based on fare capping."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Fare Capping Update",
+        "text": "Your transit charges have been updated according to the fare capping rules."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Track Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Usage": {
+      "main": [
+        [
+          {
+            "node": "Compute Caps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Caps": {
+      "main": [
+        [
+          {
+            "node": "Adjust Charges",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

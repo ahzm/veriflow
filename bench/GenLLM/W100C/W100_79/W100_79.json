@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Portfolio Rebalance",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Portfolio Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/portfolio"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Analyze Portfolio",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Rebalance Portfolio",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "client@example.com",
+        "subject": "Portfolio Rebalance Completed",
+        "text": "Your portfolio has been successfully rebalanced."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Portfolio rebalance has been completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Portfolio Rebalance": {
+      "main": [
+        [
+          {
+            "node": "Fetch Portfolio Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Portfolio Data": {
+      "main": [
+        [
+          {
+            "node": "Analyze Portfolio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Portfolio": {
+      "main": [
+        [
+          {
+            "node": "Rebalance Portfolio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rebalance Portfolio": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

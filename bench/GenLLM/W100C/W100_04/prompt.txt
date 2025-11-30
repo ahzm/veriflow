@@ -1,0 +1,1 @@
+Define a workflow that automates financial crime case management: link transactions, entities, and alerts into cases, and track investigations.

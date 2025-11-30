@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trade Agreement Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request to Trade API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.tradeagreements.com/check"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@tradeagreements.com",
+        "subject": "Trade Agreement Status Update",
+        "text": "The status of the trade agreements has been checked. Please review the latest updates."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Trade agreement status has been updated. Check your email for details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trade Agreement Check": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to Trade API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to Trade API": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

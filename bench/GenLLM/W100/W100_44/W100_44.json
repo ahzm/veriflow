@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Poetry",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.poetrydb.org/random"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Your Daily Poetry",
+        "text": "Here is your poem: {{$json[\"title\"]}} by {{$json[\"author\"]}}. {{$json[\"lines\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get Poetry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Poetry": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

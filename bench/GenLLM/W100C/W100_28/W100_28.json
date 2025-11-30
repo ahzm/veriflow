@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Offers",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Offers",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customers@example.com",
+        "subject": "Exclusive Airline Offers",
+        "text": "Check out our latest offers on ancillary services!"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Receive Purchase",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Fulfill Purchase",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.airline.com/fulfill"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Purchase",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new ancillary service purchase has been made."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { report: 'Daily sales report generated.' } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Offers": {
+      "main": [
+        [
+          {
+            "node": "Send Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Offers": {
+      "main": [
+        [
+          {
+            "node": "Receive Purchase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive Purchase": {
+      "main": [
+        [
+          {
+            "node": "Fulfill Purchase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fulfill Purchase": {
+      "main": [
+        [
+          {
+            "node": "Log Purchase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Purchase": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

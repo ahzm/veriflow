@@ -1,0 +1,98 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Format Invoice",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { formattedInvoice: 'Formatted Invoice Data' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validate Invoice",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { isValid: true } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Submit Invoice",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crossborderinvoicing.com/submit",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "formattedInvoice": "={{$json[\"formattedInvoice\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "compliance@company.com",
+        "subject": "Invoice Submission Status",
+        "text": "The invoice has been submitted successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Format Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Invoice": {
+      "main": [
+        [
+          {
+            "node": "Validate Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Invoice": {
+      "main": [
+        [
+          {
+            "node": "Submit Invoice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit Invoice": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Define a workflow that automates complex insurance bordereaux processing: ingest, reconcile, and report.

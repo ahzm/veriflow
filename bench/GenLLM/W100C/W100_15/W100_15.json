@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Monitoring",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check EV Stations",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.evstations.com/check"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Detect Outages",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.status === 'outage');"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Schedule Repairs",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Repairs need to be scheduled for the following stations: {{ $json[\"stations\"] }}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Team",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "EV Station Outages Detected",
+        "text": "Outages have been detected. Please check the Slack channel for details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Monitoring": {
+      "main": [
+        [
+          {
+            "node": "Check EV Stations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check EV Stations": {
+      "main": [
+        [
+          {
+            "node": "Detect Outages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Outages": {
+      "main": [
+        [
+          {
+            "node": "Schedule Repairs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

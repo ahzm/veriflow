@@ -1,0 +1,78 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vaccination-registry"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Deduplicate Records",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const uniqueRecords = items.filter((item, index, self) =>\n    index === self.findIndex((t) => (\n        t.json.id === item.json.id\n    )));\nreturn uniqueRecords;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Handle Corrections",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const correctedRecords = items.map(item => {\n    // Logic to handle corrections\n    return item;\n});\nreturn correctedRecords;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Update Registry",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.vaccination-registry.gov/update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "records": "={{$json[\"data\"]}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate Records": {
+      "main": [
+        [
+          {
+            "node": "Handle Corrections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Corrections": {
+      "main": [
+        [
+          {
+            "node": "Update Registry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

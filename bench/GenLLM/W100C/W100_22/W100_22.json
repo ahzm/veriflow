@@ -1,0 +1,98 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Proposal Submission",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proposal"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Approval Process",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { approved: true } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Disbursement",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.disbursement.com/send",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "amount": 1000,
+          "currency": "USD"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Impact Tracking",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Impact report generated for the project."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Report",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Proposal Submission": {
+      "main": [
+        [
+          {
+            "node": "Approval Process",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Process": {
+      "main": [
+        [
+          {
+            "node": "Disbursement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Disbursement": {
+      "main": [
+        [
+          {
+            "node": "Impact Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Report": {
+      "main": [
+        [
+          {
+            "node": "Impact Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

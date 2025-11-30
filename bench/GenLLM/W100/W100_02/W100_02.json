@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Signup Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"body\"][\"email\"]}}",
+        "subject": "Welcome to Our Service!",
+        "text": "Thank you for signing up!"
+      }
+    }
+  ],
+  "connections": {
+    "Signup Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

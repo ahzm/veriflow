@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Enrollment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Enrollment Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/enrollment-data"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Process Enrollment Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { name: item.json.name, age: item.json.age, program: item.json.program } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "parent@example.com",
+        "subject": "Enrollment Confirmation",
+        "text": "Your child has been successfully enrolled in the program."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new enrollment has been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Enrollment": {
+      "main": [
+        [
+          {
+            "node": "Get Enrollment Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Enrollment Data": {
+      "main": [
+        [
+          {
+            "node": "Process Enrollment Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Enrollment Data": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

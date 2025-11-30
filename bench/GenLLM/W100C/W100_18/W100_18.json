@@ -1,0 +1,77 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tender-evaluation"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Score Criteria",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const scores = items[0].json.scores;\nconst totalScore = scores.reduce((acc, score) => acc + score, 0);\nreturn [{ json: { totalScore } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "evaluation@publicworks.com",
+        "subject": "Tender Evaluation Results",
+        "text": "The total score for the tender evaluation is: {{$json[\"totalScore\"]}}."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Decision",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.publicworks.com/log-decision",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "decision": "Approved",
+          "score": "{{$json[\"totalScore\"]}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Score Criteria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Criteria": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

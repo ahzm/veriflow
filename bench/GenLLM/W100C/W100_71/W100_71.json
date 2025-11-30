@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Testing",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Test Scenarios",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.health.gov/scenarios"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Run Tests",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Results",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "certification@health.gov",
+        "subject": "Testing Results",
+        "text": "The testing results are ready for review."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Testing scenarios have been executed and results sent for certification."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Testing": {
+      "main": [
+        [
+          {
+            "node": "Fetch Test Scenarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Test Scenarios": {
+      "main": [
+        [
+          {
+            "node": "Run Tests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Tests": {
+      "main": [
+        [
+          {
+            "node": "Send Results",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

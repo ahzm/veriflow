@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ingest-claims"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Assign Checks",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { claim: $input.item.json.claim, assignedTo: 'factChecker1' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fact Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.factcheckers.com/check",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "claim": "={{$json[\"claim\"]}}",
+          "assignedTo": "={{$json[\"assignedTo\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Publish Verdict",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Claim: {{$json[\"claim\"]}} - Verdict: {{$json[\"verdict\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Assign Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Checks": {
+      "main": [
+        [
+          {
+            "node": "Fact Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fact Check": {
+      "main": [
+        [
+          {
+            "node": "Publish Verdict",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

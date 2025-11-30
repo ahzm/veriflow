@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Earthquake",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "An earthquake greater than magnitude 4 has occurred!"
+      }
+    }
+  ],
+  "connections": {
+    "Earthquake": {
+      "main": [
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

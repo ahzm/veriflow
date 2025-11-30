@@ -1,0 +1,1 @@
+Define a workflow that automates union contract implementation: map clauses to system changes and track completion.

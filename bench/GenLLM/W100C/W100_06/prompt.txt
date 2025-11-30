@@ -1,0 +1,1 @@
+Design a workflow that manages global HR succession planning: track roles, candidates, readiness, and development plans.

@@ -1,0 +1,93 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "disaster-relief-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Prioritize Requests",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const prioritizedRequests = items.map(item => {\n    // Logic to prioritize requests based on criteria\n    return item;\n});\nreturn prioritizedRequests;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Allocate Funding",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.fundingallocation.com/allocate",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "requests": "={{$json[\"prioritizedRequests\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "funding@disasterrelief.org",
+        "subject": "Funding Allocation Update",
+        "text": "Funding has been allocated based on prioritized requests."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Funding allocation process completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prioritize Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prioritize Requests": {
+      "main": [
+        [
+          {
+            "node": "Allocate Funding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allocate Funding": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

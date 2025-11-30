@@ -1,0 +1,1 @@
+Define a workflow that automates national building code compliance checks for submitted plans: run rule checks and issue reports.

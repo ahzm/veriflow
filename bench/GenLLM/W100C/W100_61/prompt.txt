@@ -1,0 +1,1 @@
+Design a workflow that manages large-scale workforce skills assessment and upskilling plans: assessments, recommendations, and tracking.

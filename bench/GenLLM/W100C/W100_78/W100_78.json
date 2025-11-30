@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ingest-bill"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Ingest Bill",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/ingest",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "bill": "={{$json[\"body\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Categorize Bill",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const categorized = categorizeBill($json.bill);\nreturn [{ json: { categorized } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Recommend Savings",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const recommendations = recommendSavings($json.categorized);\nreturn [{ json: { recommendations } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Actions",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Savings recommendations have been generated: {{$json.recommendations}}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "New Savings Recommendations",
+        "text": "New savings recommendations have been generated: {{$json.recommendations}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Ingest Bill",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Ingest Bill": {
+      "main": [
+        [
+          {
+            "node": "Categorize Bill",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize Bill": {
+      "main": [
+        [
+          {
+            "node": "Recommend Savings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recommend Savings": {
+      "main": [
+        [
+          {
+            "node": "Track Actions",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

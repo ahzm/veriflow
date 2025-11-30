@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 6 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Optimize Routes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/optimize-routes"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Assign Students",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/assign-students"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Publish Schedule",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "parents@example.com",
+        "subject": "School Bus Schedule",
+        "text": "The bus schedules have been updated. Please check the attached document for details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Optimize Routes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Optimize Routes": {
+      "main": [
+        [
+          {
+            "node": "Assign Students",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Students": {
+      "main": [
+        [
+          {
+            "node": "Publish Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

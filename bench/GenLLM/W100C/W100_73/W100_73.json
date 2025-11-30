@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Start Research",
+      "type": "n8n-nodes-base.start",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Collect Sources",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.museum-sources.com/collect"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Gather Evidence",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.museum-evidence.com/gather"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Make Decisions",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Decisions based on collected sources and evidence."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "research-team@museum.org",
+        "subject": "Provenance Research Summary",
+        "text": "Summary of sources, evidence, and decisions made."
+      }
+    }
+  ],
+  "connections": {
+    "Start Research": {
+      "main": [
+        [
+          {
+            "node": "Collect Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Sources": {
+      "main": [
+        [
+          {
+            "node": "Gather Evidence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gather Evidence": {
+      "main": [
+        [
+          {
+            "node": "Make Decisions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Make Decisions": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

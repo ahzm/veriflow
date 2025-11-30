@@ -1,0 +1,1 @@
+Construct a workflow that coordinates large-scale customer data migration: mapping, trial runs, cutover, and validation.

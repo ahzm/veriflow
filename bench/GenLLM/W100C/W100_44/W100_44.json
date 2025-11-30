@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "submit-plans"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Run Compliance Checks",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { complianceStatus: 'Pass', details: 'All checks passed.' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Report Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "client@example.com",
+        "subject": "Compliance Check Report",
+        "text": "Your submitted plans have passed the compliance checks."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new compliance check report has been generated."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Run Compliance Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Compliance Checks": {
+      "main": [
+        [
+          {
+            "node": "Send Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Data Collection",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/student-mobility"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Analyze Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { /* analysis logic */ return item; });"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Publish Insights",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New insights on student mobility have been generated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Data Collection": {
+      "main": [
+        [
+          {
+            "node": "Collect Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Data": {
+      "main": [
+        [
+          {
+            "node": "Analyze Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Data": {
+      "main": [
+        [
+          {
+            "node": "Publish Insights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

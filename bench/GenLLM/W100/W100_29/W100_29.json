@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Feedback",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Feedback Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "feedback@example.com",
+        "subject": "We Value Your Feedback",
+        "text": "Please provide your feedback on our services."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Feedback": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

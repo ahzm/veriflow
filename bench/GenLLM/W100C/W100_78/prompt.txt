@@ -1,0 +1,1 @@
+Build a workflow that manages global cloud cost optimization: ingest bills, categorize, recommend savings, and track actions.

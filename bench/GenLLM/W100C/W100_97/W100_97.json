@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Data Standardization",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Clinical Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.clinicaldata.org/fetch"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Standardize Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Standardized Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "Standardized Clinical Data Report",
+        "text": "The clinical data has been standardized successfully."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify via Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The clinical data standardization process is complete."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Data Standardization": {
+      "main": [
+        [
+          {
+            "node": "Fetch Clinical Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Clinical Data": {
+      "main": [
+        [
+          {
+            "node": "Standardize Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standardize Data": {
+      "main": [
+        [
+          {
+            "node": "Send Standardized Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify via Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

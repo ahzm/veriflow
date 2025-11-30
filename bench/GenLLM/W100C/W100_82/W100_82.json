@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Challenge",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Submission Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "participants@example.com",
+        "subject": "New Innovation Challenge Open for Submissions",
+        "text": "We are excited to announce a new innovation challenge. Submit your ideas!"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Receive Submissions",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Evaluate Submissions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://evaluation-service.example.com/evaluate"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Evaluation Results",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The evaluation results are in! Check the dashboard for details."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Award Winners",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "winners@example.com",
+        "subject": "Congratulations! You've Won the Innovation Challenge",
+        "text": "We are pleased to inform you that you have been selected as a winner."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Challenge": {
+      "main": [
+        [
+          {
+            "node": "Send Submission Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Submission Notification": {
+      "main": [
+        [
+          {
+            "node": "Receive Submissions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive Submissions": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Submissions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Submissions": {
+      "main": [
+        [
+          {
+            "node": "Send Evaluation Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Evaluation Results": {
+      "main": [
+        [
+          {
+            "node": "Award Winners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

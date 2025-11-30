@@ -1,0 +1,102 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Deployment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Request Supplies",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.supplychain.com/request"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Logistics Team",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Logistics team, a new deployment has been scheduled. Please prepare the necessary supplies."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Deployment Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "logistics@peacekeeping.org",
+        "subject": "Deployment Scheduled",
+        "text": "A new deployment has been scheduled. Please check the logistics portal for details."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Rotation Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 1 * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Deployment": {
+      "main": [
+        [
+          {
+            "node": "Request Supplies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Supplies": {
+      "main": [
+        [
+          {
+            "node": "Notify Logistics Team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Deployment Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Logistics Team": {
+      "main": [
+        [
+          {
+            "node": "Rotation Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Deployment Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Rotation Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rotation Schedule": {
+      "main": []
+    }
+  }
+}

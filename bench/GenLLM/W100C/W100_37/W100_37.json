@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Citizen Identity Issuance",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.identity.gov/issue"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Citizen Identity Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.identity.gov/update"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Citizen Identity Revocation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.identity.gov/revoke"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Issuance",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@identity.gov",
+        "subject": "New Citizen Identity Issued",
+        "text": "A new citizen identity has been issued."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Update",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@identity.gov",
+        "subject": "Citizen Identity Updated",
+        "text": "A citizen identity has been updated."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify Revocation",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A citizen identity has been revoked."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Schedule Identity Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Identity Check": {
+      "main": [
+        [
+          {
+            "node": "Citizen Identity Issuance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Citizen Identity Issuance": {
+      "main": [
+        [
+          {
+            "node": "Notify Issuance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Citizen Identity Update": {
+      "main": [
+        [
+          {
+            "node": "Notify Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Citizen Identity Revocation": {
+      "main": [
+        [
+          {
+            "node": "Notify Revocation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Proposal Submission",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/proposals"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Due Diligence",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/due-diligence"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Approval Process",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/approval"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Monitoring",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/monitoring"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "New Climate Finance Project Update",
+        "text": "A new climate finance project has been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Proposal Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proposal Submission": {
+      "main": [
+        [
+          {
+            "node": "Due Diligence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Due Diligence": {
+      "main": [
+        [
+          {
+            "node": "Approval Process",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Process": {
+      "main": [
+        [
+          {
+            "node": "Monitoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitoring": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

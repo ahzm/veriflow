@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Demand Prediction",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Predict Demand",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/predict-demand"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Plan Rebalancing",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/plan-rebalancing"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Execution",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-execution"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Rebalancing Plan Executed",
+        "text": "The rebalancing plan has been executed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Demand Prediction": {
+      "main": [
+        [
+          {
+            "node": "Predict Demand",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Predict Demand": {
+      "main": [
+        [
+          {
+            "node": "Plan Rebalancing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Rebalancing": {
+      "main": [
+        [
+          {
+            "node": "Track Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Execution": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

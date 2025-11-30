@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Report",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Observations",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.biodiversity.org/observations"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validate Observations",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.valid === true);"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const report = items.map(item => item.json).join('\\n'); return [{ json: { report } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Report Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "report@biodiversity.org",
+        "subject": "National Biodiversity Report",
+        "text": "Please find the attached biodiversity report."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Report": {
+      "main": [
+        [
+          {
+            "node": "Fetch Observations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Observations": {
+      "main": [
+        [
+          {
+            "node": "Validate Observations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Observations": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Send Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

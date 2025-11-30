@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Patent Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.patentmetrics.com/fetch"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Generate Proposals",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { proposal: `Proposal for ${item.json.patentId}` } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Decision Making",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { decision: item.json.proposal.includes('Proposal') ? 'Approve' : 'Reject' } }));"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Patent Portfolio Pruning Decisions",
+        "text": "The decisions have been made regarding the patent proposals."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Patent portfolio pruning decisions have been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Patent Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Patent Metrics": {
+      "main": [
+        [
+          {
+            "node": "Generate Proposals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Proposals": {
+      "main": [
+        [
+          {
+            "node": "Decision Making",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision Making": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

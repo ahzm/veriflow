@@ -1,0 +1,41 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Error Level Check",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "field": "errorLevel",
+              "operation": "equal",
+              "value": "critical"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A critical error has occurred!"
+      }
+    }
+  ],
+  "connections": {
+    "Error Level Check": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

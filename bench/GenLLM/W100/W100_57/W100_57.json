@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.airquality.com/data"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check AQI",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items[0].json.aqi > 150 ? [{ json: { hazardous: true } }] : [{ json: { hazardous: false } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Hazardous Air Quality Alert",
+        "text": "The air quality index is hazardous. Please take necessary precautions."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Check AQI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check AQI": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,429 @@
+{
+  "S": 0.98,
+  "M": 0.72,
+  "E": 1.0,
+  "Overall": 0.9,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.25,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 0.3333333333333333,
+    "order": 0.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 0.6666666666666666,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.7166666666666667,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": true,
+      "need_conditional_notify": true,
+      "need_db": true,
+      "need_email": true,
+      "need_form": true,
+      "need_http": false,
+      "need_schedule": true,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": false
+    },
+    "intent_chain": [
+      "The workflow involves managing food safety incidents, which likely requires scheduling follow-up inspections.",
+      "Email notifications are typically used for reporting incidents and follow-ups.",
+      "A database is necessary to store and manage incident reports and inspection data.",
+      "Forms are needed to collect information about incidents and inspections.",
+      "Conditions may be required to determine the next steps based on the severity of incidents.",
+      "Conditional notifications may be necessary to alert relevant parties based on specific criteria."
+    ],
+    "irrelevant_nodes": [
+      "2"
+    ],
+    "intent_caps": [
+      "condition",
+      "db",
+      "email",
+      "form",
+      "schedule"
+    ],
+    "intent_edges": [
+      [
+        "schedule",
+        "email"
+      ],
+      [
+        "condition",
+        "email"
+      ],
+      [
+        "condition",
+        "action"
+      ]
+    ],
+    "missing_capabilities": [
+      "db",
+      "form"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "schedule": true,
+        "email": true,
+        "db": false,
+        "condition": true,
+        "form": false
+      },
+      "edge_matches": [
+        {
+          "from": "schedule",
+          "to": "email",
+          "ok": false,
+          "path_nodes": []
+        },
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": true,
+          "path_nodes": [
+            "3",
+            "4"
+          ]
+        },
+        {
+          "from": "condition",
+          "to": "action",
+          "ok": true,
+          "path_nodes": [
+            "3"
+          ]
+        }
+      ]
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "intent_edge",
+        "from": "schedule",
+        "to": "email",
+        "applicable": true,
+        "ok": false,
+        "sources": [
+          "1"
+        ],
+        "targets": [
+          "4"
+        ],
+        "path": [],
+        "note": "intent edge missing"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "3"
+        ],
+        "targets": [
+          "4"
+        ],
+        "path": [
+          "3",
+          "4"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "action",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "3"
+        ],
+        "targets": [
+          "3",
+          "4"
+        ],
+        "path": [
+          "3"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "schedule->email(required)",
+        "from": "schedule",
+        "to": "email",
+        "applicable": true,
+        "ok": false,
+        "sources": [
+          "1"
+        ],
+        "targets": [
+          "4"
+        ],
+        "path": [],
+        "note": "required semantic path missing"
+      },
+      {
+        "rule": "form->db(optional)",
+        "from": "form",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "condition->email(required)",
+        "from": "condition",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "3"
+        ],
+        "targets": [
+          "4"
+        ],
+        "path": [
+          "3",
+          "4"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "db->email(optional)",
+        "from": "db",
+        "to": "email",
+        "applicable": false,
+        "ok": null,
+        "sources": [],
+        "targets": [
+          "4"
+        ],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "condition",
+        "db",
+        "email",
+        "form",
+        "schedule"
+      ],
+      "intent_edges": [
+        {
+          "from": "schedule",
+          "to": "email",
+          "ok": false,
+          "path": []
+        },
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": true,
+          "path": [
+            "3",
+            "4"
+          ]
+        },
+        {
+          "from": "condition",
+          "to": "action",
+          "ok": true,
+          "path": [
+            "3"
+          ]
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Schedule Incident Report",
+          "capability": "schedule",
+          "relevant": true
+        },
+        {
+          "id": "2",
+          "label": "Fetch Incident Reports",
+          "capability": "http",
+          "relevant": false
+        },
+        {
+          "id": "3",
+          "label": "Send Notification",
+          "capability": "slack",
+          "relevant": true
+        },
+        {
+          "id": "4",
+          "label": "Follow-up Inspection",
+          "capability": "email",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        }
+      ],
+      "relevant_nodes": [
+        "1",
+        "3",
+        "4"
+      ],
+      "irrelevant_nodes": [
+        "2"
+      ],
+      "missing_capabilities": [
+        "db",
+        "form"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 1.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 4
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": false,
+      "required_fields": {},
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "3": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {}
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "executed_nodes_readable": [
+      "Schedule Incident Report",
+      "Fetch Incident Reports",
+      "Send Notification",
+      "Follow-up Inspection"
+    ],
+    "name_map": {
+      "1": "Schedule Incident Report",
+      "2": "Fetch Incident Reports",
+      "3": "Send Notification",
+      "4": "Follow-up Inspection"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "cron ok"
+      },
+      "2": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "3": {
+        "ok": true,
+        "msg": "slack ok (mock)"
+      },
+      "4": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Schedule Incident Report",
+    "Fetch Incident Reports",
+    "Send Notification",
+    "Follow-up Inspection"
+  ]
+}

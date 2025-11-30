@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Report",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 1 * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Outputs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/outputs"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch Citations",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/citations"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Fetch Case Studies",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/case-studies"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Report Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Higher-Education Research Impact Report",
+        "text": "Here is the report for outputs, citations, and case studies."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The higher-education research impact report has been generated and sent via email."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Report": {
+      "main": [
+        [
+          {
+            "node": "Fetch Outputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Outputs": {
+      "main": [
+        [
+          {
+            "node": "Fetch Citations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Citations": {
+      "main": [
+        [
+          {
+            "node": "Fetch Case Studies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Case Studies": {
+      "main": [
+        [
+          {
+            "node": "Send Report Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Report Email": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

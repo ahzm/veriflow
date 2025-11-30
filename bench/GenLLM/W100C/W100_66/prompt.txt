@@ -1,0 +1,1 @@
+Design a workflow that manages global loyalty coalition programs: partners, earn/burn rules, and reconciliations.

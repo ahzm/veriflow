@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Reminder",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Filings",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.courtfilings.com/getFilings"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "lawyer@example.com",
+        "subject": "Litigation Case Update",
+        "text": "Please review the latest filings and deadlines."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Slack Reminder",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Reminder: Check the latest litigation filings and deadlines."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Reminder": {
+      "main": [
+        [
+          {
+            "node": "Get Filings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Filings": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

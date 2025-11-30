@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "course-proposal"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send to Committee",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New course proposal received. Please review."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Record Decision",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://university-api.com/record-decision",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "decision": "approved"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Update Catalog",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://university-api.com/update-catalog",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "update": "new course added"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Evaluation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 1"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send to Committee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Committee": {
+      "main": [
+        [
+          {
+            "node": "Record Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Decision": {
+      "main": [
+        [
+          {
+            "node": "Update Catalog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

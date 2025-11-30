@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trade Documentation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Generate Bill of Lading",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/generate-bl"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Request Inspection",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/request-inspection"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Finance Approval",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/finance-approval"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Trade Documentation Update",
+        "text": "The trade documentation process has been initiated."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Trade documentation for the commodity has been started."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trade Documentation": {
+      "main": [
+        [
+          {
+            "node": "Generate Bill of Lading",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Bill of Lading": {
+      "main": [
+        [
+          {
+            "node": "Request Inspection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Inspection": {
+      "main": [
+        [
+          {
+            "node": "Finance Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finance Approval": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Data Collection",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Sustainability Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/sustainability-data"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validate Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Validation Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "report@example.com",
+        "subject": "Sustainability Data Validation Report",
+        "text": "The sustainability data has been validated successfully."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Post Data to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Sustainability data collection and validation completed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Data Collection": {
+      "main": [
+        [
+          {
+            "node": "Collect Sustainability Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Sustainability Data": {
+      "main": [
+        [
+          {
+            "node": "Validate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Data": {
+      "main": [
+        [
+          {
+            "node": "Send Validation Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post Data to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
