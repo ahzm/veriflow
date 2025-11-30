@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Procurement",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Procurement Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/procurement"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Assign Asset",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new asset has been procured and is ready for assignment."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Maintenance Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/maintenance"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Maintenance Update",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "it-team@example.com",
+        "subject": "Maintenance Update",
+        "text": "The maintenance check has been completed."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Retire Asset",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/retirement"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Procurement": {
+      "main": [
+        [
+          {
+            "node": "Procurement Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Procurement Request": {
+      "main": [
+        [
+          {
+            "node": "Assign Asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Asset": {
+      "main": [
+        [
+          {
+            "node": "Maintenance Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Maintenance Check": {
+      "main": [
+        [
+          {
+            "node": "Send Maintenance Update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retire Asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Define a workflow that automates retail price optimization: gather sales and competitor data, run pricing models via API, propose new prices, and route for approvals.

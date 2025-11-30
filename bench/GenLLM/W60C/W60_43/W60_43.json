@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Proposal Submission",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proposal-submission"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Track Approval",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-approval"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Ethics Clearance",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/ethics-clearance"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Funding Allocation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/funding-allocation"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Milestone Tracking",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/milestone-tracking"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "New Proposal Submitted",
+        "text": "A new proposal has been submitted and is awaiting approval."
+      }
+    }
+  ],
+  "connections": {
+    "Proposal Submission": {
+      "main": [
+        [
+          {
+            "node": "Track Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Approval": {
+      "main": [
+        [
+          {
+            "node": "Ethics Clearance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ethics Clearance": {
+      "main": [
+        [
+          {
+            "node": "Funding Allocation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Funding Allocation": {
+      "main": [
+        [
+          {
+            "node": "Milestone Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Milestone Tracking": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

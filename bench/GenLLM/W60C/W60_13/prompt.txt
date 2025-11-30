@@ -1,0 +1,1 @@
+Build a workflow that orchestrates university course allocation: collect student preferences, run allocation algorithm via HTTP, notify students, and update enrollment systems.

@@ -1,0 +1,128 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "CRM Integration",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm.com/update"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Billing Integration",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.billing.com/update"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Product Analytics Integration",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.analytics.com/update"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Support Tickets Integration",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.support.com/update"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Refresh Unified Profile Store",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.profile.com/refresh"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify Downstream Systems",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Customer 360-view has been updated."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Schedule Updates",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Updates": {
+      "main": [
+        [
+          {
+            "node": "CRM Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM Integration": {
+      "main": [
+        [
+          {
+            "node": "Billing Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Billing Integration": {
+      "main": [
+        [
+          {
+            "node": "Product Analytics Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Analytics Integration": {
+      "main": [
+        [
+          {
+            "node": "Support Tickets Integration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Support Tickets Integration": {
+      "main": [
+        [
+          {
+            "node": "Refresh Unified Profile Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Refresh Unified Profile Store": {
+      "main": [
+        [
+          {
+            "node": "Notify Downstream Systems",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

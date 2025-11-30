@@ -1,0 +1,1 @@
+Design a workflow that coordinates cross-lab reagent inventory: merge stock data, predict stockouts, propose redistribution between labs, and generate purchase orders.

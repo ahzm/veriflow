@@ -1,0 +1,1 @@
+Create a workflow that manages complex onboarding for healthcare providers: verify licenses, set up accounts in multiple clinical systems, configure access roles, and send training schedules.

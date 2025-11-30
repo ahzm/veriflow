@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule QA Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Metadata",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/check-metadata"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Run Accessibility Scan",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/accessibility-scan"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Collect Reviewer Feedback",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Please provide your feedback on the e-learning content."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Publish Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/publish-content"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule QA Check": {
+      "main": [
+        [
+          {
+            "node": "Check Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Metadata": {
+      "main": [
+        [
+          {
+            "node": "Run Accessibility Scan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Accessibility Scan": {
+      "main": [
+        [
+          {
+            "node": "Collect Reviewer Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Reviewer Feedback": {
+      "main": [
+        [
+          {
+            "node": "Publish Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

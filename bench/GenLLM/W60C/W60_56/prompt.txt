@@ -1,0 +1,1 @@
+Design a workflow that manages pharmaceutical batch release: track QC results, approvals, documentation, and final release decisions.

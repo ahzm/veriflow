@@ -1,0 +1,1 @@
+Webhook “url” -> uptime email.

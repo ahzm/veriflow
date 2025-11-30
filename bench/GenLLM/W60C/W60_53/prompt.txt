@@ -1,0 +1,1 @@
+Build a workflow that manages airline crew scheduling: ensure legal rest, optimize rosters, handle swaps, and notify crew members.

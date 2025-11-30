@@ -1,0 +1,1 @@
+Hourly check humidity; Slack alert if > 85.

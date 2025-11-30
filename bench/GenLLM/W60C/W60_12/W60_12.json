@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Fetch Satellite Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.satellitedata.com/fetch"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Preprocess Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Store in Geospatial Database",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.geospatialdb.com/store"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Trigger Downstream Analysis",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Downstream analysis jobs have been triggered."
+      }
+    }
+  ],
+  "connections": {
+    "Fetch Satellite Data": {
+      "main": [
+        [
+          {
+            "node": "Preprocess Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preprocess Data": {
+      "main": [
+        [
+          {
+            "node": "Store in Geospatial Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Geospatial Database": {
+      "main": [
+        [
+          {
+            "node": "Trigger Downstream Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

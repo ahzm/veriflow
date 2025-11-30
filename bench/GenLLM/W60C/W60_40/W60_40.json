@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Screen Patients",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Randomize Assignments",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Schedule Visits",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Notify Coordinators",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "coordinator@example.com",
+        "subject": "New Patient Enrollment Notification",
+        "text": "A new patient has been enrolled and assigned to a visit."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Screen Patients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Screen Patients": {
+      "main": [
+        [
+          {
+            "node": "Randomize Assignments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Randomize Assignments": {
+      "main": [
+        [
+          {
+            "node": "Schedule Visits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Visits": {
+      "main": [
+        [
+          {
+            "node": "Notify Coordinators",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

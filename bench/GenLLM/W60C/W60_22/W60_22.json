@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Finance Approval",
+      "type": "n8n-nodes-base.wait",
+      "parameters": {
+        "timeout": 86400,
+        "timeoutAction": "continue"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Security Approval",
+      "type": "n8n-nodes-base.wait",
+      "parameters": {
+        "timeout": 86400,
+        "timeoutAction": "continue"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Legal Approval",
+      "type": "n8n-nodes-base.wait",
+      "parameters": {
+        "timeout": 86400,
+        "timeoutAction": "continue"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Approval Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "approvals@company.com",
+        "subject": "Contract Approval Status",
+        "text": "The contract has been approved by all departments."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Rejection Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "approvals@company.com",
+        "subject": "Contract Approval Status",
+        "text": "The contract has been rejected by one or more departments."
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Finance Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finance Approval": {
+      "main": [
+        [
+          {
+            "node": "Security Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Security Approval": {
+      "main": [
+        [
+          {
+            "node": "Legal Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Legal Approval": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

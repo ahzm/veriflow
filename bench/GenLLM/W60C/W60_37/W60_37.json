@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Donor Eligibility",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/check-eligibility"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Apply Matching Rules",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Update Totals",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Notify Donors",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "donors@example.com",
+        "subject": "Donation Matching Update",
+        "text": "Your donation has been matched successfully!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Check Donor Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Donor Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Apply Matching Rules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Matching Rules": {
+      "main": [
+        [
+          {
+            "node": "Update Totals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Totals": {
+      "main": [
+        [
+          {
+            "node": "Notify Donors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

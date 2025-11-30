@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Inventory Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Inventory",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/inventory/check"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Schedule Deliveries",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * *"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Delivery Schedule",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "logistics@example.com",
+        "subject": "Daily Vaccine Delivery Schedule",
+        "text": "Please find attached the delivery schedule for today."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Monitor Temperature Logs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/temperature/logs"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Report to Health Authorities",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Daily report on vaccine distribution and temperature logs has been generated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Inventory Check": {
+      "main": [
+        [
+          {
+            "node": "Check Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Inventory": {
+      "main": [
+        [
+          {
+            "node": "Schedule Deliveries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Deliveries": {
+      "main": [
+        [
+          {
+            "node": "Send Delivery Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Delivery Schedule": {
+      "main": [
+        [
+          {
+            "node": "Monitor Temperature Logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Temperature Logs": {
+      "main": [
+        [
+          {
+            "node": "Report to Health Authorities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

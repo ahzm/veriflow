@@ -1,0 +1,1 @@
+Design a workflow that automates multilingual chatbot training: ingest FAQs, translate them, generate training pairs, push them to a chatbot platform, and evaluate performance.

@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Instructor Availability",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/instructor-availability"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Match Student Time Zones",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/student-timezones"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Check Room Capacities",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/room-capacities"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create Calendar Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/create-calendar-event"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "student@example.com",
+        "subject": "Your Course Session Scheduled",
+        "text": "Your course session has been successfully scheduled."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Instructor Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Instructor Availability": {
+      "main": [
+        [
+          {
+            "node": "Match Student Time Zones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Student Time Zones": {
+      "main": [
+        [
+          {
+            "node": "Check Room Capacities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Room Capacities": {
+      "main": [
+        [
+          {
+            "node": "Create Calendar Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Calendar Event": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

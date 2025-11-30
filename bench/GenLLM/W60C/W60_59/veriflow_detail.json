@@ -1,0 +1,262 @@
+{
+  "S": 0.97,
+  "M": 1.0,
+  "E": 1.0,
+  "Overall": 0.99,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.2,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.97,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.2,
+    "penalty": 0.2,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 1.0,
+    "order": 1.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 1.0,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": false,
+      "need_conditional_notify": false,
+      "need_db": false,
+      "need_email": false,
+      "need_form": false,
+      "need_http": true,
+      "need_schedule": false,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": false
+    },
+    "intent_chain": [
+      "rule: matched need_http keywords",
+      "The task involves submitting bids to market APIs, indicating a need for HTTP requests.",
+      "No scheduling, email, or messaging services are mentioned in the workflow description.",
+      "There is no indication of needing a database, form, conditions, transformations, or conditional notifications."
+    ],
+    "irrelevant_nodes": [
+      "1",
+      "2",
+      "3",
+      "5"
+    ],
+    "intent_caps": [
+      "http"
+    ],
+    "intent_edges": [],
+    "missing_capabilities": [],
+    "alignment": {
+      "capability_matches": {
+        "http": true
+      },
+      "edge_matches": []
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "http"
+      ],
+      "intent_edges": [],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Schedule Demand Forecast",
+          "capability": "schedule",
+          "relevant": false
+        },
+        {
+          "id": "2",
+          "label": "Forecast Demand",
+          "capability": "transform",
+          "relevant": false
+        },
+        {
+          "id": "3",
+          "label": "Generate Bids",
+          "capability": "transform",
+          "relevant": false
+        },
+        {
+          "id": "4",
+          "label": "Submit Bids to Market API",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "5",
+          "label": "Reconcile Outcomes",
+          "capability": "transform",
+          "relevant": false
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        },
+        {
+          "source": "4",
+          "target": "5"
+        }
+      ],
+      "relevant_nodes": [
+        "4"
+      ],
+      "irrelevant_nodes": [
+        "1",
+        "2",
+        "3",
+        "5"
+      ],
+      "missing_capabilities": []
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 1.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 5
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": false,
+      "required_fields": {},
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "timestamp"
+        ],
+        "3": [
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "5": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {}
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "executed_nodes_readable": [
+      "Schedule Demand Forecast",
+      "Forecast Demand",
+      "Generate Bids",
+      "Submit Bids to Market API",
+      "Reconcile Outcomes"
+    ],
+    "name_map": {
+      "1": "Schedule Demand Forecast",
+      "2": "Forecast Demand",
+      "3": "Generate Bids",
+      "4": "Submit Bids to Market API",
+      "5": "Reconcile Outcomes"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "cron ok"
+      },
+      "2": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "3": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "4": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "5": {
+        "ok": true,
+        "msg": "noop"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Schedule Demand Forecast",
+    "Forecast Demand",
+    "Generate Bids",
+    "Submit Bids to Market API",
+    "Reconcile Outcomes"
+  ]
+}

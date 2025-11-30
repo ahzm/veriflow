@@ -1,0 +1,115 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Tax Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Tax Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.taxdata.com/residency"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Residency Status",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const residencyData = items[0].json;\nconst residencyStatus = residencyData.income > 50000 ? 'Resident' : 'Non-Resident';\nreturn [{ json: { residencyStatus } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Flag Ambiguous Cases",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"residencyStatus\"]}}",
+              "operation": "equal",
+              "value2": "Ambiguous"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create Task for Tax Specialist",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Ambiguous tax residency case detected. Please review."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "taxspecialist@example.com",
+        "subject": "Tax Residency Check Summary",
+        "text": "The tax residency checks have been completed. Please review the results."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Tax Check": {
+      "main": [
+        [
+          {
+            "node": "Fetch Tax Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Tax Data": {
+      "main": [
+        [
+          {
+            "node": "Compute Residency Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Residency Status": {
+      "main": [
+        [
+          {
+            "node": "Flag Ambiguous Cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flag Ambiguous Cases": {
+      "main": [
+        [
+          {
+            "node": "Create Task for Tax Specialist",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

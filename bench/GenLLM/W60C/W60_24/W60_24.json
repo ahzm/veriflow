@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check Flight Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.airline.com/check-status"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Rebook Passengers",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.airline.com/rebook"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Passengers",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "passenger@example.com",
+        "subject": "Your Flight Has Been Rebooked",
+        "text": "Dear Passenger, your flight has been rebooked. Please check your email for details."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Update PNR",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.airline.com/update-pnr"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Compensation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.airline.com/track-compensation"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Check Flight Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Flight Status": {
+      "main": [
+        [
+          {
+            "node": "Rebook Passengers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rebook Passengers": {
+      "main": [
+        [
+          {
+            "node": "Notify Passengers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update PNR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update PNR": {
+      "main": [
+        [
+          {
+            "node": "Track Compensation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

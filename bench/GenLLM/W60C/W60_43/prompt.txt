@@ -1,0 +1,1 @@
+Build a workflow that manages transnational research collaborations: track proposals, approvals, ethics clearance, funding, and milestones.

@@ -1,0 +1,1 @@
+Construct a workflow that manages cross-channel education outreach: plan campaigns, send emails and SMS, track sign-ups, and adjust targeting based on response rates.

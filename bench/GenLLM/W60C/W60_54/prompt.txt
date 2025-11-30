@@ -1,0 +1,1 @@
+Define a workflow that automates academic grant expense tracking: map expenses to grants, enforce limits, and generate reports for funders.

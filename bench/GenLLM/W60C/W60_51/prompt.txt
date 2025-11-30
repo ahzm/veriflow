@@ -1,0 +1,1 @@
+Design a workflow that manages complex real-estate transactions: track offers, contingencies, inspections, and closings, with notifications to all parties.

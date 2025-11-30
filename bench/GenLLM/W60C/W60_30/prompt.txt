@@ -1,0 +1,1 @@
+Construct a workflow that coordinates library digitalization: schedule scanning, OCR documents via API, validate outputs, and publish to the library system.

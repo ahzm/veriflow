@@ -1,0 +1,353 @@
+{
+  "S": 0.97,
+  "M": 0.85,
+  "E": 1.0,
+  "Overall": 0.94,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.2,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.97,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.2,
+    "penalty": 0.2,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 0.0,
+    "order": 1.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.7999999999999999,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": false,
+      "need_conditional_notify": false,
+      "need_db": false,
+      "need_email": false,
+      "need_form": false,
+      "need_http": true,
+      "need_schedule": true,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": true
+    },
+    "intent_chain": [
+      "rule: matched schedule keywords or English time pattern",
+      "rule: matched need_http keywords",
+      "The workflow involves scheduling publication, indicating a need for scheduling.",
+      "The use of an NLP API suggests a need for HTTP requests to interact with the API.",
+      "The mention of enforcing style guide checks implies a transformation of the drafts through NLP.",
+      "No email, Slack, Telegram, database, form, condition, or conditional notifications are explicitly mentioned."
+    ],
+    "irrelevant_nodes": [
+      "3"
+    ],
+    "intent_caps": [
+      "http",
+      "schedule",
+      "transform"
+    ],
+    "intent_edges": [
+      [
+        "schedule",
+        "http"
+      ]
+    ],
+    "missing_capabilities": [
+      "transform"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "http": true,
+        "transform": false,
+        "schedule": true
+      },
+      "edge_matches": [
+        {
+          "from": "schedule",
+          "to": "http",
+          "ok": true,
+          "path_nodes": [
+            "1",
+            "2"
+          ]
+        }
+      ]
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "support_transform_required",
+        "from": "intent",
+        "to": "transform",
+        "applicable": true,
+        "ok": false,
+        "sources": [],
+        "targets": [],
+        "path": [],
+        "note": "transform requested but missing; support score forced to 0"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "schedule",
+        "to": "http",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1",
+          "5"
+        ],
+        "targets": [
+          "2",
+          "4"
+        ],
+        "path": [
+          "1",
+          "2"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "schedule->http(required)",
+        "from": "schedule",
+        "to": "http",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "1",
+          "5"
+        ],
+        "targets": [
+          "2",
+          "4"
+        ],
+        "path": [
+          "1",
+          "2"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "http",
+        "schedule",
+        "transform"
+      ],
+      "intent_edges": [
+        {
+          "from": "schedule",
+          "to": "http",
+          "ok": true,
+          "path": [
+            "1",
+            "2"
+          ]
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Capture Drafts",
+          "capability": "schedule",
+          "relevant": true
+        },
+        {
+          "id": "2",
+          "label": "Plagiarism Check",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "3",
+          "label": "Route to Editors",
+          "capability": "slack",
+          "relevant": false
+        },
+        {
+          "id": "4",
+          "label": "Style Guide Check",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "5",
+          "label": "Schedule Publication",
+          "capability": "schedule",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        },
+        {
+          "source": "4",
+          "target": "5"
+        }
+      ],
+      "relevant_nodes": [
+        "1",
+        "2",
+        "4",
+        "5"
+      ],
+      "irrelevant_nodes": [
+        "3"
+      ],
+      "missing_capabilities": [
+        "transform"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 1.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 5
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": false,
+      "required_fields": {},
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "3": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "5": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {}
+    },
+    "executed_nodes": [
+      "1",
+      "5",
+      "2",
+      "3",
+      "4"
+    ],
+    "executed_nodes_readable": [
+      "Capture Drafts",
+      "Schedule Publication",
+      "Plagiarism Check",
+      "Route to Editors",
+      "Style Guide Check"
+    ],
+    "name_map": {
+      "1": "Capture Drafts",
+      "2": "Plagiarism Check",
+      "3": "Route to Editors",
+      "4": "Style Guide Check",
+      "5": "Schedule Publication"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "5": {
+        "ok": true,
+        "msg": "cron ok"
+      },
+      "2": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "3": {
+        "ok": true,
+        "msg": "slack ok (mock)"
+      },
+      "4": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Capture Drafts",
+    "Schedule Publication",
+    "Plagiarism Check",
+    "Route to Editors",
+    "Style Guide Check"
+  ]
+}

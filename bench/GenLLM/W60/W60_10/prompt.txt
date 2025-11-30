@@ -1,0 +1,1 @@
+Hourly BTC; Slack alert if < 55k.

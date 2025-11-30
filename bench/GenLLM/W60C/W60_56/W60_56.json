@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule QC Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get QC Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/qc-results"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Approval Process",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "QC results are in. Please review and approve."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Documentation Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/documentation-check"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Final Release Decision",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "release-team@example.com",
+        "subject": "Batch Release Decision",
+        "text": "The batch has been approved and is ready for release."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule QC Check": {
+      "main": [
+        [
+          {
+            "node": "Get QC Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get QC Results": {
+      "main": [
+        [
+          {
+            "node": "Approval Process",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Process": {
+      "main": [
+        [
+          {
+            "node": "Documentation Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Documentation Check": {
+      "main": [
+        [
+          {
+            "node": "Final Release Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

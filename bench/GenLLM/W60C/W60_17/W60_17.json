@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check High Severity Tickets",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/tickets/high-severity"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Notify Managers",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "managers@example.com",
+        "subject": "High Severity Ticket Alert",
+        "text": "A high severity ticket has been detected. Please review it."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Schedule Review Meeting",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A review meeting needs to be scheduled for the high severity ticket."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Resolution Times",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/tickets/resolution-times"
+      }
+    }
+  ],
+  "connections": {
+    "Check High Severity Tickets": {
+      "main": [
+        [
+          {
+            "node": "Notify Managers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Managers": {
+      "main": [
+        [
+          {
+            "node": "Schedule Review Meeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Review Meeting": {
+      "main": [
+        [
+          {
+            "node": "Track Resolution Times",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

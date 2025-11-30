@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Equipment Availability",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.labbooking.com/checkAvailability"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Users",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "users@example.com",
+        "subject": "Lab Equipment Booking Update",
+        "text": "There has been a change in your lab equipment booking."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate Utilization Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.labbooking.com/generateReport"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Maintenance Blackout Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.labbooking.com/checkMaintenance"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Check Equipment Availability",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Equipment Availability": {
+      "main": [
+        [
+          {
+            "node": "Maintenance Blackout Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Maintenance Blackout Check": {
+      "main": [
+        [
+          {
+            "node": "Notify Users",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Utilization Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

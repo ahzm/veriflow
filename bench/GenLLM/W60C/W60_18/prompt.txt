@@ -1,0 +1,1 @@
+Build a workflow that manages data catalog updates: when new datasets appear, profile them, suggest metadata fields, request owner confirmations, and publish to catalog.

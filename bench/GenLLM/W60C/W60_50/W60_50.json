@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Conference",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Assign Reviewers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Collect Scores",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Select Papers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Build Sessions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "organizer@example.com",
+        "subject": "Conference Review Process Completed",
+        "text": "The review process has been completed and sessions have been built."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Conference": {
+      "main": [
+        [
+          {
+            "node": "Assign Reviewers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Reviewers": {
+      "main": [
+        [
+          {
+            "node": "Collect Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Scores": {
+      "main": [
+        [
+          {
+            "node": "Select Papers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select Papers": {
+      "main": [
+        [
+          {
+            "node": "Build Sessions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Sessions": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

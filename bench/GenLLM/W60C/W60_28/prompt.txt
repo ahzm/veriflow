@@ -1,0 +1,1 @@
+Build a workflow that manages workplace safety incident reporting: intake incidents, categorize severity, notify relevant teams, track corrective actions, and produce monthly stats.

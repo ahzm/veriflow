@@ -1,0 +1,1 @@
+Define a workflow that automates airline disruption handling: detect cancellations, rebook passengers, notify them, update PNRs, and track compensation.

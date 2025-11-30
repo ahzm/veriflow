@@ -1,0 +1,1 @@
+Define a workflow that runs nightly to re-balance warehouse inventory: evaluate historical demand, compute transfer suggestions, create transfer orders in WMS, and notify logistics teams.

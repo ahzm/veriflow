@@ -1,0 +1,124 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Sales Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/sales"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Get Competitor Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/competitors"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Run Pricing Models",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/pricing-models"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Propose New Prices",
+      "type": "n8n-nodes-base.set",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send Approval Request",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New prices proposed for approval."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "approver@example.com",
+        "subject": "New Price Proposal",
+        "text": "Please review the proposed new prices."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get Sales Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sales Data": {
+      "main": [
+        [
+          {
+            "node": "Get Competitor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Competitor Data": {
+      "main": [
+        [
+          {
+            "node": "Run Pricing Models",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Pricing Models": {
+      "main": [
+        [
+          {
+            "node": "Propose New Prices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propose New Prices": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

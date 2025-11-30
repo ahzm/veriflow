@@ -1,0 +1,1 @@
+Build a workflow that orchestrates customer 360-view updates: integrate CRM, billing, product analytics, and support tickets, refresh a unified profile store, and notify downstream systems of changes.

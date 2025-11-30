@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "HR Trigger",
+      "type": "n8n-nodes-base.start",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "IAM System",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://iam.example.com/provision"
+      }
+    },
+    {
+      "id": "3",
+      "name": "SaaS Tool 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://saas1.example.com/api/user"
+      }
+    },
+    {
+      "id": "4",
+      "name": "SaaS Tool 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://saas2.example.com/api/user"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Periodic Reconciliation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "HR Trigger": {
+      "main": [
+        [
+          {
+            "node": "IAM System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IAM System": {
+      "main": [
+        [
+          {
+            "node": "SaaS Tool 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SaaS Tool 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Periodic Reconciliation": {
+      "main": [
+        [
+          {
+            "node": "IAM System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

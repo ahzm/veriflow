@@ -1,0 +1,87 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "game-events"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Standardize Schema",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { standardizedEvent: item.json.event } }));"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Metrics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { metrics: { count: item.json.standardizedEvent.length } } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Dashboard",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New game metrics computed: {{ $json[\"metrics\"] }}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Game Telemetry Metrics",
+        "text": "The latest game telemetry metrics have been computed and sent to the dashboard."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Standardize Schema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standardize Schema": {
+      "main": [
+        [
+          {
+            "node": "Compute Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Metrics": {
+      "main": [
+        [
+          {
+            "node": "Send Dashboard",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

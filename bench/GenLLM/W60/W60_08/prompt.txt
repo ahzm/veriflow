@@ -1,0 +1,1 @@
+Check uptime API bi-hourly, email if “down”.

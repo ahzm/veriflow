@@ -1,0 +1,1 @@
+Create a workflow that orchestrates humanitarian aid distribution: track inventory, prioritize regions, coordinate deliveries, and report impact metrics.

@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Patent Monitoring",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Patent Deadlines",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.patentmonitor.com/deadlines"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check New Citations",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.patentmonitor.com/citations"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Check Family Changes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.patentmonitor.com/family-changes"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Alert IP Lawyers",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "ip-lawyers@example.com",
+        "subject": "Patent Portfolio Update",
+        "text": "There are updates regarding patent deadlines, new citations, and family changes."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Patent Monitoring": {
+      "main": [
+        [
+          {
+            "node": "Check Patent Deadlines",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Patent Deadlines": {
+      "main": [
+        [
+          {
+            "node": "Check New Citations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check New Citations": {
+      "main": [
+        [
+          {
+            "node": "Check Family Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Family Changes": {
+      "main": [
+        [
+          {
+            "node": "Alert IP Lawyers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

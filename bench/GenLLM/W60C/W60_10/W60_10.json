@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Inspection",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Capture Findings",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Route Critical Issues",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Critical issue found during inspection: {{$json[\"findings\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Remediation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/remediation"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Inspection": {
+      "main": [
+        [
+          {
+            "node": "Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Capture Findings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capture Findings": {
+      "main": [
+        [
+          {
+            "node": "Route Critical Issues",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Track Remediation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

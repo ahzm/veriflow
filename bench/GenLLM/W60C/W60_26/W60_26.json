@@ -1,0 +1,120 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "thesis-submission"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Plagiarism",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://plagiarism-checker.com/api/check",
+        "method": "POST",
+        "bodyParameters": {
+          "draft": "={{$json[\"body\"][\"draft\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Assign Reviewers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const reviewers = ['reviewer1@example.com', 'reviewer2@example.com'];\nreturn reviewers.map(reviewer => ({ reviewer }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Review Request",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"reviewer\"]}}",
+        "subject": "Thesis Review Request",
+        "text": "You have been assigned to review a thesis draft."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Manage Revisions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ revisionStatus: 'pending' }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Register Final Submission",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://thesis-submission-system.com/api/register",
+        "method": "POST",
+        "bodyParameters": {
+          "finalDraft": "={{$json[\"body\"][\"finalDraft\"]}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Plagiarism",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Plagiarism": {
+      "main": [
+        [
+          {
+            "node": "Assign Reviewers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assign Reviewers": {
+      "main": [
+        [
+          {
+            "node": "Send Review Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Review Request": {
+      "main": [
+        [
+          {
+            "node": "Manage Revisions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manage Revisions": {
+      "main": [
+        [
+          {
+            "node": "Register Final Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

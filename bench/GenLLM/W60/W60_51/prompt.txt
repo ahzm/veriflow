@@ -1,0 +1,1 @@
+Daily at 7 fetch top Reddit posts email.

@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Campaign",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "example@example.com",
+        "subject": "New Education Campaign",
+        "text": "Join our new education campaign and learn more!"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send SMS",
+      "type": "n8n-nodes-base.smsSend",
+      "parameters": {
+        "text": "Don't miss our new education campaign! Sign up now!"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Sign-ups",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/signups"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Adjust Targeting",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/adjust-targeting"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Campaign": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Send SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS": {
+      "main": [
+        [
+          {
+            "node": "Track Sign-ups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Sign-ups": {
+      "main": [
+        [
+          {
+            "node": "Adjust Targeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Sales > 1000 -> Slack celebration.

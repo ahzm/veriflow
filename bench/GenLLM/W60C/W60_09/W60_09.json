@@ -1,0 +1,78 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Collect Application Data",
+      "type": "n8n-nodes-base.start",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Call Risk Models",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.riskmodels.com/evaluate"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Request Additional Info",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "We need additional information for your application."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Issue Quotes",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "Your Insurance Quote",
+        "text": "Here is your insurance quote based on the provided data."
+      }
+    }
+  ],
+  "connections": {
+    "Collect Application Data": {
+      "main": [
+        [
+          {
+            "node": "Call Risk Models",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Risk Models": {
+      "main": [
+        [
+          {
+            "node": "Request Additional Info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Issue Quotes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Additional Info": {
+      "main": [
+        [
+          {
+            "node": "Issue Quotes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

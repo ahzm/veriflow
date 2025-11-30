@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule KYC Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Detect Expiring Verifications",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Request Updated Documents",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/request-documents"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Re-run Checks",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Update Statuses",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "KYC Status Update",
+        "text": "The KYC checks have been updated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule KYC Check": {
+      "main": [
+        [
+          {
+            "node": "Detect Expiring Verifications",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Expiring Verifications": {
+      "main": [
+        [
+          {
+            "node": "Request Updated Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Updated Documents": {
+      "main": [
+        [
+          {
+            "node": "Re-run Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Re-run Checks": {
+      "main": [
+        [
+          {
+            "node": "Update Statuses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

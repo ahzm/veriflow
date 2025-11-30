@@ -1,0 +1,1 @@
+Design a workflow that manages academic thesis submissions: collect drafts, check plagiarism, assign reviewers, manage revisions, and register final submissions.

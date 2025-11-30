@@ -1,0 +1,1 @@
+Trigger daily at 9am and fetch EUR/USD, email result.

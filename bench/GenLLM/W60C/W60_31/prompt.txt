@@ -1,0 +1,1 @@
+Design a workflow that manages telemedicine appointments: sync patient bookings, send reminders, manage video links, and log consultation summaries.

@@ -1,0 +1,1 @@
+Define a workflow that automates construction project progress tracking: receive updates from site apps, compare against plan, flag delays, and notify stakeholders.

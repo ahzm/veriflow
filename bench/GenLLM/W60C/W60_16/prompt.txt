@@ -1,0 +1,1 @@
+Design a workflow that manages multi-currency payroll: pull time data, apply currency conversions, compute payroll, send summaries for approval, and push payments via bank API.

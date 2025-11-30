@@ -1,0 +1,109 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Influencer Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.socialmedia.com/influencer/posts"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.socialmedia.com/influencer/metrics"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Compute Payouts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { payout: item.json.metrics * 0.1 } }));"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Summary to Marketing",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "marketing@example.com",
+        "subject": "Influencer Campaign Summary",
+        "text": "Here is the summary of the influencer campaign."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Summary to Finance",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "finance@example.com",
+        "subject": "Influencer Campaign Payouts",
+        "text": "Here are the computed payouts for the influencer campaign."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Influencer Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Influencer Posts": {
+      "main": [
+        [
+          {
+            "node": "Fetch Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Metrics": {
+      "main": [
+        [
+          {
+            "node": "Compute Payouts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Payouts": {
+      "main": [
+        [
+          {
+            "node": "Send Summary to Marketing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Summary to Finance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

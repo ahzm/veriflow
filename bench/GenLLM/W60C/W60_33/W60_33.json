@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check Eligibility",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Request Approval",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.approvalservice.com/request"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Schedule Disbursement",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "student@example.com",
+        "subject": "Financial Aid Disbursement",
+        "text": "Your financial aid has been approved and will be disbursed soon."
+      }
+    }
+  ],
+  "connections": {
+    "Check Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Request Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Approval": {
+      "main": [
+        [
+          {
+            "node": "Schedule Disbursement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Disbursement": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+CO2 hourly; if > 800 Slack alert.

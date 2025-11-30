@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Shipment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Track Shipment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.shipmenttracking.com/track"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Condition Report",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Condition report for the artwork has been generated."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Insurance Coverage",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "insurance@artgallery.com",
+        "subject": "Insurance Coverage Confirmation",
+        "text": "Please confirm the insurance coverage for the upcoming exhibition."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Installation Timeline",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Installation timeline has been set for the exhibition."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Shipment": {
+      "main": [
+        [
+          {
+            "node": "Track Shipment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Shipment": {
+      "main": [
+        [
+          {
+            "node": "Condition Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insurance Coverage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Condition Report": {
+      "main": [
+        [
+          {
+            "node": "Installation Timeline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

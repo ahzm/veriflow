@@ -1,0 +1,124 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Expenses",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/expenses"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Map Expenses to Grants",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { grantId: item.grantId, amount: item.amount } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Enforce Limits",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.amount <= 1000);"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { report: 'Report generated with ' + items.length + ' expenses.' } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Report Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "funder@example.com",
+        "subject": "Monthly Grant Expense Report",
+        "text": "The report has been generated successfully."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The monthly grant expense report has been generated and sent to the funders."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Expenses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Expenses": {
+      "main": [
+        [
+          {
+            "node": "Map Expenses to Grants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Expenses to Grants": {
+      "main": [
+        [
+          {
+            "node": "Enforce Limits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enforce Limits": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Send Report Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

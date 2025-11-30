@@ -1,0 +1,1 @@
+Create a workflow that orchestrates film production tasks: schedule shoots, track dependencies, update call sheets, and send daily summaries to crew.

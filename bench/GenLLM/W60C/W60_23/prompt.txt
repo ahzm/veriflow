@@ -1,0 +1,1 @@
+Build a workflow that manages multi-brand product launches: synchronize content, update pricing, coordinate announcements, and capture launch KPIs across brands.

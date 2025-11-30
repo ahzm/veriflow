@@ -1,0 +1,1 @@
+Build a workflow that orchestrates online course session scheduling: match instructor availability, student time zones, and room capacities, then create calendar events and notifications.

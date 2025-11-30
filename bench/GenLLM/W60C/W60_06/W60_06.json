@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Merge Stock Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Predict Stockouts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Propose Redistribution",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Generate Purchase Orders",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "lab_manager@example.com",
+        "subject": "Reagent Inventory Update",
+        "text": "The reagent inventory has been updated and purchase orders generated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Merge Stock Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Stock Data": {
+      "main": [
+        [
+          {
+            "node": "Predict Stockouts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Predict Stockouts": {
+      "main": [
+        [
+          {
+            "node": "Propose Redistribution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propose Redistribution": {
+      "main": [
+        [
+          {
+            "node": "Generate Purchase Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Purchase Orders": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

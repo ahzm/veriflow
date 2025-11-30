@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Assessment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Retrieve Questionnaires",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/questionnaires"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Score Responses",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { score: item.json.responses.reduce((acc, response) => acc + response.score, 0) } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Trigger Follow-ups",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Follow-up needed for vendor assessments."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Produce Risk Heat Map",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { heatMap: item.json.score > 50 ? 'High Risk' : 'Low Risk' } }));"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Risk Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "riskteam@example.com",
+        "subject": "Vendor Risk Assessment Report",
+        "text": "The risk assessment has been completed. Please review the attached heat map."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Assessment": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Questionnaires",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Questionnaires": {
+      "main": [
+        [
+          {
+            "node": "Score Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Responses": {
+      "main": [
+        [
+          {
+            "node": "Produce Risk Heat Map",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Produce Risk Heat Map": {
+      "main": [
+        [
+          {
+            "node": "Trigger Follow-ups",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Risk Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

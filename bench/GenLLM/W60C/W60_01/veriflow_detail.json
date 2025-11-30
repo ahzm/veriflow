@@ -1,0 +1,439 @@
+{
+  "S": 0.98,
+  "M": 1.0,
+  "E": 0.8,
+  "Overall": 0.93,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.16666666666666669,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 1.0,
+    "order": 1.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.8099999999999999,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": true,
+      "need_conditional_notify": true,
+      "need_db": false,
+      "need_email": true,
+      "need_form": false,
+      "need_http": true,
+      "need_schedule": false,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": true
+    },
+    "intent_chain": [
+      "rule: matched need_http keywords",
+      "The workflow involves notifying customers, indicating a need for email communication.",
+      "Computing duties and taxes via API requires HTTP requests.",
+      "Checking restricted items suggests a conditional check based on the destination country.",
+      "Updating order totals implies a transformation of data.",
+      "Notifying customers with detailed breakdowns indicates a conditional notification based on the computed results."
+    ],
+    "irrelevant_nodes": [
+      "1"
+    ],
+    "intent_caps": [
+      "condition",
+      "email",
+      "http",
+      "transform"
+    ],
+    "intent_edges": [
+      [
+        "condition",
+        "email"
+      ],
+      [
+        "condition",
+        "action"
+      ]
+    ],
+    "missing_capabilities": [],
+    "alignment": {
+      "capability_matches": {
+        "http": true,
+        "condition": true,
+        "transform": true,
+        "email": true
+      },
+      "edge_matches": [
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": true,
+          "path_nodes": [
+            "6"
+          ]
+        },
+        {
+          "from": "condition",
+          "to": "action",
+          "ok": true,
+          "path_nodes": [
+            "6"
+          ]
+        }
+      ]
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "6"
+        ],
+        "targets": [
+          "6"
+        ],
+        "path": [
+          "6"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "intent_edge",
+        "from": "condition",
+        "to": "action",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "6"
+        ],
+        "targets": [
+          "6"
+        ],
+        "path": [
+          "6"
+        ],
+        "note": "intent edge satisfied"
+      },
+      {
+        "rule": "http->email(required)",
+        "from": "http",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "3",
+          "4"
+        ],
+        "targets": [
+          "6"
+        ],
+        "path": [
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "condition->email(required)",
+        "from": "condition",
+        "to": "email",
+        "applicable": true,
+        "ok": true,
+        "sources": [
+          "6"
+        ],
+        "targets": [
+          "6"
+        ],
+        "path": [
+          "6"
+        ],
+        "note": "required semantic path found"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "condition",
+        "email",
+        "http",
+        "transform"
+      ],
+      "intent_edges": [
+        {
+          "from": "condition",
+          "to": "email",
+          "ok": true,
+          "path": [
+            "6"
+          ]
+        },
+        {
+          "from": "condition",
+          "to": "action",
+          "ok": true,
+          "path": [
+            "6"
+          ]
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Webhook",
+          "capability": "schedule",
+          "relevant": false
+        },
+        {
+          "id": "2",
+          "label": "Detect Country",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "3",
+          "label": "Compute Duties and Taxes",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "4",
+          "label": "Check Restricted Items",
+          "capability": "http",
+          "relevant": true
+        },
+        {
+          "id": "5",
+          "label": "Update Order Totals",
+          "capability": "transform",
+          "relevant": true
+        },
+        {
+          "id": "6",
+          "label": "Notify Customer",
+          "capability": "email",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        },
+        {
+          "source": "4",
+          "target": "5"
+        },
+        {
+          "source": "5",
+          "target": "6"
+        }
+      ],
+      "relevant_nodes": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "irrelevant_nodes": [
+        "1"
+      ],
+      "missing_capabilities": []
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 0.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 6
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": true,
+      "required_fields": {
+        "3": [
+          "amount",
+          "country"
+        ],
+        "4": [
+          "items"
+        ],
+        "6": [
+          "customerEmail",
+          "restrictedItems",
+          "updatedTotal"
+        ]
+      },
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "timestamp"
+        ],
+        "3": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "5": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "6": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {
+        "3": [
+          "amount",
+          "country"
+        ],
+        "4": [
+          "items"
+        ],
+        "6": [
+          "customerEmail",
+          "restrictedItems",
+          "updatedTotal"
+        ]
+      }
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "executed_nodes_readable": [
+      "Webhook",
+      "Detect Country",
+      "Compute Duties and Taxes",
+      "Check Restricted Items",
+      "Update Order Totals",
+      "Notify Customer"
+    ],
+    "name_map": {
+      "1": "Webhook",
+      "2": "Detect Country",
+      "3": "Compute Duties and Taxes",
+      "4": "Check Restricted Items",
+      "5": "Update Order Totals",
+      "6": "Notify Customer"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "2": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "3": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "4": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "5": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "6": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Webhook",
+    "Detect Country",
+    "Compute Duties and Taxes",
+    "Check Restricted Items",
+    "Update Order Totals",
+    "Notify Customer"
+  ]
+}

@@ -1,0 +1,1 @@
+Pollen high -> Slack alert.

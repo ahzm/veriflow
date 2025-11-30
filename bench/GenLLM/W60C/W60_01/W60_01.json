@@ -1,0 +1,125 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ecommerce-compliance"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Detect Country",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { country: $input.item.json.destinationCountry } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Duties and Taxes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/duties-taxes",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "country": "={{$json[\"country\"]}}",
+          "amount": "={{$json[\"amount\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Check Restricted Items",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/restricted-items",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "items": "={{$json[\"items\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Update Order Totals",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const dutiesTaxes = $input.item.json.dutiesTaxes;\nconst restrictedItems = $input.item.json.restrictedItems;\nreturn [{ json: { updatedTotal: $input.item.json.amount + dutiesTaxes, restrictedItems } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify Customer",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"customerEmail\"]}}",
+        "subject": "Your Order Compliance Details",
+        "text": "Your order has been processed. Total amount including duties and taxes: {{$json[\"updatedTotal\"]}}. Restricted items: {{$json[\"restrictedItems\"]}}."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Detect Country",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Country": {
+      "main": [
+        [
+          {
+            "node": "Compute Duties and Taxes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Duties and Taxes": {
+      "main": [
+        [
+          {
+            "node": "Check Restricted Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Restricted Items": {
+      "main": [
+        [
+          {
+            "node": "Update Order Totals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Order Totals": {
+      "main": [
+        [
+          {
+            "node": "Notify Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

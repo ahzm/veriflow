@@ -1,0 +1,1 @@
+Build a workflow that manages global IT asset lifecycle: procurement, assignment, maintenance, and retirement with all system updates.

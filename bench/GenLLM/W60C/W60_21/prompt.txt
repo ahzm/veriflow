@@ -1,0 +1,1 @@
+Design a workflow that coordinates lab equipment booking: avoid conflicts, enforce maintenance blackout windows, notify users of changes, and produce utilization reports.

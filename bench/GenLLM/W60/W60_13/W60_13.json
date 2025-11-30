@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "CO2 Sensor",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.co2sensor.com/hourly"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check CO2 Level",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items[0].json.co2 > 800 ? [{ json: { alert: true } }] : [{ json: { alert: false } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Alert: CO2 level is above 800!"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Schedule CO2 Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule CO2 Check": {
+      "main": [
+        [
+          {
+            "node": "CO2 Sensor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CO2 Sensor": {
+      "main": [
+        [
+          {
+            "node": "Check CO2 Level",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check CO2 Level": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

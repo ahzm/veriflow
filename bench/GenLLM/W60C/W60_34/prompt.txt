@@ -1,0 +1,1 @@
+Define a workflow that automates cross-system user provisioning for large enterprises: HR trigger, IAM system, SaaS tools, and periodic reconciliation.

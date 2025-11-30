@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook Ticket",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Slack Notify",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New ticket received!"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Ticket": {
+      "main": [
+        [
+          {
+            "node": "Slack Notify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

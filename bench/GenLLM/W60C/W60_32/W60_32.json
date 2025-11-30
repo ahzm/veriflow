@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Shoots",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Track Dependencies",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Update Call Sheets",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Daily Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "crew@example.com",
+        "subject": "Daily Production Summary",
+        "text": "Here is the summary of today's production tasks."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Shoots": {
+      "main": [
+        [
+          {
+            "node": "Track Dependencies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Dependencies": {
+      "main": [
+        [
+          {
+            "node": "Update Call Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Call Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Proposal Submission",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proposal"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Create Voting",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { proposalId: $input.item.json.id, status: 'Voting Created' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Voting Period",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Count Votes",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { proposalId: $input.item.json.proposalId, votes: 100, decision: 'Approved' } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Decision Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Proposal Decision",
+        "text": "The proposal has been approved."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Update Changelog",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/changelog",
+        "method": "POST",
+        "json": {
+          "proposalId": "{{$json.proposalId}}",
+          "decision": "{{$json.decision}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Proposal Submission": {
+      "main": [
+        [
+          {
+            "node": "Create Voting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Voting": {
+      "main": [
+        [
+          {
+            "node": "Voting Period",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Voting Period": {
+      "main": [
+        [
+          {
+            "node": "Count Votes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count Votes": {
+      "main": [
+        [
+          {
+            "node": "Send Decision Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Changelog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

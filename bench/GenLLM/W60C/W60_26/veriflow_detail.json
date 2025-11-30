@@ -1,0 +1,326 @@
+{
+  "S": 0.98,
+  "M": 0.9,
+  "E": 0.8,
+  "Overall": 0.89,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.16666666666666669,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 0.3333333333333333,
+    "order": 1.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.75,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": true,
+      "need_conditional_notify": false,
+      "need_db": true,
+      "need_email": false,
+      "need_form": true,
+      "need_http": false,
+      "need_schedule": false,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": false
+    },
+    "intent_chain": [
+      "The workflow involves managing submissions, which implies the need for a database to store drafts and final submissions.",
+      "Collecting drafts and managing revisions suggests the use of forms for submission and feedback.",
+      "Assigning reviewers and checking plagiarism indicates the need for conditional logic to determine the next steps based on submissions."
+    ],
+    "irrelevant_nodes": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "intent_caps": [
+      "condition",
+      "db",
+      "form"
+    ],
+    "intent_edges": [],
+    "missing_capabilities": [
+      "db",
+      "condition"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "db": false,
+        "condition": false,
+        "form": true
+      },
+      "edge_matches": []
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "form->db(optional)",
+        "from": "form",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "1"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "condition",
+        "db",
+        "form"
+      ],
+      "intent_edges": [],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Webhook",
+          "capability": "schedule",
+          "relevant": true
+        },
+        {
+          "id": "2",
+          "label": "Check Plagiarism",
+          "capability": "http",
+          "relevant": false
+        },
+        {
+          "id": "3",
+          "label": "Assign Reviewers",
+          "capability": "transform",
+          "relevant": false
+        },
+        {
+          "id": "4",
+          "label": "Send Review Request",
+          "capability": "http",
+          "relevant": false
+        },
+        {
+          "id": "5",
+          "label": "Manage Revisions",
+          "capability": "transform",
+          "relevant": false
+        },
+        {
+          "id": "6",
+          "label": "Register Final Submission",
+          "capability": "http",
+          "relevant": false
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        },
+        {
+          "source": "4",
+          "target": "5"
+        },
+        {
+          "source": "5",
+          "target": "6"
+        }
+      ],
+      "relevant_nodes": [
+        "1"
+      ],
+      "irrelevant_nodes": [
+        "2",
+        "3",
+        "4",
+        "5",
+        "6"
+      ],
+      "missing_capabilities": [
+        "db",
+        "condition"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 0.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 6
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": true,
+      "required_fields": {
+        "4": [
+          "reviewer"
+        ]
+      },
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "3": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "5": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "6": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {
+        "4": [
+          "reviewer"
+        ]
+      }
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "executed_nodes_readable": [
+      "Webhook",
+      "Check Plagiarism",
+      "Assign Reviewers",
+      "Send Review Request",
+      "Manage Revisions",
+      "Register Final Submission"
+    ],
+    "name_map": {
+      "1": "Webhook",
+      "2": "Check Plagiarism",
+      "3": "Assign Reviewers",
+      "4": "Send Review Request",
+      "5": "Manage Revisions",
+      "6": "Register Final Submission"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "2": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "3": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "4": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      },
+      "5": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "6": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Webhook",
+    "Check Plagiarism",
+    "Assign Reviewers",
+    "Send Review Request",
+    "Manage Revisions",
+    "Register Final Submission"
+  ]
+}

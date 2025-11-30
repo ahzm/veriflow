@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Legal Rest",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.restHours >= 12);"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Optimize Rosters",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { optimizedRoster: item.json.roster } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Handle Swaps",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { swapHandled: true } }));"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Crew Members",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "crew@example.com",
+        "subject": "Crew Schedule Update",
+        "text": "Your schedule has been updated. Please check the roster."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Legal Rest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Legal Rest": {
+      "main": [
+        [
+          {
+            "node": "Optimize Rosters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Optimize Rosters": {
+      "main": [
+        [
+          {
+            "node": "Handle Swaps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Swaps": {
+      "main": [
+        [
+          {
+            "node": "Notify Crew Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

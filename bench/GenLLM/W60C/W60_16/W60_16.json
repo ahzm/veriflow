@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Pull Time Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/time-data"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Currency Conversion",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { item.json.convertedAmount = item.json.amount * conversionRate; return item; });"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Compute Payroll",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => { item.json.payrollAmount = item.json.convertedAmount * hourlyRate; return item; });"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Summary for Approval",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "manager@example.com",
+        "subject": "Payroll Summary for Approval",
+        "text": "Please review the payroll summary attached."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Push Payments",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/payments"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Pull Time Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pull Time Data": {
+      "main": [
+        [
+          {
+            "node": "Currency Conversion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Currency Conversion": {
+      "main": [
+        [
+          {
+            "node": "Compute Payroll",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Payroll": {
+      "main": [
+        [
+          {
+            "node": "Send Summary for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Summary for Approval": {
+      "main": [
+        [
+          {
+            "node": "Push Payments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

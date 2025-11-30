@@ -1,0 +1,1 @@
+Build a workflow that manages public consultation processes: collect feedback, categorize comments, summarize topics, and publish responses.

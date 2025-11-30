@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Capture Drafts",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Plagiarism Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.plagiarismchecker.com/check"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Route to Editors",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new draft is ready for review."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Style Guide Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.styleguidechecker.com/check"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Publication",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Capture Drafts": {
+      "main": [
+        [
+          {
+            "node": "Plagiarism Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plagiarism Check": {
+      "main": [
+        [
+          {
+            "node": "Route to Editors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to Editors": {
+      "main": [
+        [
+          {
+            "node": "Style Guide Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Style Guide Check": {
+      "main": [
+        [
+          {
+            "node": "Schedule Publication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

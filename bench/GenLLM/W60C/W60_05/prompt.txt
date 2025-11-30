@@ -1,0 +1,1 @@
+Construct a workflow that automates multi-stage editorial review: capture drafts, run plagiarism checks, route to editors, enforce style guide checks via NLP API, and schedule publication.

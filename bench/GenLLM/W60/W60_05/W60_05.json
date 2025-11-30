@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "IF Amount Check",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "field": "amount",
+              "operation": "lessThan",
+              "value": 20
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Slack Warn",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Warning: Order amount is less than 20."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "IF Amount Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Amount Check": {
+      "main": [
+        [
+          {
+            "node": "Slack Warn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 7 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Reddit Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://www.reddit.com/r/all/top.json?limit=5"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "example@example.com",
+        "subject": "Top Reddit Posts",
+        "text": "Here are the top Reddit posts:\n{{$json[\"data\"][\"children\"][0][\"data\"][\"title\"]}}\n{{$json[\"data\"][\"children\"][1][\"data\"][\"title\"]}}\n{{$json[\"data\"][\"children\"][2][\"data\"][\"title\"]}}\n{{$json[\"data\"][\"children\"][3][\"data\"][\"title\"]}}\n{{$json[\"data\"][\"children\"][4][\"data\"][\"title\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Reddit Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Reddit Posts": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

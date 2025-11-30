@@ -1,0 +1,124 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Job",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Dispatch Technicians",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/dispatch"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Optimize Routes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/optimize-routes"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Sync Job Statuses",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/sync-statuses"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track SLAs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-slas"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "manager@example.com",
+        "subject": "Field Service Update",
+        "text": "Technicians dispatched and routes optimized."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Slack Update",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Field service operations are in progress."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Job": {
+      "main": [
+        [
+          {
+            "node": "Dispatch Technicians",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dispatch Technicians": {
+      "main": [
+        [
+          {
+            "node": "Optimize Routes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Optimize Routes": {
+      "main": [
+        [
+          {
+            "node": "Sync Job Statuses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sync Job Statuses": {
+      "main": [
+        [
+          {
+            "node": "Track SLAs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track SLAs": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

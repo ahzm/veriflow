@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Onboarding",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Verify License",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.licenseverification.com/verify"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Set Up Clinical Accounts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.clinicalsystems.com/setup"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Configure Access Roles",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.accessroles.com/configure"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Training Schedule",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "provider@example.com",
+        "subject": "Your Training Schedule",
+        "text": "Please find your training schedule attached."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Onboarding": {
+      "main": [
+        [
+          {
+            "node": "Verify License",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify License": {
+      "main": [
+        [
+          {
+            "node": "Set Up Clinical Accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Up Clinical Accounts": {
+      "main": [
+        [
+          {
+            "node": "Configure Access Roles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure Access Roles": {
+      "main": [
+        [
+          {
+            "node": "Send Training Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

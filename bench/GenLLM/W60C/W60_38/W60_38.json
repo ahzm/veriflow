@@ -1,0 +1,87 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blockchain-events"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Apply Rule-Based Alerts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.value > 1000);"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Apply ML-Based Alerts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.mlAlert === true);"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Alert Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alerts@example.com",
+        "subject": "Suspicious Blockchain Activity Detected",
+        "text": "Suspicious patterns have been detected in the blockchain transactions."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Alert: Suspicious blockchain activity detected. Please investigate."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Apply Rule-Based Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Rule-Based Alerts": {
+      "main": [
+        [
+          {
+            "node": "Apply ML-Based Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply ML-Based Alerts": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

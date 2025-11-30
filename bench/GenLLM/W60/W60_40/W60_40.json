@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Timesheet Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Send HR Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "hr@example.com",
+        "subject": "New Timesheet Submission",
+        "text": "A new timesheet has been submitted."
+      }
+    }
+  ],
+  "connections": {
+    "Timesheet Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send HR Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

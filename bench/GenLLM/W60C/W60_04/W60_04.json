@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Evaluate Historical Demand",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Compute Transfer Suggestions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Create Transfer Orders",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.wms.example.com/createTransferOrder"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Logistics Teams",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Transfer orders have been created based on the latest inventory re-balance."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Historical Demand",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Historical Demand": {
+      "main": [
+        [
+          {
+            "node": "Compute Transfer Suggestions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Transfer Suggestions": {
+      "main": [
+        [
+          {
+            "node": "Create Transfer Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Transfer Orders": {
+      "main": [
+        [
+          {
+            "node": "Notify Logistics Teams",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

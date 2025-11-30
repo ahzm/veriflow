@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Dataset Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Profile Dataset",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/profile-dataset"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Suggest Metadata Fields",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/suggest-metadata"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Request Owner Confirmation",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "owner@example.com",
+        "subject": "Dataset Confirmation Required",
+        "text": "Please confirm the metadata fields for the new dataset."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Publish to Catalog",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/publish-catalog"
+      }
+    }
+  ],
+  "connections": {
+    "Dataset Trigger": {
+      "main": [
+        [
+          {
+            "node": "Profile Dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Profile Dataset": {
+      "main": [
+        [
+          {
+            "node": "Suggest Metadata Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Suggest Metadata Fields": {
+      "main": [
+        [
+          {
+            "node": "Request Owner Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Owner Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Publish to Catalog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

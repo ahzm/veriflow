@@ -1,0 +1,121 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Categorize Severity",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const severity = items[0].json.severity;\nif (severity === 'high') {\n  return [{ json: { category: 'Critical' } }];\n} else if (severity === 'medium') {\n  return [{ json: { category: 'Moderate' } }];\n} else {\n  return [{ json: { category: 'Low' } }];\n}"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Teams",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new incident has been reported with severity: {{$json[\"category\"]}}."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Corrective Actions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/corrective-actions",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "incidentId": "={{$json[\"id\"]}}",
+          "actions": "={{$json[\"correctiveActions\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Monthly Stats",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 1 * *"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { report: 'Monthly safety incident report generated.' } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Categorize Severity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize Severity": {
+      "main": [
+        [
+          {
+            "node": "Notify Teams",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Track Corrective Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Teams": {
+      "main": [
+        [
+          {
+            "node": "Track Corrective Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Corrective Actions": {
+      "main": [
+        [
+          {
+            "node": "Monthly Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monthly Stats": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "NLP Tagging",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // NLP tagging logic here\n    item.json.tags = ['tag1', 'tag2'];\n    return item;\n});"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Route to Domain Experts",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New idea submitted: {{$json[\"idea\"]}}. Please review and provide feedback."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Decisions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-decisions",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "idea": "{{$json[\"idea\"]}}",
+          "decision": "{{$json[\"decision\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Quarterly Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { report: 'Quarterly Innovation Report' } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Report Generation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 1 * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "NLP Tagging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NLP Tagging": {
+      "main": [
+        [
+          {
+            "node": "Route to Domain Experts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route to Domain Experts": {
+      "main": [
+        [
+          {
+            "node": "Track Decisions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Decisions": {
+      "main": [
+        [
+          {
+            "node": "Generate Quarterly Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Quarterly Report": {
+      "main": [
+        [
+          {
+            "node": "Schedule Report Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

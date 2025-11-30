@@ -1,0 +1,1 @@
+Define a workflow that automates energy market bidding: forecast demand, generate bids, submit to market APIs, and reconcile outcomes.

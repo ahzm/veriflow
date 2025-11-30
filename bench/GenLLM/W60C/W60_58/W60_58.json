@@ -1,0 +1,93 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "public-consultation"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Feedback",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Categorize Comments",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { category: item.json.comment.includes('urgent') ? 'Urgent' : 'General' } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Summarize Topics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const summary = {}; items.forEach(item => { const category = item.json.category; summary[category] = (summary[category] || 0) + 1; }); return [{ json: summary }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Publish Responses",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "feedback@example.com",
+        "subject": "Public Consultation Summary",
+        "text": "Here is the summary of the feedback received."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Collect Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Feedback": {
+      "main": [
+        [
+          {
+            "node": "Categorize Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize Comments": {
+      "main": [
+        [
+          {
+            "node": "Summarize Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize Topics": {
+      "main": [
+        [
+          {
+            "node": "Publish Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

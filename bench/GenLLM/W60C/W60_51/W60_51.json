@@ -1,0 +1,125 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "real-estate-transactions"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Track Offers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { offer: 'New Offer Received' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Contingencies",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { contingency: 'New Contingency Added' } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Inspections",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { inspection: 'New Inspection Scheduled' } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Closings",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { closing: 'Closing Date Set' } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email Notifications",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "parties@example.com",
+        "subject": "Real Estate Transaction Update",
+        "text": "There has been an update on the real estate transaction."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New update on real estate transaction!"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Track Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Offers": {
+      "main": [
+        [
+          {
+            "node": "Track Contingencies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Contingencies": {
+      "main": [
+        [
+          {
+            "node": "Track Inspections",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Inspections": {
+      "main": [
+        [
+          {
+            "node": "Track Closings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Closings": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notifications",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

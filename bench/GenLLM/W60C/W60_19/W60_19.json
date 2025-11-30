@@ -1,0 +1,97 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "project-updates"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Compare Progress",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const updates = items[0].json;\nconst plan = { /* predefined project plan */ };\nconst delays = [];\n\n// Logic to compare updates against the plan\nif (updates.progress < plan.expectedProgress) {\n    delays.push('Delay detected in project progress.');\n}\n\nreturn [{ json: { delays } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Flag Delays",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json[\"delays\"].length}}",
+              "operation": "greaterThan",
+              "value2": 0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "Project Delay Notification",
+        "text": "Delays have been detected in the project progress. Please check the updates."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Attention: Project delays have been flagged. Please review the latest updates."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Compare Progress",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare Progress": {
+      "main": [
+        [
+          {
+            "node": "Flag Delays",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flag Delays": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

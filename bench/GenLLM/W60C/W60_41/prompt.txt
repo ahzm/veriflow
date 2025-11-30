@@ -1,0 +1,1 @@
+Design a workflow that manages art exhibition logistics: track artwork shipments, condition reports, insurance coverage, and installation timelines.

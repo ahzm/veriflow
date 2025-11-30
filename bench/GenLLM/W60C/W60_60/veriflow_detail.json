@@ -1,0 +1,355 @@
+{
+  "S": 0.98,
+  "M": 0.75,
+  "E": 1.0,
+  "Overall": 0.91,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.14285714285714285,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 0.0,
+    "order": 1.0,
+    "conditional": 0.35,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.875,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": false,
+      "need_conditional_notify": false,
+      "need_db": false,
+      "need_email": false,
+      "need_form": false,
+      "need_http": false,
+      "need_schedule": true,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": true
+    },
+    "intent_chain": [
+      "rule: matched schedule keywords or English time pattern",
+      "rule: matched need_transform keywords",
+      "The workflow involves scheduling health checks, indicating a need for scheduling.",
+      "The process of coordinating multi-stage resettlement suggests the need for transformation of data or processes.",
+      "No explicit mention of email, HTTP, Slack, Telegram, database, form, condition, or conditional notifications was found."
+    ],
+    "irrelevant_nodes": [
+      "1",
+      "2",
+      "4",
+      "5",
+      "6"
+    ],
+    "intent_caps": [
+      "schedule",
+      "transform"
+    ],
+    "intent_edges": [],
+    "missing_capabilities": [
+      "transform"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "transform": false,
+        "schedule": true
+      },
+      "edge_matches": []
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "support_transform_required",
+        "from": "intent",
+        "to": "transform",
+        "applicable": true,
+        "ok": false,
+        "sources": [],
+        "targets": [],
+        "path": [],
+        "note": "transform requested but missing; support score forced to 0"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      },
+      {
+        "rule": "extra_conditional_notify",
+        "from": "condition",
+        "to": "action",
+        "applicable": true,
+        "ok": false,
+        "sources": [
+          "6"
+        ],
+        "targets": [
+          "6"
+        ],
+        "path": [
+          "6"
+        ],
+        "note": "workflow has conditional notify but intent does not require it"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "schedule",
+        "transform"
+      ],
+      "intent_edges": [],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Intake Cases",
+          "capability": "http",
+          "relevant": false
+        },
+        {
+          "id": "2",
+          "label": "Match Housing",
+          "capability": "http",
+          "relevant": false
+        },
+        {
+          "id": "3",
+          "label": "Schedule Health Checks",
+          "capability": "schedule",
+          "relevant": true
+        },
+        {
+          "id": "4",
+          "label": "Arrange Schooling",
+          "capability": "http",
+          "relevant": false
+        },
+        {
+          "id": "5",
+          "label": "Track Integration Milestones",
+          "capability": "http",
+          "relevant": false
+        },
+        {
+          "id": "6",
+          "label": "Send Notification",
+          "capability": "email",
+          "relevant": false
+        },
+        {
+          "id": "7",
+          "label": "Schedule Workflow",
+          "capability": "schedule",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        },
+        {
+          "source": "4",
+          "target": "5"
+        },
+        {
+          "source": "5",
+          "target": "6"
+        },
+        {
+          "source": "7",
+          "target": "1"
+        }
+      ],
+      "relevant_nodes": [
+        "3",
+        "7"
+      ],
+      "irrelevant_nodes": [
+        "1",
+        "2",
+        "4",
+        "5",
+        "6"
+      ],
+      "missing_capabilities": [
+        "transform"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 1.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 7
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": false,
+      "required_fields": {},
+      "available_fields": {
+        "7": [
+          "timestamp"
+        ],
+        "1": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "2": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "3": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "5": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "6": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {}
+    },
+    "executed_nodes": [
+      "7",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "executed_nodes_readable": [
+      "Schedule Workflow",
+      "Intake Cases",
+      "Match Housing",
+      "Schedule Health Checks",
+      "Arrange Schooling",
+      "Track Integration Milestones",
+      "Send Notification"
+    ],
+    "name_map": {
+      "1": "Intake Cases",
+      "2": "Match Housing",
+      "3": "Schedule Health Checks",
+      "4": "Arrange Schooling",
+      "5": "Track Integration Milestones",
+      "6": "Send Notification",
+      "7": "Schedule Workflow"
+    },
+    "node_results": {
+      "7": {
+        "ok": true,
+        "msg": "cron ok"
+      },
+      "1": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "2": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "3": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "4": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "5": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "6": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Schedule Workflow",
+    "Intake Cases",
+    "Match Housing",
+    "Schedule Health Checks",
+    "Arrange Schooling",
+    "Track Integration Milestones",
+    "Send Notification"
+  ]
+}

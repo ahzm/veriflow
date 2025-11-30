@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Inventory Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Inventory",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/inventory"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Prioritize Regions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.priority === 'high');"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Coordinate Deliveries",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Deliveries coordinated for prioritized regions."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Report Impact Metrics",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "report@example.com",
+        "subject": "Impact Metrics Report",
+        "text": "The impact metrics have been compiled and are ready for review."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Inventory Check": {
+      "main": [
+        [
+          {
+            "node": "Check Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Inventory": {
+      "main": [
+        [
+          {
+            "node": "Prioritize Regions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prioritize Regions": {
+      "main": [
+        [
+          {
+            "node": "Coordinate Deliveries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coordinate Deliveries": {
+      "main": [
+        [
+          {
+            "node": "Report Impact Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Create a workflow that manages climate data pipelines: fetch satellite data, run preprocessing, store in a geospatial database, and trigger downstream analysis jobs.

@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request Flight Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/flightdata"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Points",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    item.json.points = item.json.flightMiles * 1.5; // Example calculation\n    return item;\n});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Adjust Tiers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    if (item.json.points > 1000) {\n        item.json.tier = 'Gold';\n    } else if (item.json.points > 500) {\n        item.json.tier = 'Silver';\n    } else {\n        item.json.tier = 'Bronze';\n    }\n    return item;\n});"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "loyalty@example.com",
+        "subject": "Loyalty Tier Update",
+        "text": "Your loyalty tier has been recalculated based on your recent flights."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Loyalty tiers have been recalculated successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Flight Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Flight Data": {
+      "main": [
+        [
+          {
+            "node": "Compute Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Points": {
+      "main": [
+        [
+          {
+            "node": "Adjust Tiers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adjust Tiers": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

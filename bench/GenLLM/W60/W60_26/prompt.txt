@@ -1,0 +1,1 @@
+Latency > 500ms -> Slack.

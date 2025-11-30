@@ -1,0 +1,130 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Intake Cases",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.refugeeresettlement.org/intake"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Match Housing",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.refugeeresettlement.org/match-housing"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Schedule Health Checks",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.refugeeresettlement.org/schedule-health-checks"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Arrange Schooling",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.refugeeresettlement.org/arrange-schooling"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Integration Milestones",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.refugeeresettlement.org/track-integration"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "caseworker@example.com",
+        "subject": "Refugee Resettlement Update",
+        "text": "The resettlement process has been updated."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Schedule Workflow",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Workflow": {
+      "main": [
+        [
+          {
+            "node": "Intake Cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intake Cases": {
+      "main": [
+        [
+          {
+            "node": "Match Housing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Housing": {
+      "main": [
+        [
+          {
+            "node": "Schedule Health Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Health Checks": {
+      "main": [
+        [
+          {
+            "node": "Arrange Schooling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Arrange Schooling": {
+      "main": [
+        [
+          {
+            "node": "Track Integration Milestones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Integration Milestones": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

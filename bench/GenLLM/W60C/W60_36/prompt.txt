@@ -1,0 +1,1 @@
+Design a workflow that manages e-learning content QA: check metadata, run accessibility scans, collect reviewer feedback, and publish only approved content.

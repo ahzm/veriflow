@@ -1,0 +1,1 @@
+Define a workflow that automates cross-border payroll tax filings: compute liabilities, generate filings, submit via APIs where possible, and store receipts.

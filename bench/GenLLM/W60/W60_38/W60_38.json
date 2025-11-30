@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check ETH Gas Fee",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=YourApiKey"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "ETH gas fee is below 20 gwei!"
+      }
+    }
+  ],
+  "connections": {
+    "Check ETH Gas Fee": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

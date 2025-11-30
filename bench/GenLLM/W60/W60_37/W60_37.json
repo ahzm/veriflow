@@ -1,0 +1,33 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook Signup",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Onboarding Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "newuser@example.com",
+        "subject": "Welcome to Our Service!",
+        "text": "Thank you for signing up. We're excited to have you on board!"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Signup": {
+      "main": [
+        [
+          {
+            "node": "Onboarding Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

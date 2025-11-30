@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Updates",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Updates",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.ngo.org/updates"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validate Indicators",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Aggregate by Region",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Report to Donors",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "donors@example.com",
+        "subject": "Monthly Project Update",
+        "text": "Please find attached the aggregated report for the month."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Updates": {
+      "main": [
+        [
+          {
+            "node": "Collect Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Updates": {
+      "main": [
+        [
+          {
+            "node": "Validate Indicators",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Indicators": {
+      "main": [
+        [
+          {
+            "node": "Aggregate by Region",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate by Region": {
+      "main": [
+        [
+          {
+            "node": "Report to Donors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

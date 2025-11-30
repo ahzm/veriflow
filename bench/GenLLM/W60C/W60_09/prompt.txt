@@ -1,0 +1,1 @@
+Define a workflow that handles insurance underwriting: collect application data, call risk models via HTTP, request additional info for borderline cases, and issue quotes.

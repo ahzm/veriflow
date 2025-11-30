@@ -1,0 +1,1 @@
+Build a workflow that manages crypto transaction monitoring: ingest blockchain events, apply rule-based and ML-based alerts, and escalate suspicious patterns.

@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Ingest FAQs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/faqs"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Translate FAQs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.translation.com/translate"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Generate Training Pairs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Push to Chatbot Platform",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.chatbotplatform.com/train"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Evaluate Performance",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.chatbotplatform.com/evaluate"
+      }
+    }
+  ],
+  "connections": {
+    "Ingest FAQs": {
+      "main": [
+        [
+          {
+            "node": "Translate FAQs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate FAQs": {
+      "main": [
+        [
+          {
+            "node": "Generate Training Pairs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Training Pairs": {
+      "main": [
+        [
+          {
+            "node": "Push to Chatbot Platform",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push to Chatbot Platform": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Collect Preferences",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Run Allocation Algorithm",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/allocation"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Notify Students",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "student@example.com",
+        "subject": "Course Allocation Results",
+        "text": "Your course allocation has been processed."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Update Enrollment Systems",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/enrollment/update"
+      }
+    }
+  ],
+  "connections": {
+    "Collect Preferences": {
+      "main": [
+        [
+          {
+            "node": "Run Allocation Algorithm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Allocation Algorithm": {
+      "main": [
+        [
+          {
+            "node": "Notify Students",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Enrollment Systems",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Scanning",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Scan Documents",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/scan"
+      }
+    },
+    {
+      "id": "3",
+      "name": "OCR Documents",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/ocr"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Validate Outputs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Publish to Library System",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/publish"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Scanning": {
+      "main": [
+        [
+          {
+            "node": "Scan Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scan Documents": {
+      "main": [
+        [
+          {
+            "node": "OCR Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR Documents": {
+      "main": [
+        [
+          {
+            "node": "Validate Outputs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Outputs": {
+      "main": [
+        [
+          {
+            "node": "Publish to Library System",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Design a workflow that manages NGO field project reporting: collect periodic updates, validate indicators, aggregate by region, and report to donors.

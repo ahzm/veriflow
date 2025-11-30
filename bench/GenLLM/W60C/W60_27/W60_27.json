@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Detect Data Drift",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/detect-drift"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Prepare Training Datasets",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/prepare-datasets"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Trigger Training Jobs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/trigger-training"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Evaluate Models",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/evaluate-models"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Deploy Model",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/deploy-model"
+      }
+    }
+  ],
+  "connections": {
+    "Detect Data Drift": {
+      "main": [
+        [
+          {
+            "node": "Prepare Training Datasets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Training Datasets": {
+      "main": [
+        [
+          {
+            "node": "Trigger Training Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Training Jobs": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Models",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Models": {
+      "main": [
+        [
+          {
+            "node": "Deploy Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Launch",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Synchronize Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/synchronize-content"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Update Pricing",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/update-pricing"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Coordinate Announcements",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Product launch is happening! Please check the updates."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Capture Launch KPIs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/capture-kpis"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Launch": {
+      "main": [
+        [
+          {
+            "node": "Synchronize Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synchronize Content": {
+      "main": [
+        [
+          {
+            "node": "Update Pricing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Pricing": {
+      "main": [
+        [
+          {
+            "node": "Coordinate Announcements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coordinate Announcements": {
+      "main": [
+        [
+          {
+            "node": "Capture Launch KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
