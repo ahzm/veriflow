@@ -1,0 +1,1 @@
+Every 30 minutes, call an API to get website uptime status. If the “status” field equals “down”, email the admin team.

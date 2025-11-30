@@ -1,0 +1,130 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "CRM Trigger",
+      "type": "n8n-nodes-base.cron",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Create Account Tool 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.tool1.com/createAccount"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Create Account Tool 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.tool2.com/createAccount"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Create Account Tool 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.tool3.com/createAccount"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "newcustomer@example.com",
+        "subject": "Welcome to Our Service!",
+        "text": "Thank you for signing up! We're excited to have you on board."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Follow-Up Meeting",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.calendar.com/scheduleMeeting"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Log Onboarding Step",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.logging.com/log"
+      }
+    }
+  ],
+  "connections": {
+    "CRM Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create Account Tool 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Account Tool 1": {
+      "main": [
+        [
+          {
+            "node": "Create Account Tool 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Account Tool 2": {
+      "main": [
+        [
+          {
+            "node": "Create Account Tool 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Account Tool 3": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Schedule Follow-Up Meeting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Follow-Up Meeting": {
+      "main": [
+        [
+          {
+            "node": "Log Onboarding Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

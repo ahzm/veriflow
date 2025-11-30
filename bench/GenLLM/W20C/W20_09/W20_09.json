@@ -1,0 +1,121 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Watch Shared Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "parameters": {
+        "operation": "watch",
+        "resource": "file",
+        "fileType": "csv"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate CSV",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const schemaValid = true; // Add schema validation logic here\nconst sizeValid = true; // Add size validation logic here\nif (!schemaValid || !sizeValid) {\n  throw new Error('Validation failed');\n}\nreturn items;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Split CSV",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const chunkSize = 1000; // Define chunk size\nconst chunks = []; // Logic to split CSV into chunks\nreturn chunks.map(chunk => ({ json: { chunk } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Upload to Data Warehouse",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://data-warehouse.example.com/upload",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "data": "={{$json[\"chunk\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Archive Original CSV",
+      "type": "n8n-nodes-base.googleDrive",
+      "parameters": {
+        "operation": "move",
+        "resource": "file",
+        "destinationId": "archive-folder-id"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "CSV Processing Status",
+        "text": "The CSV file has been processed. You can access the datasets here: [link to datasets]"
+      }
+    }
+  ],
+  "connections": {
+    "Watch Shared Drive": {
+      "main": [
+        [
+          {
+            "node": "Validate CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate CSV": {
+      "main": [
+        [
+          {
+            "node": "Split CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split CSV": {
+      "main": [
+        [
+          {
+            "node": "Upload to Data Warehouse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Data Warehouse": {
+      "main": [
+        [
+          {
+            "node": "Archive Original CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Archive Original CSV": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

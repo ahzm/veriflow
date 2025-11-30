@@ -1,0 +1,1 @@
+Fetch daily AQI (air quality index) at 6am. If AQI > 120, send a Slack message recommending mask usage.

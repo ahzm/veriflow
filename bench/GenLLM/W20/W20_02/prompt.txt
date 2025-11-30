@@ -1,0 +1,1 @@
+When a webhook receives a JSON object with a customer email, send them a welcome message and log the payload via an HTTP Request.

@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "timesheet"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Project Codes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://internal-api.example.com/validate-project",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "projectCode": "={{$json[\"projectCode\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Overtime",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const hoursWorked = $json.hoursWorked;\nconst regularHours = 40;\nconst overtimeHours = hoursWorked > regularHours ? hoursWorked - regularHours : 0;\nreturn { overtimeHours };"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Update Payroll Spreadsheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "operation": "update",
+        "sheetId": "your_sheet_id",
+        "range": "A1",
+        "valueInputMode": "USER_ENTERED",
+        "data": [
+          {
+            "range": "Sheet1!A1",
+            "values": [
+              [
+                "={{$json[\"employeeId\"]}}",
+                "={{$json[\"overtimeHours\"]}}"
+              ]
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Discrepancy Alert to HR",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "hr@example.com",
+        "subject": "Timesheet Discrepancy Alert",
+        "text": "There is a discrepancy in the timesheet submitted by {{$json[\"employeeId\"]}}."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Discrepancy Alert to Employee",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"employeeEmail\"]}}",
+        "subject": "Timesheet Discrepancy Alert",
+        "text": "Dear {{$json[\"employeeName\"]}}, there is a discrepancy in your submitted timesheet."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Project Codes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Project Codes": {
+      "main": [
+        [
+          {
+            "node": "Compute Overtime",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Overtime": {
+      "main": [
+        [
+          {
+            "node": "Update Payroll Spreadsheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Discrepancy Alert to HR",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Discrepancy Alert to Employee",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

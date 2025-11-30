@@ -1,0 +1,1 @@
+Trigger every morning at 8am, fetch today’s weather from an API, and send me an email summarizing temperature and rain probability.

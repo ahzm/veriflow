@@ -1,0 +1,146 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "GitHub Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "github-webhook"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Filter Pull Request Events",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "field": "event_type",
+              "operation": "equal",
+              "value": "pull_request"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Static Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.staticanalysis.com/analyze",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParameters": {
+          "repository": "={{$json[\"repository\"][\"full_name\"]}}",
+          "pull_request": "={{$json[\"pull_request\"][\"number\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Post Comment to GitHub",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.github.com/repos/{{$json[\"repository\"][\"full_name\"]}}/issues/{{$json[\"pull_request\"][\"number\"]}}/comments",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParameters": {
+          "body": "Static analysis results: {{$json[\"analysis_results\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Update Notion Page",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.notion.com/v1/pages/{{$json[\"notion_page_id\"]}}",
+        "method": "PATCH",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParameters": {
+          "properties": {
+            "Summary": {
+              "rich_text": [
+                {
+                  "text": {
+                    "content": "Pull request #{{$json[\"pull_request\"][\"number\"]}} analysis completed."
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Summary to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Pull request #{{$json[\"pull_request\"][\"number\"]}} has been analyzed. Results: {{$json[\"analysis_results\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "GitHub Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter Pull Request Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Pull Request Events": {
+      "main": [
+        [
+          {
+            "node": "Static Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Static Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Static Analysis": {
+      "main": [
+        [
+          {
+            "node": "Post Comment to GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Notion Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Summary to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

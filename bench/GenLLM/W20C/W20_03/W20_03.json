@@ -1,0 +1,133 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "iot-sensor-alerts"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.alert !== undefined && item.json.deviceId !== undefined);"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Deduplicate Alerts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const deduplicated = new Map();\nitems.forEach(item => {\n    const key = item.json.deviceId + item.json.alert;\n    if (!deduplicated.has(key)) {\n        deduplicated.set(key, item);\n    }\n});\nreturn Array.from(deduplicated.values());"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Store in Database",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "alerts",
+        "columns": {
+          "deviceId": "={{$json[\"deviceId\"]}}",
+          "alert": "={{$json[\"alert\"]}}",
+          "timestamp": "={{$json[\"timestamp\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Teams Notification",
+      "type": "n8n-nodes-base.microsoftTeams",
+      "parameters": {
+        "text": "Grouped alerts received from IoT sensors."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Open Incident in ServiceNow",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your-instance.service-now.com/api/now/table/incident",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "short_description": "Critical alert from device {{$json[\"deviceId\"]}}",
+          "description": "Alert details: {{$json[\"alert\"]}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate Alerts": {
+      "main": [
+        [
+          {
+            "node": "Store in Database",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Teams Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Open Incident in ServiceNow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Database": {
+      "main": [
+        [
+          {
+            "node": "Send Teams Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Teams Notification": {
+      "main": [
+        [
+          {
+            "node": "Open Incident in ServiceNow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 12 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch GitHub Trending",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.github.com/trending/repositories"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Email Top Repositories",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "your_email@example.com",
+        "subject": "Top 3 Trending GitHub Repositories",
+        "text": "Here are the top 3 trending repositories:\n\n{{ $json[\"repositories\"] }}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch GitHub Trending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch GitHub Trending": {
+      "main": [
+        [
+          {
+            "node": "Email Top Repositories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check New Orders",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get New Orders",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.ecommerce.com/orders?status=paid"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check Inventory",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.erp.com/inventory"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Split Orders",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "Order Confirmation",
+        "text": "Your order has been confirmed and will be shipped soon."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Log Audit Trail",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Check New Orders": {
+      "main": [
+        [
+          {
+            "node": "Get New Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get New Orders": {
+      "main": [
+        [
+          {
+            "node": "Check Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Inventory": {
+      "main": [
+        [
+          {
+            "node": "Split Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Orders": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Audit Trail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

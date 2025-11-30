@@ -1,0 +1,1 @@
+Create a workflow that runs every hour, pulls sales data from a REST API, enriches it with currency rates from another API, aggregates KPIs per region, writes daily snapshots to a database, and emails a summary report only if anomalies are detected.

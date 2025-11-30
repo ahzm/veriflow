@@ -1,0 +1,123 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/api/new-post",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Article Metadata",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/api/article/{{ $json[\"id\"] }}",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Generate Teaser",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return { teaser: `Check out our new post: ${items[0].json.title}` };"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Schedule Twitter Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-twitter.com/api/schedule",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule LinkedIn Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-linkedin.com/api/schedule",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Upload Image to CDN",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-cdn.com/api/upload",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Approval Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "marketing@example.com",
+        "subject": "Approval Needed for New Blog Post",
+        "text": "Please review the new blog post for approval."
+      }
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Fetch Article Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Article Metadata": {
+      "main": [
+        [
+          {
+            "node": "Generate Teaser",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Teaser": {
+      "main": [
+        [
+          {
+            "node": "Schedule Twitter Post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Schedule LinkedIn Post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload Image to CDN",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Approval Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

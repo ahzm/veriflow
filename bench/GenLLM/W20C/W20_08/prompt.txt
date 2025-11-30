@@ -1,0 +1,1 @@
+Construct a workflow that synchronizes contacts between HubSpot and Salesforce: detects changes in either system, resolves conflicts using recency rules, writes back updates to both platforms, and sends a weekly reconciliation report with discrepancies.

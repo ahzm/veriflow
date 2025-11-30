@@ -1,0 +1,1 @@
+When receiving a webhook containing “temperature”, if temperature < 5°C, send a Slack message advising to turn on heating.

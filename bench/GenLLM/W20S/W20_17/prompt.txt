@@ -1,0 +1,1 @@
+Define a workflow that coordinates a newsletter campaign: on manual trigger, read a set of subscriber segments from a configuration node, fetch the latest blog posts and product updates from two different HTTP APIs, assemble customized newsletter content per segment, send emails in batches, and log delivery results into a tracking table.

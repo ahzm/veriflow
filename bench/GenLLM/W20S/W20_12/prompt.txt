@@ -1,0 +1,1 @@
+Create a workflow that reacts to new support tickets created via webhook, categorizes tickets based on keywords in the subject and body, assigns priority levels, posts high-priority tickets to a "support-escalation" Slack channel, calls a mock "knowledge base search" API to retrieve three suggested articles, and sends an email to the user with links to those articles.

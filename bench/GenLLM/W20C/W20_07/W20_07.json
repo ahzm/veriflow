@@ -1,0 +1,93 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Normalize Payload",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Normalize the payload\n    return { json: { deviceId: item.json.deviceId, value: item.json.value } };\n});"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Aggregate Metrics",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const metrics = {};\nitems.forEach(item => {\n    const deviceId = item.json.deviceId;\n    const value = item.json.value;\n    if (!metrics[deviceId]) {\n        metrics[deviceId] = { count: 0, sum: 0 };\n    }\n    metrics[deviceId].count++;\n    metrics[deviceId].sum += value;\n});\nreturn Object.keys(metrics).map(deviceId => ({ json: { deviceId, average: metrics[deviceId].sum / metrics[deviceId].count } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Push to Time-Series DB",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/api/metrics",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "deviceId": "={{$json[\"deviceId\"]}}",
+          "average": "={{$json[\"average\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Email Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alert@example.com",
+        "subject": "Threshold Exceeded Alert",
+        "text": "The metrics for device {{$json[\"deviceId\"]}} have exceeded the threshold."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Payload": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Metrics": {
+      "main": [
+        [
+          {
+            "node": "Push to Time-Series DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

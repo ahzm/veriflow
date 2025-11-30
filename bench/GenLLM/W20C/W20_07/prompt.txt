@@ -1,0 +1,1 @@
+Build a workflow that consumes messages from an MQTT broker via webhook, normalizes the payloads, aggregates metrics per device over 5-minute tumbling windows, pushes metrics to a time-series database, and alerts via email when thresholds are exceeded.

@@ -1,0 +1,1 @@
+Build a workflow that listens to a webhook with IoT sensor alerts, validates payload schemas, deduplicates alerts within a 10-minute window, stores them in a database, sends grouped notifications to Teams, and opens incidents in ServiceNow for critical devices.

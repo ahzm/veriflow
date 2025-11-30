@@ -1,0 +1,100 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request License Usage",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mockapi.com/license-usage"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Calculate Remaining Quota",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const usageData = items[0].json;\nconst departments = usageData.departments;\nconst results = departments.map(department => {\n    const remainingQuota = department.licensedLimit - department.currentUsage;\n    return {\n        department: department.name,\n        remainingQuota: remainingQuota,\n        usagePercentage: (department.currentUsage / department.licensedLimit) * 100\n    };\n});\nreturn results.map(result => ({ json: result }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Database Write",
+      "type": "n8n-nodes-base.database",
+      "parameters": {
+        "operation": "insert",
+        "table": "license_reports",
+        "data": {
+          "department": "={{$json[\"department\"]}}",
+          "remainingQuota": "={{$json[\"remainingQuota\"]}}",
+          "usagePercentage": "={{$json[\"usagePercentage\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "department_heads@example.com",
+        "subject": "License Usage Alert",
+        "text": "Usage has exceeded 80% of the quota for your department."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request License Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request License Usage": {
+      "main": [
+        [
+          {
+            "node": "Calculate Remaining Quota",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Remaining Quota": {
+      "main": [
+        [
+          {
+            "node": "Database Write",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Database Write": {
+      "main": []
+    },
+    "Send Email Notification": {
+      "main": []
+    }
+  }
+}

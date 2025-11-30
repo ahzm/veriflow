@@ -1,0 +1,150 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "merged-pull-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Repository Metadata",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.gitservice.com/repo/metadata",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Lookup Author and Reviewers",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://internal-directory-api.com/users",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Merged PR Summary: {{ $json[\"summary\"] }}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Increment Developer Score",
+      "type": "n8n-nodes-base.mockDatabase",
+      "parameters": {
+        "operation": "increment",
+        "field": "developerScore"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Weekly Digest Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "engineering@company.com",
+        "subject": "Weekly Digest of Merged PRs",
+        "text": "This week's merged PRs: {{ $json[\"mergedPRs\"] }}"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Schedule Weekly Digest",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 0"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch Repository Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Repository Metadata": {
+      "main": [
+        [
+          {
+            "node": "Lookup Author and Reviewers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Author and Reviewers": {
+      "main": [
+        [
+          {
+            "node": "Post to Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Increment Developer Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Slack": {
+      "main": [
+        [
+          {
+            "node": "Send Weekly Digest Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increment Developer Score": {
+      "main": [
+        [
+          {
+            "node": "Send Weekly Digest Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Weekly Digest Email": {
+      "main": [
+        [
+          {
+            "node": "Schedule Weekly Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Weekly Digest": {
+      "main": [
+        [
+          {
+            "node": "Send Weekly Digest Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

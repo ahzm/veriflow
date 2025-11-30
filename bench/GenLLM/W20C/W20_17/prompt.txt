@@ -1,0 +1,1 @@
+Build a workflow that receives product feedback from multiple channels (webhook, email parsing), normalizes and tags feedback with an NLP API, pushes structured items into a backlog tool, and sends weekly summaries with trend graphs via email.

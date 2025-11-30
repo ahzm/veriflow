@@ -1,0 +1,1 @@
+Design a workflow that monitors an e-commerce order database for newly paid orders, checks inventory in an external ERP via REST, splits orders into multiple shipments when necessary, sends confirmation emails, and logs all decisions in an audit trail sheet.

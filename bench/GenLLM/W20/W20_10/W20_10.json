@@ -1,0 +1,76 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Set Email List",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          {
+            "name": "emailList",
+            "value": "={{$json[\"body\"][\"emails\"]}}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3",
+      "name": "Split Email List",
+      "type": "n8n-nodes-base.splitInBatches",
+      "parameters": {
+        "batchSize": 1
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"emailList\"]}}",
+        "subject": "Notification",
+        "text": "This is a short notification email."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Set Email List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Email List": {
+      "main": [
+        [
+          {
+            "node": "Split Email List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Email List": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

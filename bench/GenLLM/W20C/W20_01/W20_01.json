@@ -1,0 +1,127 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check Mailbox",
+      "type": "n8n-nodes-base.emailReadImap",
+      "parameters": {
+        "email": "support@example.com",
+        "password": "yourpassword",
+        "folder": "INBOX",
+        "pollingInterval": 5
+      }
+    },
+    {
+      "id": "2",
+      "name": "Extract Metadata",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    return {\n        json: {\n            subject: item.json.subject,\n            from: item.json.from,\n            body: item.json.body\n        }\n    };\n});"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Classify Urgency",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/classify",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "text": "={{$json[\"body\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New high-priority ticket from {{$json[\"from\"]}}: {{$json[\"subject\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create Jira Issue",
+      "type": "n8n-nodes-base.jira",
+      "parameters": {
+        "project": "SUPPORT",
+        "summary": "={{$json[\"subject\"]}}",
+        "description": "={{$json[\"body\"]}}",
+        "issueType": "Task"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Update Jira Status",
+      "type": "n8n-nodes-base.jira",
+      "parameters": {
+        "issueId": "={{$json[\"id\"]}}",
+        "status": "In Progress"
+      }
+    }
+  ],
+  "connections": {
+    "Check Mailbox": {
+      "main": [
+        [
+          {
+            "node": "Extract Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Metadata": {
+      "main": [
+        [
+          {
+            "node": "Classify Urgency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Urgency": {
+      "main": [
+        [
+          {
+            "node": "Send to Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create Jira Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Slack": {
+      "main": [
+        [
+          {
+            "node": "Update Jira Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Jira Issue": {
+      "main": [
+        [
+          {
+            "node": "Update Jira Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

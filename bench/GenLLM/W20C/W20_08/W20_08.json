@@ -1,0 +1,135 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 0"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get HubSpot Contacts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.hubapi.com/contacts/v1/lists/all/contacts/all"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Get Salesforce Contacts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://yourinstance.salesforce.com/services/data/vXX.X/sobjects/Contact/"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Resolve Conflicts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Update HubSpot Contacts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.hubapi.com/contacts/v1/contact/",
+        "method": "POST"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Update Salesforce Contacts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://yourinstance.salesforce.com/services/data/vXX.X/sobjects/Contact/",
+        "method": "PATCH"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Reconciliation Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Weekly Reconciliation Report",
+        "text": "Here are the discrepancies found during the synchronization."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get HubSpot Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get HubSpot Contacts": {
+      "main": [
+        [
+          {
+            "node": "Get Salesforce Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Salesforce Contacts": {
+      "main": [
+        [
+          {
+            "node": "Resolve Conflicts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Conflicts": {
+      "main": [
+        [
+          {
+            "node": "Update HubSpot Contacts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Salesforce Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update HubSpot Contacts": {
+      "main": [
+        [
+          {
+            "node": "Send Reconciliation Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Salesforce Contacts": {
+      "main": [
+        [
+          {
+            "node": "Send Reconciliation Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

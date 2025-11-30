@@ -1,0 +1,1 @@
+Build a workflow that periodically checks a mock "license usage" API, compares current usage to licensed limits, calculates remaining quota per department, writes an aggregated report to a database-like node, and emails department heads when usage exceeds 80% of their quota.

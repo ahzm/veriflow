@@ -1,0 +1,1 @@
+Define a workflow that monitors Twitter mentions of a brand via API, filters by language and sentiment, creates tickets in a support system for negative mentions, posts summaries to Slack, and logs all interactions in a central database.

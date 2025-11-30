@@ -1,0 +1,1 @@
+Run every midnight, call an API to fetch server health metrics, and send a Slack alert if CPU usage is above 85%.

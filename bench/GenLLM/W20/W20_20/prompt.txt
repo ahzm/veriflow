@@ -1,0 +1,1 @@
+On webhook trigger, receive customer form data, send a confirmation email, then call an HTTP endpoint to log the submission.

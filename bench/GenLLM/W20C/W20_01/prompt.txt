@@ -1,0 +1,1 @@
+Design an n8n workflow that monitors a shared mailbox for new support tickets, extracts ticket metadata, classifies urgency via an HTTP ML API, routes high-priority tickets to Slack, and creates corresponding issues in Jira with bidirectional status updates.

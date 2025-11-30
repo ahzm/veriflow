@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "customer-form"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "Confirmation of Your Submission",
+        "text": "Thank you for your submission!"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Log Submission",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/log",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "submission": "{{$json}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "Log Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "candidate-application"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Store Candidate Info",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Send Acknowledgement Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"email\"]}}",
+        "subject": "Application Received",
+        "text": "Thank you for your application. We will review it shortly."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Evaluate CV",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-api.com/evaluate-cv",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "cv": "{{$json[\"cv\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Route Strong Candidates",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New strong candidate has been identified!"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Schedule Follow-up Email",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 3 * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Store Candidate Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Candidate Info": {
+      "main": [
+        [
+          {
+            "node": "Send Acknowledgement Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Acknowledgement Email": {
+      "main": [
+        [
+          {
+            "node": "Evaluate CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate CV": {
+      "main": [
+        [
+          {
+            "node": "Route Strong Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Strong Candidates": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Schedule Follow-up Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

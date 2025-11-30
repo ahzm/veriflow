@@ -1,0 +1,140 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Read Subscriber Segments",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          {
+            "name": "segments",
+            "value": "[{\"name\": \"Segment A\"}, {\"name\": \"Segment B\"}]"
+          }
+        ]
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch Latest Blog Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/latest-blog-posts"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Fetch Product Updates",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/latest-product-updates"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Assemble Newsletter Content",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const segments = items[0].json.segments;\nconst blogPosts = items[1].json;\nconst productUpdates = items[2].json;\n\nreturn segments.map(segment => ({\n    json: {\n        segment: segment.name,\n        content: `Newsletter for ${segment.name}:\\nLatest Blog Posts: ${JSON.stringify(blogPosts)}\\nProduct Updates: ${JSON.stringify(productUpdates)}`\n    }\n}));"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Emails",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "subscriber@example.com",
+        "subject": "Your Customized Newsletter",
+        "text": "={{$json[\"content\"]}}"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Log Delivery Results",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          {
+            "name": "deliveryStatus",
+            "value": "Email sent to {{$json[\"segment\"]}}"
+          }
+        ]
+      }
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Subscriber Segments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Subscriber Segments": {
+      "main": [
+        [
+          {
+            "node": "Fetch Latest Blog Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Latest Blog Posts": {
+      "main": [
+        [
+          {
+            "node": "Fetch Product Updates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Product Updates": {
+      "main": [
+        [
+          {
+            "node": "Assemble Newsletter Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assemble Newsletter Content": {
+      "main": [
+        [
+          {
+            "node": "Send Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Emails": {
+      "main": [
+        [
+          {
+            "node": "Log Delivery Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

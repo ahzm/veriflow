@@ -1,0 +1,94 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Stripe Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-webhook",
+        "responseMode": "onReceived"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Update Billing Database",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your-database-api.com/update-billing",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{}"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Customer Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "Your Subscription Update",
+        "text": "Dear Customer, your subscription has been updated."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Finance Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A subscription lifecycle event has occurred."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Update MRR/ARR Dashboards",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://your-analytics-api.com/update-metrics",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{}"
+      }
+    }
+  ],
+  "connections": {
+    "Stripe Webhook": {
+      "main": [
+        [
+          {
+            "node": "Update Billing Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Billing Database": {
+      "main": [
+        [
+          {
+            "node": "Send Customer Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notify Finance Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update MRR/ARR Dashboards",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

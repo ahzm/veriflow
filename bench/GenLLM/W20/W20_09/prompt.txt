@@ -1,0 +1,1 @@
+On hourly schedule, check weather API for wind speed. If wind speed > 40 km/h, send a Slack storm warning.

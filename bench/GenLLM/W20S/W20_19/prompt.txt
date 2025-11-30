@@ -1,0 +1,1 @@
+Create a workflow that listens to a webhook for new IoT sensor alerts, validates the payload, groups alerts by device ID and severity, stores them into a "sensor_events" collection, raises a critical incident via HTTP API for severe alerts, and sends both Slack and email notifications summarizing the incident.

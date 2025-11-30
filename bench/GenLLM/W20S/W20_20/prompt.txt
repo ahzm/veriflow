@@ -1,0 +1,1 @@
+Build an n8n workflow that orchestrates a simple customer feedback loop: when a purchase event is received via webhook, wait 3 days, send a feedback survey email, log responses arriving via another webhook into a database-like node, compute a daily Net Promoter Score, and post the results to a Slack channel along with a short textual summary.

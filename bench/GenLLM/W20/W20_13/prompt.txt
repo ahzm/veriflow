@@ -1,0 +1,1 @@
+When a webhook receives a support ticket, extract “user”, “priority”, and “message”, and forward them to a Slack channel.

@@ -1,0 +1,130 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "budget-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Fields",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "if (!items[0].json.amount || !items[0].json.requester) {\n  throw new Error('Mandatory fields are missing.');\n}\nreturn items;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Approval Email to Manager",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "manager@example.com",
+        "subject": "Budget Request Approval Needed",
+        "text": "A budget request has been submitted. Please review and approve."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Wait for Approval",
+      "type": "n8n-nodes-base.wait",
+      "parameters": {
+        "waitFor": "5",
+        "waitForType": "minutes"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Escalate to Director",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "director@example.com",
+        "subject": "Budget Request Escalation",
+        "text": "The budget request has not been approved in time and has been escalated."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Update Tracking Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/update-tracking",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "requester": "={{$json[\"requester\"]}}",
+          "amount": "={{$json[\"amount\"]}}",
+          "status": "Approved"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Fields": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Email to Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Email to Manager": {
+      "main": [
+        [
+          {
+            "node": "Wait for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Approval": {
+      "main": [
+        [
+          {
+            "node": "Escalate to Director",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Tracking Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escalate to Director": {
+      "main": [
+        [
+          {
+            "node": "Update Tracking Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

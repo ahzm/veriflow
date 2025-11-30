@@ -1,0 +1,166 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request A",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://service-a.example.com/metrics"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request B",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://service-b.example.com/metrics"
+      }
+    },
+    {
+      "id": "4",
+      "name": "HTTP Request C",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://service-c.example.com/metrics"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Check Anomalies",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const metricsA = items[0].json;\nconst metricsB = items[1].json;\nconst metricsC = items[2].json;\n\nlet anomalies = [];\n\n// Logic to check for missing or inconsistent fields\n// Push anomalies to the anomalies array\n\nreturn [{ json: { anomalies } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Log Anomalies",
+      "type": "n8n-nodes-base.mongodb",
+      "parameters": {
+        "operation": "insert",
+        "collection": "data_issues",
+        "document": "={{$json[\"anomalies\"]}}"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Alert: Anomaly count has exceeded the threshold!"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Daily Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const date = new Date();\nconst report = `Daily report for ${date.toISOString()}`;\nreturn [{ json: { report } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request A",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request B",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request C",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request A": {
+      "main": [
+        [
+          {
+            "node": "Check Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request B": {
+      "main": [
+        [
+          {
+            "node": "Check Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request C": {
+      "main": [
+        [
+          {
+            "node": "Check Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Anomalies": {
+      "main": [
+        [
+          {
+            "node": "Log Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Anomalies": {
+      "main": [
+        [
+          {
+            "node": "Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Alert": {
+      "main": [
+        [
+          {
+            "node": "Daily Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Report": {
+      "main": []
+    }
+  }
+}

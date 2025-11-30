@@ -1,0 +1,1 @@
+When a webhook receives an order event, validate that the amount is above 50, and then send a confirmation email to the customer.

@@ -1,0 +1,1 @@
+Create a workflow that orchestrates an approval process for budget requests: intake via webform webhook, validate mandatory fields, route to manager for approval by email, escalate to director after a timeout, and update a central tracking sheet with all decisions.

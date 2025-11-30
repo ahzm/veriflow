@@ -1,0 +1,1 @@
+Create a workflow that ingests employee timesheets submitted via webhook, validates project codes against an internal API, computes overtime and missing entries, updates a payroll spreadsheet, and sends discrepancy alerts to HR and employees.

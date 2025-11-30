@@ -1,0 +1,1 @@
+Create a multi-branch workflow that receives GitHub webhook events, filters for pull-request events, runs static analysis via an HTTP API, posts comments back to GitHub, updates a Notion documentation page, and sends a summary digest to a Slack channel.

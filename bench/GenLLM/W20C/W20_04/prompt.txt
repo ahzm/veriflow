@@ -1,0 +1,1 @@
+Define a workflow that starts from a scheduled trigger, queries a CRM for contacts with expiring subscriptions, generates personalized renewal offers with dynamic discounts, sends emails, logs responses to a Google Sheet, and retries failed sends with exponential backoff.

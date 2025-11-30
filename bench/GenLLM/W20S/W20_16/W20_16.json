@@ -1,0 +1,144 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Open Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.billing.com/invoices?status=open"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Filter Overdue Invoices",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const overdueInvoices = items.filter(item => new Date(item.json.dueDate) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));\nreturn overdueInvoices;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Reminder Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "finance@company.com",
+        "subject": "Friendly Reminder: Overdue Invoice",
+        "text": "Dear Customer, this is a gentle reminder that your invoice is overdue. Please make the payment at your earliest convenience."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Reminder Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.logging.com/reminders",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "invoiceId": "={{$json[\"id\"]}}",
+          "status": "reminder_sent"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Calculate Total Overdue Amount",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const totalAmount = items.reduce((sum, item) => sum + item.json.amount, 0);\nreturn [{ json: { totalOverdueAmount: totalAmount } }];"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Daily Summary",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "finance@company.com",
+        "subject": "Daily Summary of Overdue Invoices",
+        "text": "Total overdue amount: {{$json[\"totalOverdueAmount\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Open Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Open Invoices": {
+      "main": [
+        [
+          {
+            "node": "Filter Overdue Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Overdue Invoices": {
+      "main": [
+        [
+          {
+            "node": "Send Reminder Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Calculate Total Overdue Amount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Reminder Email": {
+      "main": [
+        [
+          {
+            "node": "Log Reminder Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Reminder Event": {
+      "main": [
+        [
+          {
+            "node": "Calculate Total Overdue Amount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Total Overdue Amount": {
+      "main": [
+        [
+          {
+            "node": "Send Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

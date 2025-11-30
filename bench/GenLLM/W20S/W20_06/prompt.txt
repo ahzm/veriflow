@@ -1,0 +1,1 @@
+Define an n8n workflow that periodically (every 10 minutes) polls a mock order management API, identifies all new orders with status "PENDING_PAYMENT", sends a payment reminder email to the customer, updates the order status to "REMINDER_SENT" via another API call, and creates a consolidated CSV export of all reminders sent during the day.

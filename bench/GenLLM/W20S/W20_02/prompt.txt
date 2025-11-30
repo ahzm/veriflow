@@ -1,0 +1,1 @@
+Create an n8n workflow that runs every morning at 07:00, fetches yesterday's sales data from a mock REST API, aggregates totals per region and per product category, compares the results against target thresholds stored in a configuration node, generates a plain-text summary report, and sends it by email to both the sales director and regional managers.

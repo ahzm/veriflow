@@ -1,0 +1,156 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "*/5 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Service 1",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.mockservice1.com/uptime"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request - Service 2",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.mockservice2.com/uptime"
+      }
+    },
+    {
+      "id": "4",
+      "name": "HTTP Request - Service 3",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.mockservice3.com/uptime"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Compute Uptime",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const uptime1 = items[0].json.uptime;\nconst uptime2 = items[1].json.uptime;\nconst uptime3 = items[2].json.uptime;\n\nconst avgUptime = (uptime1 + uptime2 + uptime3) / 3;\n\nreturn [{ json: { avgUptime } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Raise Incident",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.incidentmanagement.com/raise",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "service": "Critical Service",
+          "status": "down",
+          "uptime": "{{$json[\"avgUptime\"]}}"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "sre-team@example.com",
+        "subject": "Uptime Alert: Service Down",
+        "text": "One of the critical services is down. Please check the incident management system."
+      }
+    },
+    {
+      "id": "8",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Incident raised: One of the critical services has dropped below 99.5% uptime."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Service 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Service 1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Service 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Service 2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Service 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Service 3": {
+      "main": [
+        [
+          {
+            "node": "Compute Uptime",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Uptime": {
+      "main": [
+        [
+          {
+            "node": "Raise Incident",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raise Incident": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

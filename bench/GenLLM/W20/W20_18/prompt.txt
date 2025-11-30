@@ -1,0 +1,1 @@
+When webhook receives a JSON with "deviceId" and “errorCode”, forward the error information to Slack for debugging.

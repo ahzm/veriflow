@@ -1,0 +1,138 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request Sales Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/sales"
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request Currency Rates",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/currency-rates"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Aggregate KPIs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Write to Database",
+      "type": "n8n-nodes-base.postgres",
+      "parameters": {
+        "operation": "insert",
+        "table": "daily_snapshots",
+        "columns": {
+          "region": "={{$json[\"region\"]}}",
+          "kpi": "={{$json[\"kpi\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Check Anomalies",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "7",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "report@example.com",
+        "subject": "Daily Sales Report",
+        "text": "Anomalies detected in today's sales data."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Sales Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Sales Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Currency Rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Currency Rates": {
+      "main": [
+        [
+          {
+            "node": "Aggregate KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate KPIs": {
+      "main": [
+        [
+          {
+            "node": "Write to Database",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write to Database": {
+      "main": [
+        [
+          {
+            "node": "Check Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Anomalies": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

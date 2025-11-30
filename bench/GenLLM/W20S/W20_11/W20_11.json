@@ -1,0 +1,136 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Product Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/products"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Transform Prices",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "items.forEach(item => { item.json.price = convertToStandardCurrency(item.json.price); }); return items;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Normalize Categories",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "items.forEach(item => { item.json.category = normalizeCategory(item.json.category); }); return items;"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Flag Missing Attributes",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "items.forEach(item => { if (!item.json.criticalAttribute) { item.json.flagged = true; } }); return items;"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Write to Data Warehouse",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/data_warehouse",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "data": "={{$json[\"data\"]}}"
+        }
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "summary@example.com",
+        "subject": "ETL Processing Summary",
+        "text": "Processed {{ $json[\"processedCount\"] }} records with {{ $json[\"errorCount\"] }} errors."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Product Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Product Data": {
+      "main": [
+        [
+          {
+            "node": "Transform Prices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Prices": {
+      "main": [
+        [
+          {
+            "node": "Normalize Categories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Categories": {
+      "main": [
+        [
+          {
+            "node": "Flag Missing Attributes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flag Missing Attributes": {
+      "main": [
+        [
+          {
+            "node": "Write to Data Warehouse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write to Data Warehouse": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Design an n8n workflow that monitors a mock "project management" API for tasks with status "BLOCKED", retrieves their details and owners, posts a consolidated "blocked tasks" report to a Slack channel every morning, sends individual reminder emails to task owners, and writes a log entry for each notification into a database-like node.

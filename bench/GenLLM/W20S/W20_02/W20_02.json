@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 7 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Sales Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mockapi.com/sales/yesterday"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Aggregate Sales Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const salesData = items[0].json;\nconst aggregatedData = {};\n\nsalesData.forEach(sale => {\n    const region = sale.region;\n    const category = sale.category;\n    const amount = sale.amount;\n\n    if (!aggregatedData[region]) {\n        aggregatedData[region] = {};\n    }\n    if (!aggregatedData[region][category]) {\n        aggregatedData[region][category] = 0;\n    }\n    aggregatedData[region][category] += amount;\n});\n\nreturn [{ json: aggregatedData }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Compare Against Targets",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const aggregatedData = items[0].json;\nconst targets = { 'North': { 'Electronics': 1000, 'Clothing': 500 }, 'South': { 'Electronics': 800, 'Clothing': 600 } };\nconst results = [];\n\nfor (const region in aggregatedData) {\n    for (const category in aggregatedData[region]) {\n        const actual = aggregatedData[region][category];\n        const target = targets[region] ? targets[region][category] : 0;\n        results.push({ region, category, actual, target, met: actual >= target });\n    }\n}\n\nreturn [{ json: results }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Summary Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const results = items[0].json;\nlet report = 'Sales Summary Report:\\n';\n\nresults.forEach(result => {\n    report += `Region: ${result.region}, Category: ${result.category}, Actual: ${result.actual}, Target: ${result.target}, Met: ${result.met ? 'Yes' : 'No'}\\n`;\n});\n\nreturn [{ json: { report } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "sales.director@example.com, regional.managers@example.com",
+        "subject": "Daily Sales Summary Report",
+        "text": "={{$json[\"report\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Sales Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Sales Data": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Sales Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Sales Data": {
+      "main": [
+        [
+          {
+            "node": "Compare Against Targets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare Against Targets": {
+      "main": [
+        [
+          {
+            "node": "Generate Summary Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Summary Report": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

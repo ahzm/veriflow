@@ -1,0 +1,1 @@
+At noon daily, fetch trending GitHub repositories and email me the top three with their descriptions.

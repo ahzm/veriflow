@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.weatherapi.com/v1/current.json?key=YOUR_API_KEY&q=YOUR_LOCATION"
+      }
+    },
+    {
+      "id": "3",
+      "name": "IF Wind Speed",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"current\"][\"wind_kph\"]}}",
+              "operation": "greaterThan",
+              "value2": 40
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Slack Warning",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Storm Warning: Wind speed is over 40 km/h!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "IF Wind Speed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Wind Speed": {
+      "main": [
+        [
+          {
+            "node": "Slack Warning",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

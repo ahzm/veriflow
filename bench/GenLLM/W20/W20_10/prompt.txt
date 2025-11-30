@@ -1,0 +1,1 @@
+When receiving a webhook with a list of email addresses, iterate through them and send each person a short notification email.

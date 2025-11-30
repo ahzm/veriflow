@@ -1,0 +1,1 @@
+Design a workflow that runs nightly, fetches error logs from multiple microservices via HTTP, parses and classifies errors, clusters similar ones, creates aggregated bug tickets in Jira, and posts a ranked list of top recurring issues to Slack.

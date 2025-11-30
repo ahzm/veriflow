@@ -1,0 +1,120 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "RSS Feed",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "parameters": {
+        "url": "https://example.com/rss"
+      }
+    },
+    {
+      "id": "3",
+      "name": "NLP API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/classify",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "article": "={{$json[\"title\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Search Index",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://search.example.com/index",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "title": "={{$json[\"title\"]}}",
+          "topic": "={{$json[\"topic\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Email Digest - Topic A",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "topicA@example.com",
+        "subject": "Topic A Digest",
+        "text": "Here are the latest articles on Topic A."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Email Digest - Topic B",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "topicB@example.com",
+        "subject": "Topic B Digest",
+        "text": "Here are the latest articles on Topic B."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "RSS Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Feed": {
+      "main": [
+        [
+          {
+            "node": "NLP API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NLP API": {
+      "main": [
+        [
+          {
+            "node": "Search Index",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Index": {
+      "main": [
+        [
+          {
+            "node": "Email Digest - Topic A",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email Digest - Topic B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

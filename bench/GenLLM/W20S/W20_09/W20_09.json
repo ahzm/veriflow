@@ -1,0 +1,140 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "upload-leads"
+      }
+    },
+    {
+      "id": "2",
+      "name": "CSV Parse",
+      "type": "n8n-nodes-base.csvParse",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Validate Leads",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.name && item.json.email && item.json.company);"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Lead Scoring",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.leadscoring.com/score",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "name": "={{$json[\"name\"]}}",
+          "email": "={{$json[\"email\"]}}",
+          "company": "={{$json[\"company\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Filter Leads",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.score >= 50);"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Store Leads",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": [
+          {
+            "name": "acceptedLeads",
+            "value": "={{$json[\"name\"]}}"
+          }
+        ]
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Leads processed: Accepted - {{$json[\"acceptedLeads\"].length}}, Rejected - {{$json[\"rejectedLeads\"].length}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "CSV Parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSV Parse": {
+      "main": [
+        [
+          {
+            "node": "Validate Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Leads": {
+      "main": [
+        [
+          {
+            "node": "Lead Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Scoring": {
+      "main": [
+        [
+          {
+            "node": "Filter Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Leads": {
+      "main": [
+        [
+          {
+            "node": "Store Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Leads": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

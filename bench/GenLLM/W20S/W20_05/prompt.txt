@@ -1,0 +1,1 @@
+Create a data quality monitoring workflow that runs every hour, calls three different REST endpoints to retrieve metrics from microservices A, B, and C, checks for missing or inconsistent fields across services, logs anomalies into a "data_issues" collection, sends a Slack alert when the anomaly count exceeds a threshold, and writes a summarized daily report at midnight.

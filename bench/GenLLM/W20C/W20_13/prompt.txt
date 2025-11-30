@@ -1,0 +1,1 @@
+Construct a workflow that periodically scrapes multiple RSS feeds, extracts article metadata, classifies topics using an external NLP API, stores results in a search index, and sends topic-specific email digests to different subscriber segments.

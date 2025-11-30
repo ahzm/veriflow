@@ -1,0 +1,1 @@
+Monitor a GitHub repository using a webhook, and when a new issue is created, email the issue title and URL.

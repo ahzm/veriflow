@@ -1,0 +1,1 @@
+Every day at 20:00, fetch currency conversion rate USD→JPY and USD→EUR, and send them in a short email summary.

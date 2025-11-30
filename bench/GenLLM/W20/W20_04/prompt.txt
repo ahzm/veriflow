@@ -1,0 +1,1 @@
+Fetch daily top news headlines from a public API at 7am and email me the three most relevant ones.

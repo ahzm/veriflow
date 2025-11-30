@@ -1,0 +1,1 @@
+Create an n8n workflow that runs every night, fetches all "open invoices" from a billing API, identifies invoices overdue by more than 7 days, sends a polite reminder email, logs the reminder event via another HTTP endpoint, calculates the total overdue amount per customer, and sends a daily summary to the finance team.

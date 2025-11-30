@@ -1,0 +1,1 @@
+Design a workflow for subscription renewal management: every day at 08:00, query a mock billing API for subscriptions expiring in the next 7 days, generate individualized renewal reminder emails with dynamic pricing, update a CRM-like HTTP service to log the contact attempt, and notify the account owner via Slack if a "high-value" customer is found.

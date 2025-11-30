@@ -1,0 +1,1 @@
+Check an API every hour for Bitcoin price, and if it exceeds $70,000, send a Slack alert with the new value.

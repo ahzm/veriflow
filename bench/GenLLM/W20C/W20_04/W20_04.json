@@ -1,0 +1,131 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "CRM Query",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.crm.com/contacts?filter=expiring_subscriptions"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Generate Offers",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    const discount = Math.random() * 30;\n    return {\n        json: {\n            email: item.json.email,\n            offer: `Renew your subscription with a ${discount.toFixed(2)}% discount!`\n        }\n    };\n});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Your Subscription Renewal Offer",
+        "text": "={{$json[\"offer\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Response",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "operation": "append",
+        "sheetId": "your_sheet_id",
+        "data": "={{$json}}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Retry Failed Sends",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const maxRetries = 5;\nconst retryCount = $json.retryCount || 0;\nif (retryCount < maxRetries) {\n    return [{ json: { ...$json, retryCount: retryCount + 1 } }];\n}\nreturn [{ json: { ...$json, status: 'failed' } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "CRM Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CRM Query": {
+      "main": [
+        [
+          {
+            "node": "Generate Offers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Offers": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Log Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retry Failed Sends",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Response": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Failed Sends": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

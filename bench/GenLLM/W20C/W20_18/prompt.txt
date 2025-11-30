@@ -1,0 +1,1 @@
+Create a workflow that manages data privacy requests: intake via form webhook, validates identity using an external verification API, retrieves data from multiple systems, compiles a downloadable archive link, and tracks deadlines and completion in a compliance log.

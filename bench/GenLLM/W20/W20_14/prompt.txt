@@ -1,0 +1,1 @@
+Check a cryptocurrency API for Ethereum gas fees every hour; if base fee < 20 gwei, email me that it’s a good time to transact.

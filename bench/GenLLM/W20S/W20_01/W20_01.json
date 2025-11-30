@@ -1,0 +1,122 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Email Monitor",
+      "type": "n8n-nodes-base.emailRead",
+      "parameters": {
+        "email": "operations@company.com",
+        "pollingInterval": 60
+      }
+    },
+    {
+      "id": "2",
+      "name": "Classify Incident",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const incidentTypes = ['outage', 'performance degradation', 'security alert', 'general request'];\nconst emailSubject = $json[\"subject\"];\nlet incidentType = 'general request';\n\nif (emailSubject.includes('outage')) {\n    incidentType = 'outage';\n} else if (emailSubject.includes('performance degradation')) {\n    incidentType = 'performance degradation';\n} else if (emailSubject.includes('security alert')) {\n    incidentType = 'security alert';\n}\n\nreturn [{ json: { incidentType, email: $json } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Create/Update Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-itsm-system.com/api/tickets",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "incidentType": "={{$json[\"incidentType\"]}}",
+          "email": "={{$json[\"email\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New incident reported: {{$json[\"incidentType\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Check Ticket Age",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const ticketCreatedAt = new Date($json[\"createdAt\"]);\nconst now = new Date();\nconst hoursOpen = (now - ticketCreatedAt) / (1000 * 60 * 60);\nreturn [{ json: { hoursOpen } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Escalate to Manager",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Escalation: Ticket has been open for more than 4 hours."
+      }
+    }
+  ],
+  "connections": {
+    "Email Monitor": {
+      "main": [
+        [
+          {
+            "node": "Classify Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Incident": {
+      "main": [
+        [
+          {
+            "node": "Create/Update Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create/Update Ticket": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Ticket Age",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Slack": {
+      "main": [
+        [
+          {
+            "node": "Check Ticket Age",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Ticket Age": {
+      "main": [
+        [
+          {
+            "node": "Escalate to Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

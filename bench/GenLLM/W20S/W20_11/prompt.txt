@@ -1,0 +1,1 @@
+Define an n8n workflow to orchestrate a simple ETL: on a schedule, fetch raw product data from an HTTP API, transform prices to a standard currency, normalize category labels, detect and flag missing critical attributes, write clean data into a mock "data_warehouse" API, and send a processing summary (counts, error rows) by email.

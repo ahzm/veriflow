@@ -1,0 +1,148 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook Purchase Event",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Wait 3 Days",
+      "type": "n8n-nodes-base.wait",
+      "parameters": {
+        "waitFor": {
+          "time": 3,
+          "unit": "days"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Feedback Survey Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "We value your feedback!",
+        "text": "Please take a moment to fill out our feedback survey."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Webhook Feedback Response",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Log Feedback Responses",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const feedback = items[0].json;\n// Code to log feedback into a database-like structure"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Compute Net Promoter Score",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const responses = []; // Fetch responses from the database\nconst nps = computeNPS(responses);\nreturn [{ json: { nps } }];\n\nfunction computeNPS(responses) {\n    // Logic to compute NPS\n}"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Post NPS to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Today's Net Promoter Score is {{ $json[\"nps\"] }}. Thank you for your feedback!"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Schedule Daily NPS Calculation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Purchase Event": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Days": {
+      "main": [
+        [
+          {
+            "node": "Send Feedback Survey Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Feedback Survey Email": {
+      "main": [
+        [
+          {
+            "node": "Webhook Feedback Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Feedback Response": {
+      "main": [
+        [
+          {
+            "node": "Log Feedback Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Feedback Responses": {
+      "main": [
+        [
+          {
+            "node": "Compute Net Promoter Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Net Promoter Score": {
+      "main": [
+        [
+          {
+            "node": "Post NPS to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Daily NPS Calculation": {
+      "main": [
+        [
+          {
+            "node": "Compute Net Promoter Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

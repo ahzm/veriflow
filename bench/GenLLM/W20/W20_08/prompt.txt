@@ -1,0 +1,1 @@
+Every Monday morning, fetch currency exchange rates (EUR→USD, CNY→EUR), format them as text, and send them via email.

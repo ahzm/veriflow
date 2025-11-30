@@ -1,0 +1,1 @@
+Design a workflow that orchestrates onboarding of new customers: triggered by a CRM event, creates accounts in three SaaS tools via APIs, sends a welcome email sequence, schedules a follow-up meeting, and logs each onboarding step with success or failure status.

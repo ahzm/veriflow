@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "data-privacy-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Verify Identity",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.verification.com/verify",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "identity": "={{$json[\"body\"][\"identity\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "HTTP Request - Retrieve Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.dataretrieval.com/getData",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "identity": "={{$json[\"body\"][\"identity\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Compile Archive",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const data = items[0].json;\nconst archiveLink = `https://archive.service.com/download/${data.identity}`;\nreturn [{ json: { archiveLink } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new data privacy request has been processed for identity: {{$json[\"body\"][\"identity\"]}}. Archive link: {{$json[\"archiveLink\"]}}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Compliance Log",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const logEntry = {\n  identity: items[0].json.identity,\n  status: 'Completed',\n  archiveLink: items[0].json.archiveLink,\n  timestamp: new Date().toISOString()\n};\nreturn [{ json: logEntry }];"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Verify Identity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Verify Identity": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Retrieve Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Retrieve Data": {
+      "main": [
+        [
+          {
+            "node": "Compile Archive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compile Archive": {
+      "main": [
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Compliance Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

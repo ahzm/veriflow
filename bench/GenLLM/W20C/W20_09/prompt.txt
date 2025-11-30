@@ -1,0 +1,1 @@
+Define a workflow that watches a shared drive for new CSV files, validates schema and size constraints, splits large files into chunks, uploads them to a data warehouse via API, archives originals, and sends status notifications with links to processed datasets.

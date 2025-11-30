@@ -1,0 +1,133 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Segment Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://data-warehouse.example.com/segment-users"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Personalize Email",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Your Personalized Campaign",
+        "text": "Hello, {{ $json[\"name\"] }}! Check out our latest offers."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Check Email Open",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send SMS",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "We noticed you haven't opened our email. Check it out!"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Write Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://analytics.example.com/record-metrics"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Segment Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Segment Users": {
+      "main": [
+        [
+          {
+            "node": "Personalize Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Personalize Email": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Check Email Open",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Email Open": {
+      "main": [
+        [
+          {
+            "node": "Send SMS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Write Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send SMS": {
+      "main": [
+        [
+          {
+            "node": "Write Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

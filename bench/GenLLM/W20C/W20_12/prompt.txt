@@ -1,0 +1,1 @@
+Build a workflow that listens to Stripe webhook events for subscription lifecycle changes, updates a billing database, sends tailored customer emails per event type, notifies the finance Slack channel, and updates MRR/ARR dashboards via an analytics API.

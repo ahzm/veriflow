@@ -1,0 +1,124 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "*/10 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Get Orders",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-order-management-api.com/orders",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Filter Pending Payments",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.status === 'PENDING_PAYMENT');"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Payment Reminder Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"customerEmail\"]}}",
+        "subject": "Payment Reminder",
+        "text": "Dear Customer, this is a reminder to complete your payment for your order."
+      }
+    },
+    {
+      "id": "5",
+      "name": "HTTP Request - Update Order Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-order-management-api.com/orders/update",
+        "method": "POST",
+        "body": {
+          "status": "REMINDER_SENT",
+          "orderId": "={{$json[\"orderId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Create CSV Export",
+      "type": "n8n-nodes-base.csv",
+      "parameters": {
+        "options": {
+          "delimiter": ","
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Get Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Get Orders": {
+      "main": [
+        [
+          {
+            "node": "Filter Pending Payments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Pending Payments": {
+      "main": [
+        [
+          {
+            "node": "Send Payment Reminder Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request - Update Order Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Payment Reminder Email": {
+      "main": [
+        [
+          {
+            "node": "Create CSV Export",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Update Order Status": {
+      "main": [
+        [
+          {
+            "node": "Create CSV Export",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

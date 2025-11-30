@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Get Subscriptions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mockbillingapi.com/subscriptions/expiring"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Email - Send Renewal Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"email\"]}}",
+        "subject": "Your Subscription Renewal Reminder",
+        "text": "Dear Customer, your subscription is expiring soon. The renewal price is {{$json[\"price\"]}}."
+      }
+    },
+    {
+      "id": "4",
+      "name": "HTTP Request - Log Contact Attempt",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mockcrmservice.com/log",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "customerId": "={{$json[\"customerId\"]}}",
+          "attemptedContact": true
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Slack - Notify Account Owner",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "High-value customer found: {{$json[\"customerId\"]}}. Please follow up."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Get Subscriptions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Get Subscriptions": {
+      "main": [
+        [
+          {
+            "node": "Email - Send Renewal Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email - Send Renewal Reminder": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Log Contact Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Log Contact Attempt": {
+      "main": [
+        [
+          {
+            "node": "Slack - Notify Account Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 6 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch AQI",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/aqi"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check AQI",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json[\"data\"][\"aqi\"]}}",
+              "operation": "greaterThan",
+              "value2": 120
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "AQI is above 120. Please wear a mask."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch AQI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch AQI": {
+      "main": [
+        [
+          {
+            "node": "Check AQI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check AQI": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

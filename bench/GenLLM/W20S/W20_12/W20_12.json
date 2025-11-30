@@ -1,0 +1,97 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Categorize Ticket",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const keywords = { high: ['urgent', 'immediate'], medium: ['important', 'not urgent'], low: ['general', 'info'] };\nconst subject = $json[\"subject\"];\nconst body = $json[\"body\"];\nlet priority = 'low';\n\nfor (const [level, words] of Object.entries(keywords)) {\n    if (words.some(word => subject.includes(word) || body.includes(word))) {\n        priority = level;\n        break;\n    }\n}\n\nreturn [{ priority }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "High-priority ticket received: {{$json[\"subject\"]}}"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Knowledge Base Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-api.com/knowledge-base/search",
+        "method": "GET",
+        "responseFormat": "json"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"userEmail\"]}}",
+        "subject": "Suggested Articles for Your Support Ticket",
+        "text": "Here are some articles that may help you:\n{{$json[\"articles\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Categorize Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Categorize Ticket": {
+      "main": [
+        [
+          {
+            "node": "Post to Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Knowledge Base Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Slack": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge Base Search": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

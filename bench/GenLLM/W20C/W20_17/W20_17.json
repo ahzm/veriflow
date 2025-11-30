@@ -1,0 +1,129 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "product-feedback"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Email Parser",
+      "type": "n8n-nodes-base.emailReadImap",
+      "parameters": {
+        "email": "your-email@example.com",
+        "password": "your-password",
+        "host": "imap.example.com",
+        "port": 993,
+        "secure": true,
+        "fetchAll": true
+      }
+    },
+    {
+      "id": "3",
+      "name": "NLP API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.nlp-service.com/analyze",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParameters": {
+          "feedback": "={{$json[\"body\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Backlog Tool",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.backlogtool.com/add",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParameters": {
+          "item": "={{$json[\"tags\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Weekly Summary",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 0"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Summary Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "summary@example.com",
+        "subject": "Weekly Feedback Summary",
+        "text": "Here is the summary of the feedback received this week."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "NLP API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Parser": {
+      "main": [
+        [
+          {
+            "node": "NLP API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NLP API": {
+      "main": [
+        [
+          {
+            "node": "Backlog Tool",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Backlog Tool": {
+      "main": [
+        [
+          {
+            "node": "Weekly Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Summary Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

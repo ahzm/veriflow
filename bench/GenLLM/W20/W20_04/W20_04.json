@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 7 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch News",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://newsapi.org/v2/top-headlines?country=us&apiKey=YOUR_API_KEY"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "your_email@example.com",
+        "subject": "Daily Top News Headlines",
+        "text": "Here are the top 3 news headlines:\n1. {{ $json[\"articles\"][0][\"title\"] }}\n2. {{ $json[\"articles\"][1][\"title\"] }}\n3. {{ $json[\"articles\"][2][\"title\"] }}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch News": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

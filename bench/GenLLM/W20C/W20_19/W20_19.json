@@ -1,0 +1,125 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Watch CI/CD System",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "*/5 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Build Logs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://ci-cd-system/api/builds/failed"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Extract Root-Cause Hints",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { hints: item.json.logs.match(/error: (.*)/)[1] } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Post to Chat Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A build has failed. Root cause hints: {{$json[\"hints\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Create or Update Git Issue",
+      "type": "n8n-nodes-base.git",
+      "parameters": {
+        "operation": "createOrUpdate",
+        "repository": "your-repo",
+        "title": "Build Failure: {{$json[\"hints\"]}}",
+        "body": "Details of the failure and hints: {{$json[\"hints\"]}}"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Remind Assignees",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 */48 * * *"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Reminder to Assignees",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Reminder: The issue regarding the build failure is still unresolved. Please check!"
+      }
+    }
+  ],
+  "connections": {
+    "Watch CI/CD System": {
+      "main": [
+        [
+          {
+            "node": "Fetch Build Logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Build Logs": {
+      "main": [
+        [
+          {
+            "node": "Extract Root-Cause Hints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Root-Cause Hints": {
+      "main": [
+        [
+          {
+            "node": "Post to Chat Channel",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create or Update Git Issue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or Update Git Issue": {
+      "main": [
+        [
+          {
+            "node": "Remind Assignees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remind Assignees": {
+      "main": [
+        [
+          {
+            "node": "Send Reminder to Assignees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

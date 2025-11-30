@@ -1,0 +1,1 @@
+Define a workflow that watches a CI/CD system for failed builds, fetches build logs from an HTTP API, extracts root-cause hints, posts detailed summaries to a chat channel, creates or updates issues in Git, and reminds assignees if not resolved within 48 hours.

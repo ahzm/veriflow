@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Check Domain",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/check-domain"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Company Lookup",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/company-lookup"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Store Data",
+      "type": "n8n-nodes-base.database",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New user sign-up from a high-value company!"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "{{$json[\"email\"]}}",
+        "subject": "Welcome to Our Service!",
+        "text": "Welcome! Use code DISCOUNT2023 for your first purchase."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check Domain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Domain": {
+      "main": [
+        [
+          {
+            "node": "Company Lookup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Company Lookup": {
+      "main": [
+        [
+          {
+            "node": "Store Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

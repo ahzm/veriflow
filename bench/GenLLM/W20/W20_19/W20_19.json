@@ -1,0 +1,78 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 20 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch USD to JPY",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.exchangerate-api.com/v4/latest/USD"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Fetch USD to EUR",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.exchangerate-api.com/v4/latest/USD"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Daily Currency Conversion Rates",
+        "text": "USD to JPY: {{$json[\"rates\"][\"JPY\"]}}\nUSD to EUR: {{$json[\"rates\"][\"EUR\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch USD to JPY",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch USD to EUR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch USD to JPY": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch USD to EUR": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

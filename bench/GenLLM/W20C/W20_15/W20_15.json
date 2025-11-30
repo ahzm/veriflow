@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Twitter Mention Monitor",
+      "type": "n8n-nodes-base.twitter",
+      "parameters": {
+        "resource": "mention",
+        "operation": "get",
+        "language": "en"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Sentiment Analysis",
+      "type": "n8n-nodes-base.sentimentAnalysis",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Create Support Ticket",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://support-system.example.com/tickets",
+        "method": "POST",
+        "body": {
+          "mention": "={{$json[\"text\"]}}",
+          "sentiment": "negative"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Post Summary to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Negative mention detected: {{$json[\"text\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Interaction",
+      "type": "n8n-nodes-base.database",
+      "parameters": {
+        "operation": "insert",
+        "table": "interactions",
+        "data": {
+          "mention": "={{$json[\"text\"]}}",
+          "sentiment": "={{$json[\"sentiment\"]}}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Twitter Mention Monitor": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Create Support Ticket",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Post Summary to Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Interaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

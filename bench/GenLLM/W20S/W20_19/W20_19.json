@@ -1,0 +1,135 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sensor-alerts"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Payload",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.deviceId && item.json.severity);"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Group Alerts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const grouped = {};\nitems.forEach(item => {\n    const key = `${item.json.deviceId}-${item.json.severity}`;\n    if (!grouped[key]) {\n        grouped[key] = [];\n    }\n    grouped[key].push(item);\n});\nreturn Object.values(grouped).map(group => ({ json: { alerts: group } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Store in Database",
+      "type": "n8n-nodes-base.mongodb",
+      "parameters": {
+        "operation": "insert",
+        "collection": "sensor_events",
+        "document": "={{$json[\"alerts\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Raise Critical Incident",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/incidents",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "alerts": "={{$json[\"alerts\"]}}"
+        }
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New critical incident raised for device alerts."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alerts@example.com",
+        "subject": "New Sensor Alerts Incident",
+        "text": "A new incident has been raised for sensor alerts."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Payload": {
+      "main": [
+        [
+          {
+            "node": "Group Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group Alerts": {
+      "main": [
+        [
+          {
+            "node": "Store in Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Database": {
+      "main": [
+        [
+          {
+            "node": "Raise Critical Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raise Critical Incident": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

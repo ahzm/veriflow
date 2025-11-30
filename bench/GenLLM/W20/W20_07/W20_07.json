@@ -1,0 +1,37 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "GitHub Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "github-webhook",
+        "responseMode": "onReceived"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "New GitHub Issue Created",
+        "text": "A new issue has been created: {{ $json[\"issue\"][\"title\"] }} - {{ $json[\"issue\"][\"html_url\"] }}"
+      }
+    }
+  ],
+  "connections": {
+    "GitHub Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

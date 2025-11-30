@@ -1,0 +1,1 @@
+Design an n8n workflow for content publishing: given a trigger when a new blog post is added via HTTP request, fetch the full article metadata and body, generate a short teaser for social media, schedule posts to a mock Twitter and LinkedIn endpoint, upload images to a mock CDN HTTP API, and send an approval email to the marketing team before actually publishing.

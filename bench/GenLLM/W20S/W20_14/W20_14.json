@@ -1,0 +1,128 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook Receive Request",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "maintenance-request"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request to Facility Team",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-facility-team-api.com/assign",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "location": "={{$json[\"location\"]}}",
+          "category": "={{$json[\"category\"]}}",
+          "urgency": "={{$json[\"urgency\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Update Tracking Table",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://mock-tracking-table-api.com/update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "requestId": "={{$json[\"id\"]}}",
+          "status": "assigned"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New maintenance request assigned: {{$json[\"location\"]}} - {{$json[\"category\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Webhook Completed Callback",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "maintenance-completed"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Completion Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"requesterEmail\"]}}",
+        "subject": "Maintenance Request Completed",
+        "text": "Your maintenance request has been completed. Details: {{$json[\"details\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Receive Request": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to Facility Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to Facility Team": {
+      "main": [
+        [
+          {
+            "node": "Update Tracking Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Tracking Table": {
+      "main": [
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Webhook Completed Callback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Completed Callback": {
+      "main": [
+        [
+          {
+            "node": "Send Completion Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

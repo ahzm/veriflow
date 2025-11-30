@@ -1,0 +1,1 @@
+Build a monitoring workflow that tracks a mock uptime API for three critical services every 5 minutes, computes rolling uptime over the last 24 hours, raises an incident via HTTP POST if uptime for any service drops below 99.5%, sends a notification email to the SRE mailing list, and posts a structured incident message to a Slack channel.

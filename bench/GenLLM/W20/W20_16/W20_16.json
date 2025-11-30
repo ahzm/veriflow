@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "IF Temperature",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "field": "temperature",
+              "operation": "less",
+              "value": 5
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The temperature is below 5°C. Please turn on the heating."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "IF Temperature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Temperature": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

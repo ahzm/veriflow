@@ -1,0 +1,1 @@
+Run every 6 hours, call an API for stock price of AAPL, and email me price, percentage change, and volume.

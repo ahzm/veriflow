@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Exchange Rates",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.exchangerate-api.com/v4/latest/EUR"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Format Rates",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const rates = items[0].json.rates;\nconst formattedText = `Exchange Rates:\\nEUR to USD: ${rates.USD}\\nCNY to EUR: ${rates.CNY}`;\nreturn [{ json: { text: formattedText } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Weekly Currency Exchange Rates",
+        "text": "={{$json[\"text\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Exchange Rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Exchange Rates": {
+      "main": [
+        [
+          {
+            "node": "Format Rates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Rates": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
