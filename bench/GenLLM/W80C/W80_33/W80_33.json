@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Aggregation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Aggregate Meters",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.energycommunity.com/aggregate"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Allocate Energy",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.energycommunity.com/allocate"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Generate Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.energycommunity.com/invoice"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Invoice Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "community@example.com",
+        "subject": "Your Energy Invoice",
+        "text": "Please find attached your energy invoice."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.energycommunity.com/report"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Report to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The energy community report has been generated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Aggregation": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Meters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Meters": {
+      "main": [
+        [
+          {
+            "node": "Allocate Energy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allocate Energy": {
+      "main": [
+        [
+          {
+            "node": "Generate Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Invoices": {
+      "main": [
+        [
+          {
+            "node": "Send Invoice Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Send Report to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

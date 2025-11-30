@@ -1,0 +1,275 @@
+{
+  "S": 0.98,
+  "M": 0.85,
+  "E": 1.0,
+  "Overall": 0.94,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.25,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 0.6666666666666666,
+    "order": 1.0,
+    "conditional": 0.35,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 0.75,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": true,
+      "need_conditional_notify": false,
+      "need_db": true,
+      "need_email": false,
+      "need_form": true,
+      "need_http": false,
+      "need_schedule": false,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": false
+    },
+    "intent_chain": [
+      "The workflow involves curriculum change approvals, which typically require a database to store proposals and updates.",
+      "The mention of proposals and committee reviews suggests the need for forms to collect and manage these submissions.",
+      "Committee reviews imply that there may be conditions based on which approvals are granted, indicating a need for conditional logic."
+    ],
+    "irrelevant_nodes": [
+      "2",
+      "4"
+    ],
+    "intent_caps": [
+      "condition",
+      "db",
+      "form"
+    ],
+    "intent_edges": [],
+    "missing_capabilities": [
+      "db"
+    ],
+    "alignment": {
+      "capability_matches": {
+        "db": false,
+        "condition": true,
+        "form": true
+      },
+      "edge_matches": []
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "form->db(optional)",
+        "from": "form",
+        "to": "db",
+        "applicable": false,
+        "ok": null,
+        "sources": [
+          "1"
+        ],
+        "targets": [],
+        "path": [],
+        "note": "not applicable (optional)"
+      },
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      },
+      {
+        "rule": "extra_conditional_notify",
+        "from": "condition",
+        "to": "action",
+        "applicable": true,
+        "ok": false,
+        "sources": [
+          "3"
+        ],
+        "targets": [
+          "3",
+          "2"
+        ],
+        "path": [
+          "3"
+        ],
+        "note": "workflow has conditional notify but intent does not require it"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "condition",
+        "db",
+        "form"
+      ],
+      "intent_edges": [],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Proposal Submission",
+          "capability": "schedule",
+          "relevant": true
+        },
+        {
+          "id": "2",
+          "label": "Committee Review",
+          "capability": "slack",
+          "relevant": false
+        },
+        {
+          "id": "3",
+          "label": "Approval Notification",
+          "capability": "email",
+          "relevant": true
+        },
+        {
+          "id": "4",
+          "label": "Catalog Update",
+          "capability": "http",
+          "relevant": false
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        }
+      ],
+      "relevant_nodes": [
+        "1",
+        "3"
+      ],
+      "irrelevant_nodes": [
+        "2",
+        "4"
+      ],
+      "missing_capabilities": [
+        "db"
+      ]
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 1.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 4
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": false,
+      "required_fields": {},
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "timestamp"
+        ],
+        "3": [
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {}
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "executed_nodes_readable": [
+      "Proposal Submission",
+      "Committee Review",
+      "Approval Notification",
+      "Catalog Update"
+    ],
+    "name_map": {
+      "1": "Proposal Submission",
+      "2": "Committee Review",
+      "3": "Approval Notification",
+      "4": "Catalog Update"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "2": {
+        "ok": true,
+        "msg": "slack ok (mock)"
+      },
+      "3": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      },
+      "4": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Proposal Submission",
+    "Committee Review",
+    "Approval Notification",
+    "Catalog Update"
+  ]
+}

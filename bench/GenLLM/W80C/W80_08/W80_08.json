@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "customs-clearance"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Documents",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { documents: ['invoice.pdf', 'packing_list.pdf'] } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validate Documents",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const documents = $input.item.json.documents;\nconst valid = documents.length > 0;\nreturn [{ json: { valid } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Customs API Interaction",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.customs.gov/clearance",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "documents": "={{$json[\"documents\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Stakeholders",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "stakeholders@example.com",
+        "subject": "Customs Clearance Update",
+        "text": "The customs clearance process has been completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Collect Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Documents": {
+      "main": [
+        [
+          {
+            "node": "Validate Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Documents": {
+      "main": [
+        [
+          {
+            "node": "Customs API Interaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customs API Interaction": {
+      "main": [
+        [
+          {
+            "node": "Notify Stakeholders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

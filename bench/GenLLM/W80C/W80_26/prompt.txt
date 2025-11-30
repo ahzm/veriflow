@@ -1,0 +1,1 @@
+Design a workflow that manages cross-platform news publishing: curate stories, localize content, and publish to multiple apps and sites.

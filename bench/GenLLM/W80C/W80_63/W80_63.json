@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Exam Production",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Produce Exam",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Distribute Exam",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/distribute-exam"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Collect Exam Responses",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/collect-responses"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Score Exams",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Send Results Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Exam Results",
+        "text": "The exam results have been scored and are ready for review."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Notify Slack Channel",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The exam results have been processed and emailed to the admin."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Exam Production": {
+      "main": [
+        [
+          {
+            "node": "Produce Exam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Produce Exam": {
+      "main": [
+        [
+          {
+            "node": "Distribute Exam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Distribute Exam": {
+      "main": [
+        [
+          {
+            "node": "Collect Exam Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Exam Responses": {
+      "main": [
+        [
+          {
+            "node": "Score Exams",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Exams": {
+      "main": [
+        [
+          {
+            "node": "Send Results Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Results Email": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack Channel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

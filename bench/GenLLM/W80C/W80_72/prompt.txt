@@ -1,0 +1,1 @@
+Create a workflow that orchestrates museum collection digitization across institutions: prioritize, scan, and publish.

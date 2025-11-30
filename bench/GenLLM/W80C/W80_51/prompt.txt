@@ -1,0 +1,1 @@
+Design a workflow that manages multi-hospital bed capacity coordination: real-time census, transfer suggestions, and alerts.

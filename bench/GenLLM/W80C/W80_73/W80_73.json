@@ -1,0 +1,89 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "esg-supplier-assessment"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Questionnaire",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/collect-questionnaire"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Scores",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    const score = calculateScore(item.json);\n    return { json: { ...item.json, score } };\n});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Manage Remediation",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Remediation needed for supplier assessment."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "supplier@example.com",
+        "subject": "ESG Supplier Assessment Results",
+        "text": "Your ESG supplier assessment has been completed. Please review the scores."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Collect Questionnaire",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Questionnaire": {
+      "main": [
+        [
+          {
+            "node": "Compute Scores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Scores": {
+      "main": [
+        [
+          {
+            "node": "Manage Remediation",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

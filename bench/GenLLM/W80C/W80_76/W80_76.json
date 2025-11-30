@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Conflicts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.satellite-scheduling.com/checkConflicts"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Conflict Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@satellite-scheduling.com",
+        "subject": "Conflict Detected in Satellite Scheduling",
+        "text": "There is a conflict in the satellite scheduling. Please review the schedule."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Rebook Schedule",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.satellite-scheduling.com/rebook"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Rebooking Confirmation",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The satellite scheduling has been successfully rebooked."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Conflicts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Conflicts": {
+      "main": [
+        [
+          {
+            "node": "Send Conflict Notification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Rebook Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rebook Schedule": {
+      "main": [
+        [
+          {
+            "node": "Send Rebooking Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

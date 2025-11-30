@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request Usage Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/usage-data"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Calculate Split",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const usageData = items[0].json;\n// Perform split calculations based on usageData\nconst splits = calculateSplits(usageData);\nreturn [{ json: splits }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email Payouts",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "payouts@example.com",
+        "subject": "Media Royalties Payouts",
+        "text": "The media royalties payouts have been calculated and are ready for processing."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Media royalties allocations have been processed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Usage Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Usage Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Split": {
+      "main": [
+        [
+          {
+            "node": "Send Email Payouts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

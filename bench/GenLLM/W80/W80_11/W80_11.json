@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "PM2.5 Sensor",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/pm25"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check PM2.5 Level",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const pm25Level = items[0].json.pm25;\nreturn [{ json: { high: pm25Level > 35 } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "example@example.com",
+        "subject": "High PM2.5 Alert",
+        "text": "The PM2.5 level is high."
+      }
+    }
+  ],
+  "connections": {
+    "PM2.5 Sensor": {
+      "main": [
+        [
+          {
+            "node": "Check PM2.5 Level",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check PM2.5 Level": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

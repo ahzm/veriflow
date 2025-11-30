@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Exhibition Rotation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * 0"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Object Conditions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.museum.org/objects/conditions"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Loans",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.museum.org/loans"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Arrange Shipping",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.museum.org/shipping"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Staff",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "staff@museum.org",
+        "subject": "Exhibition Rotation Update",
+        "text": "The exhibition rotation has been scheduled. Please check the object conditions, loans, and shipping arrangements."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Exhibition Rotation": {
+      "main": [
+        [
+          {
+            "node": "Check Object Conditions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Object Conditions": {
+      "main": [
+        [
+          {
+            "node": "Track Loans",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Loans": {
+      "main": [
+        [
+          {
+            "node": "Arrange Shipping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Arrange Shipping": {
+      "main": [
+        [
+          {
+            "node": "Notify Staff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

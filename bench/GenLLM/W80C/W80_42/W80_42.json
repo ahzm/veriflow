@@ -1,0 +1,89 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Intake Proposals",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "intake-proposals"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Schedule Reviews",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Collect Decisions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/collect-decisions"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Document Patterns",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Patterns documented successfully."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Architecture Review Board Update",
+        "text": "New proposals have been reviewed and decisions collected."
+      }
+    }
+  ],
+  "connections": {
+    "Intake Proposals": {
+      "main": [
+        [
+          {
+            "node": "Schedule Reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Reviews": {
+      "main": [
+        [
+          {
+            "node": "Collect Decisions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Decisions": {
+      "main": [
+        [
+          {
+            "node": "Document Patterns",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

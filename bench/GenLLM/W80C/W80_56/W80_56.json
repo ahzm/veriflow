@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Application Received",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Send Approval Request",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "approvals@university.edu",
+        "subject": "New Student Exchange Application",
+        "text": "A new application has been received. Please review it."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Approval Received",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Notify Student",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "student@example.com",
+        "subject": "Your Application Status",
+        "text": "Your application has been approved."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Transfer Credits",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://university.edu/api/transfer-credits"
+      }
+    }
+  ],
+  "connections": {
+    "Application Received": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Approval Received",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Received": {
+      "main": [
+        [
+          {
+            "node": "Notify Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Student": {
+      "main": [
+        [
+          {
+            "node": "Transfer Credits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

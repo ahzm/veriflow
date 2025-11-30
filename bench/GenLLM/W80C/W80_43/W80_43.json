@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "research-ethics-approval"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "researcher@example.com",
+        "subject": "Research Ethics Submission Received",
+        "text": "Your submission for research ethics approval has been received."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Review Submission",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new research ethics submission is ready for review."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Amendment Request",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "researcher@example.com",
+        "subject": "Request for Amendment",
+        "text": "Please provide the necessary amendments for your submission."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Renewal Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "researcher@example.com",
+        "subject": "Renewal Reminder for Ethics Approval",
+        "text": "Your research ethics approval is due for renewal."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Renewal Reminder",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 1 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Notification": {
+      "main": [
+        [
+          {
+            "node": "Review Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Submission": {
+      "main": [
+        [
+          {
+            "node": "Amendment Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Amendment Request": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Renewal Reminder": {
+      "main": [
+        [
+          {
+            "node": "Renewal Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

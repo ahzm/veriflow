@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Fraud Alert Trigger",
+      "type": "n8n-nodes-base.trigger",
+      "parameters": {
+        "cronExpression": "*/5 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Enrich Fraud Case",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.fraudenrichment.com/enrich"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Alert Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "investigator@example.com",
+        "subject": "New Fraud Case Alert",
+        "text": "A new fraud case has been detected and enriched."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Create Task in Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New fraud case requires investigation. Please check the details."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Log Outcome",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.fraudoutcomes.com/log"
+      }
+    }
+  ],
+  "connections": {
+    "Fraud Alert Trigger": {
+      "main": [
+        [
+          {
+            "node": "Enrich Fraud Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich Fraud Case": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Task in Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Alert Email": {
+      "main": [
+        [
+          {
+            "node": "Log Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Task in Slack": {
+      "main": [
+        [
+          {
+            "node": "Log Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

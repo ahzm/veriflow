@@ -1,0 +1,136 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Proposal Submission",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proposal-submission"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Proposal Acknowledgment",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "submitter@example.com",
+        "subject": "Proposal Received",
+        "text": "Thank you for your proposal submission. We will review it shortly."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Review Proposals",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New proposal submitted. Please review it."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Collect Reviews",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "collect-reviews"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Review Reminder",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "reviewer@example.com",
+        "subject": "Review Reminder",
+        "text": "This is a reminder to submit your review for the proposal."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Publication Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "author@example.com",
+        "subject": "Your Proposal has been Accepted",
+        "text": "Congratulations! Your proposal has been accepted for publication."
+      }
+    },
+    {
+      "id": "7",
+      "name": "Schedule Publication",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 1 * *"
+      }
+    }
+  ],
+  "connections": {
+    "Proposal Submission": {
+      "main": [
+        [
+          {
+            "node": "Send Proposal Acknowledgment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Proposal Acknowledgment": {
+      "main": [
+        [
+          {
+            "node": "Review Proposals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Proposals": {
+      "main": [
+        [
+          {
+            "node": "Collect Reviews",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Reviews": {
+      "main": [
+        [
+          {
+            "node": "Send Review Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Review Reminder": {
+      "main": [
+        [
+          {
+            "node": "Publication Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publication Notification": {
+      "main": [
+        [
+          {
+            "node": "Schedule Publication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

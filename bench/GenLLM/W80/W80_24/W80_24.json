@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Sales Trigger",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Sales",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/sales"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Sales have exceeded 1000!"
+      }
+    }
+  ],
+  "connections": {
+    "Sales Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Sales",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Sales": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

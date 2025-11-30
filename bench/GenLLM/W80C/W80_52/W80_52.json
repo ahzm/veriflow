@@ -1,0 +1,105 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Flight Schedules",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/flight-schedules"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check Constraints",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.constraintMet);"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Allocate Stands",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "items.forEach(item => item.json.standAllocated = 'Stand ' + Math.floor(Math.random() * 10));\nreturn items;"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Allocation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "airport@example.com",
+        "subject": "Stand Allocation Update",
+        "text": "The stand allocations have been updated."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Stand allocations have been processed and emailed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Flight Schedules",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Flight Schedules": {
+      "main": [
+        [
+          {
+            "node": "Check Constraints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Constraints": {
+      "main": [
+        [
+          {
+            "node": "Allocate Stands",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allocate Stands": {
+      "main": [
+        [
+          {
+            "node": "Send Allocation Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

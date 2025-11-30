@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check Capacity",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request Get Census",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.hospitalcensus.com/getCensus"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Evaluate Capacity",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const censusData = items[0].json;\n// Logic to evaluate capacity and suggest transfers\nreturn [{ json: { suggestions: 'Transfer patient A to Hospital B' } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@hospitalnetwork.com",
+        "subject": "Bed Capacity Alert",
+        "text": "Transfer suggestions: Transfer patient A to Hospital B."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Transfer suggestions: Transfer patient A to Hospital B."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check Capacity": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Get Census",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Get Census": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Capacity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Capacity": {
+      "main": [
+        [
+          {
+            "node": "Send Email Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

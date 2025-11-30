@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Booking",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Create Booking",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.freightforwarding.com/bookings"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Customs Clearance",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.freightforwarding.com/customs"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Shipment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.freightforwarding.com/track"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Delivery Confirmation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.freightforwarding.com/delivery"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Freight Forwarding Update",
+        "text": "Your shipment status has been updated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Booking": {
+      "main": [
+        [
+          {
+            "node": "Create Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Booking": {
+      "main": [
+        [
+          {
+            "node": "Customs Clearance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customs Clearance": {
+      "main": [
+        [
+          {
+            "node": "Track Shipment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Shipment": {
+      "main": [
+        [
+          {
+            "node": "Delivery Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delivery Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Segment Contacts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Schedule Calls",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Log Outcomes",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Adjust Scripts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Segment Contacts": {
+      "main": [
+        [
+          {
+            "node": "Schedule Calls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Calls": {
+      "main": [
+        [
+          {
+            "node": "Log Outcomes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Outcomes": {
+      "main": [
+        [
+          {
+            "node": "Adjust Scripts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

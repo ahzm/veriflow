@@ -1,0 +1,1 @@
+Webhook “errorLevel” -> Slack warn if critical.

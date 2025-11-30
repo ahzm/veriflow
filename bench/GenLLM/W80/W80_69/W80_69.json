@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Earthquake Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "*/5 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Magnitude",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "An earthquake with magnitude greater than 4 has occurred!"
+      }
+    }
+  ],
+  "connections": {
+    "Earthquake Trigger": {
+      "main": [
+        [
+          {
+            "node": "Check Magnitude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Magnitude": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

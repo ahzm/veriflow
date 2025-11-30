@@ -1,0 +1,1 @@
+Build a workflow that manages scientific instrument time allocation: handle proposals, peer review, schedule runs, and log results.

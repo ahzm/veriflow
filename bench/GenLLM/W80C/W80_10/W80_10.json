@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Initiate Payment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank.com/initiate-payment"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Confirm Payment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank.com/confirm-payment"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Reconcile Payment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.bank.com/reconcile-payment"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Handle Failure",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Payment process failed. Please check the logs."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Payment Process",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Payment Process": {
+      "main": [
+        [
+          {
+            "node": "Initiate Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initiate Payment": {
+      "main": [
+        [
+          {
+            "node": "Confirm Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirm Payment": {
+      "main": [
+        [
+          {
+            "node": "Reconcile Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconcile Payment": {
+      "main": [
+        [
+          {
+            "node": "Handle Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

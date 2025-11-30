@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Trade Matcher",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Margin Calculator",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Book Reconciler",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "trader@example.com",
+        "subject": "Trade Operations Update",
+        "text": "The trade matching, margin calculation, and book reconciliation processes have been completed."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Trade Matcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trade Matcher": {
+      "main": [
+        [
+          {
+            "node": "Margin Calculator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Margin Calculator": {
+      "main": [
+        [
+          {
+            "node": "Book Reconciler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Book Reconciler": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

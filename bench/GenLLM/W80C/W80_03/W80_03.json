@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Config Changes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/config/changes"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validate Overrides",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.overrideValid);"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Propagate Changes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/config/propagate"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Rollback Changes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/config/rollback"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Configuration Update Notification",
+        "text": "Configuration changes have been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get Config Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Config Changes": {
+      "main": [
+        [
+          {
+            "node": "Validate Overrides",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Overrides": {
+      "main": [
+        [
+          {
+            "node": "Propagate Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propagate Changes": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rollback Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

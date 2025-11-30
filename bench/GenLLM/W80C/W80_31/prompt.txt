@@ -1,0 +1,1 @@
+Design a workflow that manages digital identity verification across channels: documents, biometrics, and risk scoring.

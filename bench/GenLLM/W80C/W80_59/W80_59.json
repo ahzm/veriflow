@@ -1,0 +1,90 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Loan Proposal",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/loan/proposal"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Loan Simulation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/loan/simulation"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Approval Process",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Loan restructuring proposal is ready for approval."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Contract Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/loan/update"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Workflow",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Workflow": {
+      "main": [
+        [
+          {
+            "node": "Loan Proposal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loan Proposal": {
+      "main": [
+        [
+          {
+            "node": "Loan Simulation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loan Simulation": {
+      "main": [
+        [
+          {
+            "node": "Approval Process",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Process": {
+      "main": [
+        [
+          {
+            "node": "Contract Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

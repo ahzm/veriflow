@@ -1,0 +1,55 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Asset Submission",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "asset-submission"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Regional Review",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new asset has been submitted for review."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Final Approval",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "approvals@brand.com",
+        "subject": "Final Approval Needed",
+        "text": "Please review and approve the submitted asset."
+      }
+    }
+  ],
+  "connections": {
+    "Asset Submission": {
+      "main": [
+        [
+          {
+            "node": "Regional Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Regional Review": {
+      "main": [
+        [
+          {
+            "node": "Final Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

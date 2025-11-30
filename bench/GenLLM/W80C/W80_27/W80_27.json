@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Flight",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 8 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Plan Route",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.routeplanning.com/plan"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Delivery",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.deliverytracking.com/track"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Customer",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "Your Drone Delivery Update",
+        "text": "Your delivery is on the way!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Flight": {
+      "main": [
+        [
+          {
+            "node": "Plan Route",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Route": {
+      "main": [
+        [
+          {
+            "node": "Track Delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Delivery": {
+      "main": [
+        [
+          {
+            "node": "Notify Customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

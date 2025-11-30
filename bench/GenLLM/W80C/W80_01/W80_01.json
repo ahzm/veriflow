@@ -1,0 +1,148 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Define Promotions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Propagate to POS",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.pos-system.com/promotions"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Propagate to E-commerce",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.ecommerce-platform.com/promotions"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Monitor Performance",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.analytics.com/performance"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Auto-Adjust Campaigns",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "6",
+      "name": "Schedule Promotions",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Promotion Update",
+        "text": "Promotions have been updated and propagated."
+      }
+    },
+    {
+      "id": "8",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New promotions have been defined and propagated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Promotions": {
+      "main": [
+        [
+          {
+            "node": "Define Promotions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define Promotions": {
+      "main": [
+        [
+          {
+            "node": "Propagate to POS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Propagate to E-commerce",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propagate to POS": {
+      "main": [
+        [
+          {
+            "node": "Monitor Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propagate to E-commerce": {
+      "main": [
+        [
+          {
+            "node": "Monitor Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monitor Performance": {
+      "main": [
+        [
+          {
+            "node": "Auto-Adjust Campaigns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-Adjust Campaigns": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

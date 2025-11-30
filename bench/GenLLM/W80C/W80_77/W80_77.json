@@ -1,0 +1,149 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Billing Retrieval",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 1 * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Retrieve Electricity Bill",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.electricity.com/bill"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Retrieve Water Bill",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.water.com/bill"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Retrieve Gas Bill",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.gas.com/bill"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Retrieve Internet Bill",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.internet.com/bill"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Consolidate Bills",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const bills = [\n  $json[\"electricity\"],\n  $json[\"water\"],\n  $json[\"gas\"],\n  $json[\"internet\"]\n];\nreturn { consolidatedBill: bills.reduce((acc, bill) => acc + bill.amount, 0) };"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Send Consolidated Bill Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Your Consolidated Utility Bill",
+        "text": "Your total utility bill for this month is: {{$json[\"consolidatedBill\"]}}"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Send Notification to Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The consolidated utility bill has been generated and sent via email."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Billing Retrieval": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Electricity Bill",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Electricity Bill": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Water Bill",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Water Bill": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Gas Bill",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Gas Bill": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Internet Bill",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Internet Bill": {
+      "main": [
+        [
+          {
+            "node": "Consolidate Bills",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consolidate Bills": {
+      "main": [
+        [
+          {
+            "node": "Send Consolidated Bill Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Consolidated Bill Email": {
+      "main": [
+        [
+          {
+            "node": "Send Notification to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

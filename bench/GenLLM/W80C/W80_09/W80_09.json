@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Demand Forecasts",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/demand-forecasts"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Slot Constraints",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/slot-constraints"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Optimize Schedule",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Publish Schedule",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "schedule@airline.com",
+        "subject": "Optimized Flight Schedule",
+        "text": "The optimized flight schedule has been generated and is attached."
+      }
+    }
+  ],
+  "connections": {
+    "Demand Forecasts": {
+      "main": [
+        [
+          {
+            "node": "Optimize Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slot Constraints": {
+      "main": [
+        [
+          {
+            "node": "Optimize Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Optimize Schedule": {
+      "main": [
+        [
+          {
+            "node": "Publish Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

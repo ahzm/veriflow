@@ -1,0 +1,74 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "parking-sensor-data"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Detect Violations",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const violations = items.filter(item => item.json.violated === true);\nreturn violations;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Notice",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "violator@example.com",
+        "subject": "Parking Violation Notice",
+        "text": "You have received a parking violation notice."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Track Appeals",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-appeals"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Detect Violations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Violations": {
+      "main": [
+        [
+          {
+            "node": "Send Notice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Notice": {
+      "main": [
+        [
+          {
+            "node": "Track Appeals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

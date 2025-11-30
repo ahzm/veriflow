@@ -1,0 +1,84 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Digitization",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Prioritize Collection",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Scan Items",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.museum.org/scan"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Publish Collection",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The digitization of the museum collection has been completed and is now published."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "curator@museum.org",
+        "subject": "Digitization Completed",
+        "text": "The digitization process for the museum collection has been successfully completed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Digitization": {
+      "main": [
+        [
+          {
+            "node": "Prioritize Collection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prioritize Collection": {
+      "main": [
+        [
+          {
+            "node": "Scan Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scan Items": {
+      "main": [
+        [
+          {
+            "node": "Publish Collection",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

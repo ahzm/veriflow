@@ -1,0 +1,1 @@
+Design a workflow that manages complex cross-channel retail promotions: define promotions, propagate to POS and e-commerce, monitor performance, and auto-adjust underperforming campaigns.

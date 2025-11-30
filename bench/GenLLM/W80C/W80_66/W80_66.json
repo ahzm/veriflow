@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Event",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 12 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Notify Participants",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A demand response event has been triggered. Please adjust your usage accordingly."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Settle Incentives",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/settle-incentives"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Event": {
+      "main": [
+        [
+          {
+            "node": "Notify Participants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Participants": {
+      "main": [
+        [
+          {
+            "node": "Settle Incentives",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

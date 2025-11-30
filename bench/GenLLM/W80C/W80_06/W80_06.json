@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule A/B Test",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Run A/B Test",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/run-ab-test"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Collect Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/collect-metrics"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Compute Lift",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return { lift: inputData[0].metrics.control - inputData[0].metrics.treatment };"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Roll Out Winner",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/rollout-winner"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "A/B Test Results",
+        "text": "The A/B test has been completed and the winner has been rolled out."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule A/B Test": {
+      "main": [
+        [
+          {
+            "node": "Run A/B Test",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run A/B Test": {
+      "main": [
+        [
+          {
+            "node": "Collect Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Metrics": {
+      "main": [
+        [
+          {
+            "node": "Compute Lift",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Lift": {
+      "main": [
+        [
+          {
+            "node": "Roll Out Winner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Roll Out Winner": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

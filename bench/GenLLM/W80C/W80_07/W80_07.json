@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Temperature Sensor",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.temperaturesensor.com/getLatest"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Temperature",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const temperature = items[0].json.temperature;\nreturn [{ json: { isExcursion: temperature < 2 || temperature > 8 } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Alert Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "supplychain@pharma.com",
+        "subject": "Temperature Excursion Alert",
+        "text": "A temperature excursion has been detected in the cold chain."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Attention: Temperature excursion detected! Immediate action required."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Remediation Action",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { action: 'Initiate remediation process' } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Monitoring",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "*/5 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Monitoring": {
+      "main": [
+        [
+          {
+            "node": "Temperature Sensor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Temperature Sensor": {
+      "main": [
+        [
+          {
+            "node": "Check Temperature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Temperature": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Remediation Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

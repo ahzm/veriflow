@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Backup",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Backup Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "backup@example.com",
+        "subject": "Daily Email Backup",
+        "text": "This is your daily email backup."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Backup": {
+      "main": [
+        [
+          {
+            "node": "Send Backup Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

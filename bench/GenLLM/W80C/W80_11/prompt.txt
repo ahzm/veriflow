@@ -1,0 +1,1 @@
+Design a workflow that manages higher-education accreditation evidence: collect documents, map to standards, and generate submission packages.

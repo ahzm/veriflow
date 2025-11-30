@@ -1,0 +1,74 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "citizen-permit-application"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Application",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "if (!items[0].json.name || !items[0].json.address) {\n  throw new Error('Validation failed: Name and Address are required.');\n}\nreturn items;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Route for Approvals",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New citizen permit application received for approval."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Issue Permit",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "applicant@example.com",
+        "subject": "Your Citizen Permit Application",
+        "text": "Your application has been approved. Your permit will be issued shortly."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Application",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Application": {
+      "main": [
+        [
+          {
+            "node": "Route for Approvals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route for Approvals": {
+      "main": [
+        [
+          {
+            "node": "Issue Permit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

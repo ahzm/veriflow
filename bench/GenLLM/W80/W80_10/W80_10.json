@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check BTC Price",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.coindesk.com/v1/bpi/currentprice/BTC.json"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "BTC price is below 55k!"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Evaluate Price",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const price = parseFloat(items[0].json.bpi.USD.rate.replace(/,/g, ''));\nreturn price < 55000 ? [{ json: { notify: true } }] : [{ json: { notify: false } }];"
+      }
+    }
+  ],
+  "connections": {
+    "Check BTC Price": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Price",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Price": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

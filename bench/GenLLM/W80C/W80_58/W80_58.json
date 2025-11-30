@@ -1,0 +1,78 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check Deadlines",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Compute Fees",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const fees = calculateFees();\nreturn [{ json: { fees } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Execute Payment",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.paymentgateway.com/pay",
+        "method": "POST",
+        "body": {
+          "amount": "={{$json[\"fees\"]}}",
+          "currency": "USD"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Patent Annuity Payment Processed",
+        "text": "Your patent annuity payment of {{$json[\"fees\"]}} has been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check Deadlines": {
+      "main": [
+        [
+          {
+            "node": "Compute Fees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Fees": {
+      "main": [
+        [
+          {
+            "node": "Execute Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Payment": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

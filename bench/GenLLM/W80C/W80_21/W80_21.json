@@ -1,0 +1,96 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Generate Fixtures",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { fixtures: 'Generated fixtures data' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Handle Constraints",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { updatedFixtures: 'Updated fixtures after constraints' } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Update Calendar",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.calendar.com/update",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "fixtures": "={{$json[\"updatedFixtures\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Teams",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Fixtures have been updated and calendars are refreshed."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Handle Constraints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Constraints": {
+      "main": [
+        [
+          {
+            "node": "Update Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Calendar": {
+      "main": [
+        [
+          {
+            "node": "Notify Teams",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

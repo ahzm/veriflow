@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Ingest Briefs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/ingest-briefs"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Build Placements",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Push to Ad Platforms",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/push-ad-platforms"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Reconcile Delivery",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/reconcile-delivery"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Campaign",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Campaign": {
+      "main": [
+        [
+          {
+            "node": "Ingest Briefs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ingest Briefs": {
+      "main": [
+        [
+          {
+            "node": "Build Placements",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Placements": {
+      "main": [
+        [
+          {
+            "node": "Push to Ad Platforms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Push to Ad Platforms": {
+      "main": [
+        [
+          {
+            "node": "Reconcile Delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proposals"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Peer Review",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => ({ json: { proposalId: item.json.id, reviewStatus: 'Reviewed' } }));"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Schedule Runs",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Results",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/log-results",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "proposalId": "={{$json[\"proposalId\"]}}",
+          "result": "Success"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new proposal has been reviewed and scheduled for execution."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Peer Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Peer Review": {
+      "main": [
+        [
+          {
+            "node": "Schedule Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Runs": {
+      "main": [
+        [
+          {
+            "node": "Log Results",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

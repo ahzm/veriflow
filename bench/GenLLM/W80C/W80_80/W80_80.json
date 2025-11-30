@@ -1,0 +1,87 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "case-data"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Case Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.caseId && item.json.country && item.json.date);"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Aggregate Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const aggregated = {}; items.forEach(item => { const country = item.json.country; if (!aggregated[country]) { aggregated[country] = 0; } aggregated[country]++; }); return Object.keys(aggregated).map(country => ({ json: { country, count: aggregated[country] } }));"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "health@organization.org",
+        "subject": "Cross-Border Health Surveillance Report",
+        "text": "The aggregated case data is ready for review."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New health surveillance report generated."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Case Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Case Data": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Data": {
+      "main": [
+        [
+          {
+            "node": "Send Email Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

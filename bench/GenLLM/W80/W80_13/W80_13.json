@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "CO2 Sensor",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/co2"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check CO2 Level",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "if (items[0].json.co2 > 800) {\n  return [{ json: { alert: true } }];\n} else {\n  return [{ json: { alert: false } }];\n}"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Alert: CO2 level is above 800!"
+      }
+    }
+  ],
+  "connections": {
+    "CO2 Sensor": {
+      "main": [
+        [
+          {
+            "node": "Check CO2 Level",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check CO2 Level": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

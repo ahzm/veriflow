@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "identity-verification"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Document Verification",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.documentverification.com/verify",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "document": "={{$json[\"document\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Biometric Verification",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.biometricverification.com/verify",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "biometricData": "={{$json[\"biometricData\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Risk Scoring",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.riskscoring.com/score",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "userId": "={{$json[\"userId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Identity Verification Status",
+        "text": "Your identity verification has been processed."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Document Verification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Verification": {
+      "main": [
+        [
+          {
+            "node": "Biometric Verification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Biometric Verification": {
+      "main": [
+        [
+          {
+            "node": "Risk Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Risk Scoring": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

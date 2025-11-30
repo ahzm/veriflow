@@ -1,0 +1,99 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Get Cases",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.agency.gov/cases"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Slack - Notify Team",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New cases have been retrieved for review."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Email - Share Data",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@agency.gov",
+        "subject": "New Social Benefit Cases",
+        "text": "Please find the attached data for the new cases."
+      }
+    },
+    {
+      "id": "5",
+      "name": "HTTP Request - Post Decisions",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.agency.gov/decisions"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Get Cases",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Get Cases": {
+      "main": [
+        [
+          {
+            "node": "Slack - Notify Team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email - Share Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack - Notify Team": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Post Decisions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email - Share Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Post Decisions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

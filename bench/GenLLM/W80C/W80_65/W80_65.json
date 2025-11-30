@@ -1,0 +1,78 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Alert",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Email Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alert@example.com",
+        "subject": "Disaster Alert",
+        "text": "This is a disaster early-warning message."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "This is a disaster early-warning message."
+      }
+    },
+    {
+      "id": "4",
+      "name": "HTTP Request for Confirmation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/confirm"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Alert": {
+      "main": [
+        [
+          {
+            "node": "Send Email Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Alert": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Slack Alert": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

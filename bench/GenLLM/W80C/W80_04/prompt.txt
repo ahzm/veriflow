@@ -1,0 +1,1 @@
+Define a workflow that automates city parking policy enforcement: ingest sensor data, detect violations, issue notices, and track appeals.

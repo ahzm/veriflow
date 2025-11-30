@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Data Aggregation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Aggregate Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.financialdata.com/aggregate"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validate Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Submit to Regulator A",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Submitting data to Regulator A"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Submit to Regulator B",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Submitting data to Regulator B"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "compliance@financialfirm.com",
+        "subject": "Regulatory Submission Confirmation",
+        "text": "The regulatory submissions have been completed successfully."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Data Aggregation": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Data": {
+      "main": [
+        [
+          {
+            "node": "Validate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Data": {
+      "main": [
+        [
+          {
+            "node": "Submit to Regulator A",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Submit to Regulator B",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit to Regulator A": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit to Regulator B": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

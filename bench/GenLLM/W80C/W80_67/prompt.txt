@@ -1,0 +1,1 @@
+Create a workflow that orchestrates complex B2B onboarding in fintech: KYC, KYB, risk scoring, and account setup.

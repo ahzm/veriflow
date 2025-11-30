@@ -1,0 +1,35 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Onboarding Email",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "newemployee@example.com",
+        "subject": "Welcome to the Team!",
+        "text": "Dear New Employee,\n\nWelcome aboard! We are excited to have you with us.\n\nBest,\nThe Team"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Onboarding Email": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

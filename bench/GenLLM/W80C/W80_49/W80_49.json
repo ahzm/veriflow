@@ -1,0 +1,87 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Claim Intake",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "claim-intake"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Documentation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/documentation",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "claimId": "={{$json[\"id\"]}}",
+          "documents": "={{$json[\"documents\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Validation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/validate",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "claimId": "={{$json[\"id\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Settlement",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "claims@example.com",
+        "subject": "Claim Settlement Notification",
+        "text": "Your claim has been settled."
+      }
+    }
+  ],
+  "connections": {
+    "Claim Intake": {
+      "main": [
+        [
+          {
+            "node": "Documentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Documentation": {
+      "main": [
+        [
+          {
+            "node": "Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validation": {
+      "main": [
+        [
+          {
+            "node": "Settlement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

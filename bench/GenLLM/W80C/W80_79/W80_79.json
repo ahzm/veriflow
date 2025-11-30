@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trade Surveillance",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Trade Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.tradedata.com/v1/trades"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Analyze Patterns",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Alert Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "alerts@tradesurveillance.com",
+        "subject": "Suspicious Trade Patterns Detected",
+        "text": "Suspicious patterns have been detected in the trade data."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Alert: Suspicious trade patterns detected!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trade Surveillance": {
+      "main": [
+        [
+          {
+            "node": "Fetch Trade Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Trade Data": {
+      "main": [
+        [
+          {
+            "node": "Analyze Patterns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Patterns": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

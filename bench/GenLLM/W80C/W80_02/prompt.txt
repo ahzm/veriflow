@@ -1,0 +1,1 @@
+Create a workflow that orchestrates multi-step manufacturing quality control: capture inspection data, run statistical checks, quarantine defective batches, and notify production leads.

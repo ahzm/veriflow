@@ -1,0 +1,1 @@
+Build a workflow that manages multi-tenancy configuration for a SaaS app: propagate config changes, validate per-tenant overrides, and roll back on errors.

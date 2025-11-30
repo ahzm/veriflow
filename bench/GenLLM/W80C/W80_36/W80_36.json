@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Allocate Risks",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Logic to allocate risks\n    return { json: { allocatedRisk: item.json.risk * 0.8 } };\n});"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute Premiums",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.map(item => {\n    // Logic to compute premiums\n    return { json: { premium: item.json.allocatedRisk * 0.1 } };\n});"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "report@example.com",
+        "subject": "Insurance Reinsurance Cession Report",
+        "text": "The premiums have been computed and risks allocated."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Allocate Risks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allocate Risks": {
+      "main": [
+        [
+          {
+            "node": "Compute Premiums",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Premiums": {
+      "main": [
+        [
+          {
+            "node": "Send Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Price Signals",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.pricesignals.com/latest"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Run Optimization",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const priceSignals = items[0].json;\n// Optimization logic here\nconst setpoints = { optimized: true }; // Example output\nreturn [{ json: setpoints }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Setpoints",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "operations@example.com",
+        "subject": "Battery Dispatch Setpoints",
+        "text": "The optimized setpoints have been calculated and are ready for dispatch."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Price Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Price Signals": {
+      "main": [
+        [
+          {
+            "node": "Run Optimization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Optimization": {
+      "main": [
+        [
+          {
+            "node": "Send Setpoints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

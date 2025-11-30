@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Error Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Send Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "An error has occurred."
+      }
+    }
+  ],
+  "connections": {
+    "Error Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

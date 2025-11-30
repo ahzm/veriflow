@@ -1,0 +1,74 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Proposal Submission",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proposal-submission"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Committee Review",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new curriculum proposal has been submitted for review."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Approval Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "committee@example.com",
+        "subject": "Curriculum Proposal Approval",
+        "text": "The curriculum proposal has been approved."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Catalog Update",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example.com/update-catalog"
+      }
+    }
+  ],
+  "connections": {
+    "Proposal Submission": {
+      "main": [
+        [
+          {
+            "node": "Committee Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Committee Review": {
+      "main": [
+        [
+          {
+            "node": "Approval Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Notification": {
+      "main": [
+        [
+          {
+            "node": "Catalog Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

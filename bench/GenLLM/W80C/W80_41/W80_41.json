@@ -1,0 +1,74 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Case Intake",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "case-intake"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Evidence Collection",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/evidence-collection"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Decision Making",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Decision has been made regarding the tax audit case."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "client@example.com",
+        "subject": "Tax Audit Case Update",
+        "text": "Your tax audit case has been processed. Please check the details."
+      }
+    }
+  ],
+  "connections": {
+    "Case Intake": {
+      "main": [
+        [
+          {
+            "node": "Evidence Collection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evidence Collection": {
+      "main": [
+        [
+          {
+            "node": "Decision Making",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision Making": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

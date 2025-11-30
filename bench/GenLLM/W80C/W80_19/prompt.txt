@@ -1,0 +1,1 @@
+Define a workflow that automates grid-scale battery dispatch optimization: pull price signals, run optimization, and send setpoints.

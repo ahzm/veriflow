@@ -1,0 +1,1 @@
+Build a workflow that manages cross-media rights for sports events: track territories, platforms, and sublicenses.

@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Drill",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Plan Drill",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.citydrills.com/plan"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Execute Drill",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.citydrills.com/execute"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Collect Feedback",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.citydrills.com/feedback"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Report Findings",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "emergency@city.gov",
+        "subject": "Emergency Drill Report",
+        "text": "The report for the recent emergency drill is ready."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Drill": {
+      "main": [
+        [
+          {
+            "node": "Plan Drill",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Drill": {
+      "main": [
+        [
+          {
+            "node": "Execute Drill",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Drill": {
+      "main": [
+        [
+          {
+            "node": "Collect Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Feedback": {
+      "main": [
+        [
+          {
+            "node": "Report Findings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

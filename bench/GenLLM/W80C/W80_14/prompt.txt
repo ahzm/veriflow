@@ -1,0 +1,1 @@
+Define a workflow that automates fleet maintenance scheduling: integrate telematics, schedule services, and track completion.

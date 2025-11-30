@@ -1,0 +1,101 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "inter-library-loan"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request - Route Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://library-routing-service.com/route",
+        "method": "POST",
+        "jsonParameters": true,
+        "options": {},
+        "body": {
+          "request": "={{$json[\"request\"]}}"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://library-tracking-service.com/track",
+        "method": "GET",
+        "jsonParameters": true,
+        "options": {},
+        "query": {
+          "requestId": "={{$json[\"requestId\"]}}"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "={{$json[\"patronEmail\"]}}",
+        "subject": "Your Inter-Library Loan Request Update",
+        "text": "Your request is being processed. Current status: {{$json[\"status\"]}}"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New inter-library loan request received: {{$json[\"requestId\"]}}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request - Route Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request - Route Request": {
+      "main": [
+        [
+          {
+            "node": "Track Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Request": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

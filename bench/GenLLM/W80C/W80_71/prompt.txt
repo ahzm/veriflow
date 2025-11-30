@@ -1,0 +1,1 @@
+Design a workflow that manages cross-agency social benefit cases: share data, coordinate decisions, and prevent duplication.

@@ -1,0 +1,1 @@
+Earthquake magnitude >4 -> Slack alert.

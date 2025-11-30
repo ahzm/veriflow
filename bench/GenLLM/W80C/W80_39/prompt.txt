@@ -1,0 +1,1 @@
+Define a workflow that automates outbound call center campaigns: segment contacts, schedule calls, log outcomes, and adjust scripts.

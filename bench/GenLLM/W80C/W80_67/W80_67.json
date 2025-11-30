@@ -1,0 +1,124 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Onboarding",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "KYC Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.fintech.com/kyc"
+      }
+    },
+    {
+      "id": "3",
+      "name": "KYB Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.fintech.com/kyb"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Risk Scoring",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.fintech.com/risk-scoring"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Account Setup",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.fintech.com/account-setup"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "client@example.com",
+        "subject": "Onboarding Complete",
+        "text": "Your onboarding process is complete. Welcome aboard!"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new client has completed the onboarding process."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Onboarding": {
+      "main": [
+        [
+          {
+            "node": "KYC Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KYC Check": {
+      "main": [
+        [
+          {
+            "node": "KYB Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KYB Check": {
+      "main": [
+        [
+          {
+            "node": "Risk Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Risk Scoring": {
+      "main": [
+        [
+          {
+            "node": "Account Setup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Account Setup": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

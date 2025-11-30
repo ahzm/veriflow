@@ -1,0 +1,93 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Project Tracking",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Project Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/projects"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Project Update Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Project Update",
+        "text": "Here is the latest update on the climate adaptation projects."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Milestones",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Milestones have been logged for the climate adaptation projects."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Impact Indicators",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/impact-indicators"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Project Tracking": {
+      "main": [
+        [
+          {
+            "node": "Fetch Project Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Project Data": {
+      "main": [
+        [
+          {
+            "node": "Send Project Update Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Milestones",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Track Impact Indicators",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Project Update Email": {
+      "main": []
+    },
+    "Log Milestones": {
+      "main": []
+    },
+    "Track Impact Indicators": {
+      "main": []
+    }
+  }
+}

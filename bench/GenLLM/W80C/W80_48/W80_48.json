@@ -1,0 +1,86 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Sensor Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.smartcity.com/sensors"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Optimize Lighting",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const data = items[0].json;\nconst optimizedSettings = { dimming: data.lightLevel < 50 ? 'high' : 'low' };\nreturn [{ json: optimizedSettings }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Maintenance Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "maintenance@smartcity.com",
+        "subject": "Maintenance Required for Street Lights",
+        "text": "Please check the street lights that are not functioning properly."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Lighting optimization has been updated based on the latest sensor data."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get Sensor Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sensor Data": {
+      "main": [
+        [
+          {
+            "node": "Optimize Lighting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Optimize Lighting": {
+      "main": [
+        [
+          {
+            "node": "Send Maintenance Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Dataset Submission",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "dataset-submission"
+      }
+    },
+    {
+      "id": "2",
+      "name": "QA Process",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Metadata Generation",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Release Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new dataset has been released."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Publish Dataset",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.opendataportal.com/publish"
+      }
+    }
+  ],
+  "connections": {
+    "Dataset Submission": {
+      "main": [
+        [
+          {
+            "node": "QA Process",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QA Process": {
+      "main": [
+        [
+          {
+            "node": "Metadata Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Metadata Generation": {
+      "main": [
+        [
+          {
+            "node": "Publish Dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Dataset": {
+      "main": [
+        [
+          {
+            "node": "Release Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

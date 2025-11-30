@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Check Rights",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Check Rights",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.copyright.com/check-rights"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Expiration Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "rights@copyright.com",
+        "subject": "Copyright Expiration Alert",
+        "text": "Some copyrights are about to expire. Please check the details."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Log Usage",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.copyright.com/log-usage"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Copyright rights have been checked and logged."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check Rights": {
+      "main": [
+        [
+          {
+            "node": "Check Rights",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Rights": {
+      "main": [
+        [
+          {
+            "node": "Send Expiration Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Usage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Usage": {
+      "main": [
+        [
+          {
+            "node": "Notify Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

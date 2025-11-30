@@ -1,0 +1,1 @@
+Design a workflow that manages sports league scheduling: generate fixtures, handle constraints, update calendars, and notify teams.

@@ -1,0 +1,1 @@
+Temp >30 -> Slack.

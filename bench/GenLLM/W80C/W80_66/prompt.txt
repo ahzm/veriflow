@@ -1,0 +1,1 @@
+Design a workflow that manages smart grid demand response events: trigger events, notify participants, and settle incentives.

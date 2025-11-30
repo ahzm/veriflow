@@ -1,0 +1,1 @@
+Define a workflow that automates satellite imaging tasking: requests, prioritization, scheduling, and delivery.

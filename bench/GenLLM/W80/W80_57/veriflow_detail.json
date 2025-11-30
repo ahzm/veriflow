@@ -1,0 +1,240 @@
+{
+  "S": 0.98,
+  "M": 1.0,
+  "E": 1.0,
+  "Overall": 0.99,
+  "struct_detail": {
+    "schema_ok": 1.0,
+    "connected_ratio": 1.0,
+    "acyclic": 1.0,
+    "orphan_ratio": 0.0,
+    "avg_out_norm": 0.25,
+    "exit_coverage": 1.0,
+    "base_structural_score": 0.96,
+    "final_S": 0.98,
+    "unreachable_ratio": 0.0,
+    "dead_end_ratio": 0.0,
+    "penalty": 0.0,
+    "k": 0.15,
+    "explanation": {
+      "connected_ratio": "Fraction of nodes in the largest weakly connected component",
+      "acyclic": "1.0 means no directed cycles; 0.0 means at least one cycle exists",
+      "orphan_ratio": "Fraction of nodes with no incoming and no outgoing edges",
+      "avg_out_norm": "Average out-degree normalized by maximum possible out-degree",
+      "exit_coverage": "Fraction of terminal nodes that are reachable from triggers",
+      "unreachable_ratio": "Fraction of nodes not reachable from any trigger",
+      "dead_end_ratio": "Reachable nodes/chains that do not lead to terminal actions"
+    }
+  },
+  "semantic_detail": {
+    "trigger": 1.0,
+    "action": 1.0,
+    "support": 1.0,
+    "order": 1.0,
+    "conditional": 1.0,
+    "param_sem": 1.0,
+    "intent_edge": 1.0,
+    "intent_edge_note": "ratio of satisfied intent-graph edges",
+    "params_req": {},
+    "intent_conf": 1.0,
+    "source": "rule+llm",
+    "intent": {
+      "need_condition": false,
+      "need_conditional_notify": false,
+      "need_db": false,
+      "need_email": true,
+      "need_form": false,
+      "need_http": false,
+      "need_schedule": false,
+      "need_slack": false,
+      "need_telegram": false,
+      "need_transform": false
+    },
+    "intent_chain": [
+      "rule: matched email keywords",
+      "The description mentions 'email', indicating a need for email communication."
+    ],
+    "irrelevant_nodes": [
+      "1",
+      "2",
+      "3"
+    ],
+    "intent_caps": [
+      "email"
+    ],
+    "intent_edges": [],
+    "missing_capabilities": [],
+    "alignment": {
+      "capability_matches": {
+        "email": true
+      },
+      "edge_matches": []
+    },
+    "score_weights": {
+      "trigger": 1.0,
+      "action": 1.0,
+      "support": 1.0,
+      "order": 1.0,
+      "conditional": 1.0,
+      "param_sem": 1.0,
+      "intent_edge": 0.5
+    },
+    "evidence": [
+      {
+        "rule": "embedding_relevance",
+        "applicable": true,
+        "ok": true,
+        "top_k": 3,
+        "threshold": 0.55,
+        "boosted": [],
+        "note": "soft relevance boost by embeddings (batch)"
+      }
+    ],
+    "alignment_graph": {
+      "intent_caps": [
+        "email"
+      ],
+      "intent_edges": [],
+      "workflow_nodes": [
+        {
+          "id": "1",
+          "label": "Schedule",
+          "capability": "schedule",
+          "relevant": false
+        },
+        {
+          "id": "2",
+          "label": "HTTP Request",
+          "capability": "http",
+          "relevant": false
+        },
+        {
+          "id": "3",
+          "label": "Check AQI",
+          "capability": "transform",
+          "relevant": false
+        },
+        {
+          "id": "4",
+          "label": "Send Email",
+          "capability": "email",
+          "relevant": true
+        }
+      ],
+      "workflow_edges": [
+        {
+          "source": "1",
+          "target": "2"
+        },
+        {
+          "source": "2",
+          "target": "3"
+        },
+        {
+          "source": "3",
+          "target": "4"
+        }
+      ],
+      "relevant_nodes": [
+        "4"
+      ],
+      "irrelevant_nodes": [
+        "1",
+        "2",
+        "3"
+      ],
+      "missing_capabilities": []
+    }
+  },
+  "exec_detail": {
+    "param_ok": 1.0,
+    "path_ok": 1.0,
+    "runtime_ok": 1.0,
+    "dataflow_ok": 1.0,
+    "weights": {
+      "param": 0.4,
+      "path": 0.25,
+      "run": 0.15,
+      "dataflow": 0.2
+    },
+    "missing_params": [],
+    "param_detail": {
+      "checked_nodes": 4
+    },
+    "unreachable_nodes": [],
+    "dataflow_detail": {
+      "applicable": false,
+      "required_fields": {},
+      "available_fields": {
+        "1": [
+          "timestamp"
+        ],
+        "2": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "3": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ],
+        "4": [
+          "body",
+          "headers",
+          "statusCode",
+          "timestamp"
+        ]
+      },
+      "missing_fields": {}
+    },
+    "executed_nodes": [
+      "1",
+      "2",
+      "3",
+      "4"
+    ],
+    "executed_nodes_readable": [
+      "Schedule",
+      "HTTP Request",
+      "Check AQI",
+      "Send Email"
+    ],
+    "name_map": {
+      "1": "Schedule",
+      "2": "HTTP Request",
+      "3": "Check AQI",
+      "4": "Send Email"
+    },
+    "node_results": {
+      "1": {
+        "ok": true,
+        "msg": "cron ok"
+      },
+      "2": {
+        "ok": true,
+        "msg": "http ok (mock)"
+      },
+      "3": {
+        "ok": true,
+        "msg": "noop"
+      },
+      "4": {
+        "ok": true,
+        "msg": "email ok (mock)"
+      }
+    },
+    "time_budget_sec": 2.0,
+    "faulted_nodes": [],
+    "fault_profile": "medium",
+    "faults_enabled": false
+  },
+  "executed_path": [
+    "Schedule",
+    "HTTP Request",
+    "Check AQI",
+    "Send Email"
+  ]
+}

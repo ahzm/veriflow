@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Berthing",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Handle Cargo",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.portoperations.com/handleCargo"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Customs Clearance",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.portoperations.com/customsClearance"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "operations@port.com",
+        "subject": "Port Operations Update",
+        "text": "Berthing schedules, cargo handling, and customs processes have been coordinated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Berthing": {
+      "main": [
+        [
+          {
+            "node": "Handle Cargo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle Cargo": {
+      "main": [
+        [
+          {
+            "node": "Customs Clearance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customs Clearance": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

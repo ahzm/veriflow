@@ -1,0 +1,120 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Match Mentors and Mentees",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const mentors = [/* array of mentors */];\nconst mentees = [/* array of mentees */];\nconst matches = mentors.map(mentor => {\n    const mentee = mentees[Math.floor(Math.random() * mentees.length)];\n    return { mentor, mentee };\n});\nreturn matches;"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Schedule Sessions",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const matches = items.map(item => item.json);\nconst sessions = matches.map(match => {\n    return { session: `Session between ${match.mentor} and ${match.mentee}` };\n});\nreturn sessions;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email to Mentors",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "mentor@example.com",
+        "subject": "Your Mentoring Session Scheduled",
+        "text": "Your mentoring session has been scheduled. Please check your calendar."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email to Mentees",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "mentee@example.com",
+        "subject": "Your Mentoring Session Scheduled",
+        "text": "Your mentoring session has been scheduled. Please check your calendar."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Track Outcomes",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-outcomes"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Match Mentors and Mentees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Mentors and Mentees": {
+      "main": [
+        [
+          {
+            "node": "Schedule Sessions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Sessions": {
+      "main": [
+        [
+          {
+            "node": "Send Email to Mentors",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email to Mentees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Mentors": {
+      "main": [
+        [
+          {
+            "node": "Track Outcomes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email to Mentees": {
+      "main": [
+        [
+          {
+            "node": "Track Outcomes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

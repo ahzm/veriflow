@@ -1,0 +1,1 @@
+Define a workflow that automates multi-step loan restructuring: proposals, simulations, approvals, and contract updates.

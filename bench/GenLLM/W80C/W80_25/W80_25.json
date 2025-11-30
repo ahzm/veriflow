@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Identify Owners",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/owners"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Notices",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "owner@example.com",
+        "subject": "Vehicle Recall Notice",
+        "text": "Dear Owner, your vehicle is subject to a recall. Please contact us for more information."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Schedule Repairs",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/schedule-repair"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Track Completion",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/track-completion"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Identify Owners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identify Owners": {
+      "main": [
+        [
+          {
+            "node": "Send Notices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Notices": {
+      "main": [
+        [
+          {
+            "node": "Schedule Repairs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Repairs": {
+      "main": [
+        [
+          {
+            "node": "Track Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

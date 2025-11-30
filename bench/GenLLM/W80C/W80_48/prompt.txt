@@ -1,0 +1,1 @@
+Build a workflow that manages smart city lighting optimization: sensor data, dimming schedules, and maintenance.

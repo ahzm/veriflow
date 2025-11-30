@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Validation",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Edits",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Merge Edits",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Publish Tiles",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/publish"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "admin@example.com",
+        "subject": "Tiles Published",
+        "text": "The mapping tiles have been successfully published."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Validation": {
+      "main": [
+        [
+          {
+            "node": "Validate Edits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Edits": {
+      "main": [
+        [
+          {
+            "node": "Merge Edits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Edits": {
+      "main": [
+        [
+          {
+            "node": "Publish Tiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Tiles": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

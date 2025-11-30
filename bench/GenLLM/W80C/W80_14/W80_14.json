@@ -1,0 +1,119 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request Telematics",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.telematics.com/getData"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Schedule Service",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "fleetmanager@example.com",
+        "subject": "Fleet Maintenance Scheduled",
+        "text": "The maintenance for the fleet has been scheduled."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Fleet maintenance has been scheduled successfully."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Track Completion",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.telematics.com/trackCompletion"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Telematics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Telematics": {
+      "main": [
+        [
+          {
+            "node": "Schedule Service",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Service": {
+      "main": [
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Notification": {
+      "main": [
+        [
+          {
+            "node": "Track Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack Notification": {
+      "main": [
+        [
+          {
+            "node": "Track Completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Completion": {
+      "main": []
+    }
+  }
+}

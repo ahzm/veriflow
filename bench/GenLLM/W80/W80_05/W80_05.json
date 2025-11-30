@@ -1,0 +1,41 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Check Order",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "operation": "lessThan",
+              "value1": "{{$json[\"orderAmount\"]}}",
+              "value2": 20
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "2",
+      "name": "Send Slack Message",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "An order below $20 has been placed."
+      }
+    }
+  ],
+  "connections": {
+    "Check Order": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

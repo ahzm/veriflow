@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Training",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Enroll Participants",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.corporatetraining.com/enroll"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Track Attendance",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.corporatetraining.com/attendance"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Assess Participants",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.corporatetraining.com/assess"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Certificates",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "participant@example.com",
+        "subject": "Your Training Certificate",
+        "text": "Congratulations on completing the training program!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Training": {
+      "main": [
+        [
+          {
+            "node": "Enroll Participants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enroll Participants": {
+      "main": [
+        [
+          {
+            "node": "Track Attendance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Track Attendance": {
+      "main": [
+        [
+          {
+            "node": "Assess Participants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assess Participants": {
+      "main": [
+        [
+          {
+            "node": "Send Certificates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

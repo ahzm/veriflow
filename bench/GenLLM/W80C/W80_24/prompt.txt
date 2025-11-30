@@ -1,0 +1,1 @@
+Define a workflow that automates citizen permit applications: intake, validate, route for approvals, and issue permits.

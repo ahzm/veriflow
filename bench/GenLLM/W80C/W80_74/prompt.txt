@@ -1,0 +1,1 @@
+Define a workflow that automates media royalties allocations: usage data, split calculations, and payouts.

@@ -1,0 +1,1 @@
+Build a workflow that manages NGO monitoring and evaluation frameworks: collect indicators, validate, aggregate, and report.

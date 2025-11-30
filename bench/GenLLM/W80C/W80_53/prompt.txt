@@ -1,0 +1,1 @@
+Build a workflow that manages global brand asset approvals: asset submissions, regional reviews, and final approvals.

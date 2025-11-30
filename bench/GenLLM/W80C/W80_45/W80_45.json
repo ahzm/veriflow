@@ -1,0 +1,107 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Coupons",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.airline.com/coupons"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Match Coupons",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.status === 'matched');"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Detect Mismatches",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items.filter(item => item.json.status === 'mismatch');"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Resolve Mismatches",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Mismatches detected, please review the details."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "reconciliation@airline.com",
+        "subject": "Reconciliation Update",
+        "text": "The reconciliation process has completed. Please check for mismatches."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule": {
+      "main": [
+        [
+          {
+            "node": "Fetch Coupons",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Coupons": {
+      "main": [
+        [
+          {
+            "node": "Match Coupons",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Coupons": {
+      "main": [
+        [
+          {
+            "node": "Detect Mismatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Mismatches": {
+      "main": [
+        [
+          {
+            "node": "Resolve Mismatches",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

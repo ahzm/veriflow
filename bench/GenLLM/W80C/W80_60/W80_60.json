@@ -1,0 +1,101 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Data Collection",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Collect Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.airline-data.com/collect"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Compute KPIs",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Propose Changes",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Send Email Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "manager@airline.com",
+        "subject": "Airline Route Profitability Analysis Report",
+        "text": "The analysis report is ready. Please review the proposed changes."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The airline route profitability analysis has been completed and the report is sent."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Data Collection": {
+      "main": [
+        [
+          {
+            "node": "Collect Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Data": {
+      "main": [
+        [
+          {
+            "node": "Compute KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute KPIs": {
+      "main": [
+        [
+          {
+            "node": "Propose Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propose Changes": {
+      "main": [
+        [
+          {
+            "node": "Send Email Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

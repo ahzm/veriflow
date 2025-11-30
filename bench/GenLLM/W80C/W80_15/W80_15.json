@@ -1,0 +1,111 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Exercise",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 9 * * 1"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Plan Scenarios",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { scenario: 'Phishing Attack' } }, { json: { scenario: 'Ransomware Attack' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Send Injects",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New scenario inject: {{$json[\"scenario\"]}}"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Collect Responses",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/collect-responses"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { report: 'Exercise Report Generated' } }];"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Report",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "team@example.com",
+        "subject": "Cyber Incident Exercise Report",
+        "text": "The report for the recent exercise has been generated."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Exercise": {
+      "main": [
+        [
+          {
+            "node": "Plan Scenarios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Scenarios": {
+      "main": [
+        [
+          {
+            "node": "Send Injects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Injects": {
+      "main": [
+        [
+          {
+            "node": "Collect Responses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Responses": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Send Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

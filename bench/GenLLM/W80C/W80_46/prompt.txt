@@ -1,0 +1,1 @@
+Design a workflow that manages large corporate training programs: enrollments, attendance tracking, assessments, and certificates.

@@ -1,0 +1,1 @@
+Build a workflow that manages cross-institution research ethics approvals: submissions, reviews, amendments, and renewals.

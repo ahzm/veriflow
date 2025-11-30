@@ -1,0 +1,1 @@
+Design a workflow that manages complex insurance reinsurance cessions: allocate risks, compute premiums, and report.

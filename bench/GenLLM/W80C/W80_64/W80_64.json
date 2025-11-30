@@ -1,0 +1,88 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Task",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Request Satellite Imaging",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.satelliteimaging.com/request"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Prioritize Requests",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Schedule Imaging",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "5",
+      "name": "Deliver Imaging Results",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Satellite Imaging Results",
+        "text": "The satellite imaging results are ready for your review."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Task": {
+      "main": [
+        [
+          {
+            "node": "Request Satellite Imaging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Request Satellite Imaging": {
+      "main": [
+        [
+          {
+            "node": "Prioritize Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prioritize Requests": {
+      "main": [
+        [
+          {
+            "node": "Schedule Imaging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Imaging": {
+      "main": [
+        [
+          {
+            "node": "Deliver Imaging Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

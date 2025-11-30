@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "errorLevel",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Slack Warn",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Critical error level detected!"
+      }
+    }
+  ],
+  "connections": {
+    "errorLevel": {
+      "main": [
+        [
+          {
+            "node": "Slack Warn",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

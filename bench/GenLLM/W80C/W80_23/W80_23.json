@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Fetch Exam Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://university-api.com/exams"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Check Conflicts",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const exams = items[0].json;\nconst conflicts = [];\n// Logic to check for conflicts\nreturn [{ json: { conflicts } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Allocate Rooms",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const exams = items[0].json;\nconst allocatedRooms = [];\n// Logic to allocate rooms\nreturn [{ json: { allocatedRooms } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Publish Schedule",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "students@university.com",
+        "subject": "Exam Schedule Published",
+        "text": "The exam schedule has been published. Please check your email for details."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Exam Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Exam Data": {
+      "main": [
+        [
+          {
+            "node": "Check Conflicts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Conflicts": {
+      "main": [
+        [
+          {
+            "node": "Allocate Rooms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Allocate Rooms": {
+      "main": [
+        [
+          {
+            "node": "Publish Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

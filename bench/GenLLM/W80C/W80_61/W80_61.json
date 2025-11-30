@@ -1,0 +1,71 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Monitor Transfers",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "*/5 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "HTTP Request to Monitor Transfers",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.blockchainbridge.com/monitor"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Reconcile States",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items;"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Alert on Anomalies",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Anomaly detected in blockchain bridge operations!"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Monitor Transfers": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request to Monitor Transfers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to Monitor Transfers": {
+      "main": [
+        [
+          {
+            "node": "Reconcile States",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconcile States": {
+      "main": [
+        [
+          {
+            "node": "Alert on Anomalies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

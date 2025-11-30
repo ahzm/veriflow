@@ -1,0 +1,1 @@
+Build a workflow that manages energy community billing: meter aggregation, allocation, invoicing, and reporting.

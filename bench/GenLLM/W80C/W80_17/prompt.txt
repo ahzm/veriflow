@@ -1,0 +1,1 @@
+Create a workflow that orchestrates museum exhibition rotations: track objects, conditions, loans, and shipping.

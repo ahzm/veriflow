@@ -1,0 +1,82 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Event Detection",
+      "type": "n8n-nodes-base.eventDetection",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Deduplicate Events",
+      "type": "n8n-nodes-base.deduplicate",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Prioritize Events",
+      "type": "n8n-nodes-base.prioritize",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Send Email Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "user@example.com",
+        "subject": "Banking Alert",
+        "text": "You have a new banking alert."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "You have a new banking alert."
+      }
+    }
+  ],
+  "connections": {
+    "Event Detection": {
+      "main": [
+        [
+          {
+            "node": "Deduplicate Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deduplicate Events": {
+      "main": [
+        [
+          {
+            "node": "Prioritize Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prioritize Events": {
+      "main": [
+        [
+          {
+            "node": "Send Email Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

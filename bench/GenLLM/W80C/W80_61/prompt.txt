@@ -1,0 +1,1 @@
+Design a workflow that manages cross-chain blockchain bridge operations: monitor transfers, reconcile states, and alert on anomalies.

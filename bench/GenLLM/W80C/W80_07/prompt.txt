@@ -1,0 +1,1 @@
+Create a workflow that orchestrates pharmaceutical supply chain cold-chain monitoring: track temperatures, detect excursions, and trigger remediation.

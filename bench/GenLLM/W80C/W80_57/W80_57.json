@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Demand Forecast",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/demand-forecast"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Capacity Plan",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { plan: 'New Capacity Plan based on forecast' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Approval Request",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Requesting approval for the new capacity plan."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Approval Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "approver@example.com",
+        "subject": "Approval Needed for Capacity Plan",
+        "text": "Please review and approve the new capacity plan."
+      }
+    }
+  ],
+  "connections": {
+    "Demand Forecast": {
+      "main": [
+        [
+          {
+            "node": "Capacity Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capacity Plan": {
+      "main": [
+        [
+          {
+            "node": "Approval Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Send Approval Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

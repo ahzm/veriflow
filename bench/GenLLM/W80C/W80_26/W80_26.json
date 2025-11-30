@@ -1,0 +1,110 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Curate Stories",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Localize Content",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Publish to Website",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example-website.com/api/publish"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Publish to App",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://example-app.com/api/publish"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "New stories have been published!"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Schedule Publishing",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Publishing": {
+      "main": [
+        [
+          {
+            "node": "Curate Stories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Curate Stories": {
+      "main": [
+        [
+          {
+            "node": "Localize Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Localize Content": {
+      "main": [
+        [
+          {
+            "node": "Publish to Website",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Publish to App",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Publish to Website": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish to App": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

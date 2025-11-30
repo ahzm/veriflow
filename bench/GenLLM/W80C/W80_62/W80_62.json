@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Forecast Supplies",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.pharmaceuticals.com/forecast"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Package Supplies",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Supplies have been packaged."
+      }
+    },
+    {
+      "id": "3",
+      "name": "Ship Supplies",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.pharmaceuticals.com/ship"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Reconcile Supplies",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "manager@pharmaceuticals.com",
+        "subject": "Supply Reconciliation Report",
+        "text": "The supplies have been reconciled successfully."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Workflow",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Workflow": {
+      "main": [
+        [
+          {
+            "node": "Forecast Supplies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Forecast Supplies": {
+      "main": [
+        [
+          {
+            "node": "Package Supplies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Package Supplies": {
+      "main": [
+        [
+          {
+            "node": "Ship Supplies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ship Supplies": {
+      "main": [
+        [
+          {
+            "node": "Reconcile Supplies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

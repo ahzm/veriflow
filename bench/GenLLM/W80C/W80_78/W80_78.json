@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Eligibility Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/eligibility"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Payment Processing",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/payments"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Reconciliation",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/reconciliation"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "recipient@example.com",
+        "subject": "Cash Transfer Update",
+        "text": "Your cash transfer has been processed."
+      }
+    },
+    {
+      "id": "5",
+      "name": "Schedule Check",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Check": {
+      "main": [
+        [
+          {
+            "node": "Eligibility Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eligibility Check": {
+      "main": [
+        [
+          {
+            "node": "Payment Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment Processing": {
+      "main": [
+        [
+          {
+            "node": "Reconciliation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconciliation": {
+      "main": [
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Experiment",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 0 * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Version Dataset",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/version-dataset"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Log Configuration",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Experiment configuration logged."
+      }
+    },
+    {
+      "id": "4",
+      "name": "Publish Results",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "results@example.com",
+        "subject": "Experiment Results",
+        "text": "The results of the experiment are ready."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Experiment": {
+      "main": [
+        [
+          {
+            "node": "Version Dataset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Version Dataset": {
+      "main": [
+        [
+          {
+            "node": "Log Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Configuration": {
+      "main": [
+        [
+          {
+            "node": "Publish Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

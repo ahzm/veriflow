@@ -1,0 +1,1 @@
+Create a workflow that orchestrates transnational clinical registry updates: collect, validate, harmonize, and publish datasets.

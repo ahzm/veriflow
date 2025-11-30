@@ -1,0 +1,1 @@
+Design a workflow that manages inter-university student exchanges: applications, approvals, and credit transfers.

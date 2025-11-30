@@ -1,0 +1,67 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Collect Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/collect-data"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Harmonize Data",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Publish Data",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "The datasets have been successfully updated and published."
+      }
+    }
+  ],
+  "connections": {
+    "Collect Data": {
+      "main": [
+        [
+          {
+            "node": "Validate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Data": {
+      "main": [
+        [
+          {
+            "node": "Harmonize Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Harmonize Data": {
+      "main": [
+        [
+          {
+            "node": "Publish Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

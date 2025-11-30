@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Capture Inspection Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.example.com/inspection-data"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Run Statistical Checks",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "3",
+      "name": "Quarantine Defective Batches",
+      "type": "n8n-nodes-base.function",
+      "parameters": {}
+    },
+    {
+      "id": "4",
+      "name": "Notify Production Leads",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "production_leads@example.com",
+        "subject": "Quality Control Update",
+        "text": "Please be informed about the latest quality control results."
+      }
+    }
+  ],
+  "connections": {
+    "Capture Inspection Data": {
+      "main": [
+        [
+          {
+            "node": "Run Statistical Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Statistical Checks": {
+      "main": [
+        [
+          {
+            "node": "Quarantine Defective Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quarantine Defective Batches": {
+      "main": [
+        [
+          {
+            "node": "Notify Production Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

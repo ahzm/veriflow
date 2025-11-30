@@ -1,0 +1,50 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {}
+    },
+    {
+      "id": "2",
+      "name": "Sentiment API",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.sentimentanalysis.com/analyze"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Slack Label",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "Sentiment analysis result"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Sentiment API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment API": {
+      "main": [
+        [
+          {
+            "node": "Slack Label",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

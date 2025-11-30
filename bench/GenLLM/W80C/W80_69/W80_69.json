@@ -1,0 +1,92 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Schedule Tracking",
+      "type": "n8n-nodes-base.schedule",
+      "parameters": {
+        "cronExpression": "0 * * * *"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Get Sea Tracking Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.seatracking.com/v1/tracking"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Get Rail Tracking Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.railtracking.com/v1/tracking"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Get Road Tracking Info",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "https://api.roadtracking.com/v1/tracking"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Unified Tracking Update",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "tracking@company.com",
+        "subject": "Unified Transport Tracking Update",
+        "text": "Here is the unified tracking information for your intermodal transport."
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Tracking": {
+      "main": [
+        [
+          {
+            "node": "Get Sea Tracking Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sea Tracking Info": {
+      "main": [
+        [
+          {
+            "node": "Get Rail Tracking Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rail Tracking Info": {
+      "main": [
+        [
+          {
+            "node": "Get Road Tracking Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Road Tracking Info": {
+      "main": [
+        [
+          {
+            "node": "Send Unified Tracking Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

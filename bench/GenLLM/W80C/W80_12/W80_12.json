@@ -1,0 +1,113 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "3d-print-order"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Validate Model",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return items[0].json.model ? [{ json: { valid: true } }] : [{ json: { valid: false, error: 'Invalid model' } }];"
+      }
+    },
+    {
+      "id": "3",
+      "name": "Price Job",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { price: 100 } }];"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Queue Print",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "return [{ json: { status: 'queued' } }];"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.emailSend",
+      "parameters": {
+        "to": "customer@example.com",
+        "subject": "Your 3D Print Order Status",
+        "text": "Your order has been processed and is now queued for printing."
+      }
+    },
+    {
+      "id": "6",
+      "name": "Send Slack Notification",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "text": "A new 3D print order has been queued."
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Model": {
+      "main": [
+        [
+          {
+            "node": "Price Job",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Price Job": {
+      "main": [
+        [
+          {
+            "node": "Queue Print",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue Print": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Slack Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
