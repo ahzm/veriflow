@@ -130,11 +130,16 @@ Overall:           1.00
 ```
 
 ### 2. Visualize a workflow DAG
+VeriFlow can generate DAG diagrams from workflow JSON files.
+Below is an example visualization generated using:
 ```bash
 python scripts/plot_dag.py \
   -i bench/T001/gold.json \
   -o experiments/results/T001_dag.png
 ```
+<p align="center">
+  <img src="experiments/results/T001_dag.png" alt="Workflow DAG example" width="700">
+</p>
 
 ### 3. Verify a bench of workflows
 Runs batch verification and exports CSV + detailed reports.
