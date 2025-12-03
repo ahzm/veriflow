@@ -157,17 +157,21 @@ python -m veriflow.cli bench \
 ```
 veriflow/
 ├── veriflow/                   # Core framework
-│   ├── cli.py                  # Main CLI entry (verify / bench commands)
+│   ├── cli.py                  # Main CLI entry (verify / bench / generate commands)
 │   ├── structural/             # Structural validation
 │   │   ├── checker.py          # Static schema checking
+│   │   ├── metrics.py          # Compute structural metrics
 │   │   └── schema.py           # Workflow schema definitions
 │   ├── semantic/               # Semantic consistency
 │   │   ├── intent_extractor.py # Intent extraction
+│   │   ├── embedding.py        # Embedding utilities for semantic matcher
 │   │   └── matcher.py          # keyword matching
 │   ├── generator/              # Produce n8n JSON workflows from prompts
 │   │   └── genllm.py           # LLM-based workflow generation
 │   ├── executable/             # Executability validation
-│   │   ├── sandbox.py          # validate workflow in sandbox
+│   │   ├── dataflow.py         # Data–flow consistency check
+│   │   ├── faults.py           # Inject a runtime fault
+│   │   ├── sandbox.py          # Validate workflow in sandbox
 │   │   └── dryrun.py           # Dry-run simulation
 │   └── utils/                  # Shared helpers
 │       ├── io.py               # JSON & figure I/O utilities
@@ -175,12 +179,18 @@ veriflow/
 │       └── graph.py            # Build and traverse workflow DAG
 │
 ├── bench/                      # VeriFlow-Bench dataset
-│   └── T001/                   # Example task
-│       ├── prompt.txt          # Natural language prompt
-│       └── gold.json           # Ground-truth workflow
+│   ├── T001/                   # Example task
+│   │   ├── prompt.txt          # Natural language prompt
+│   │   └── gold.json           # Ground-truth workflow
+│   ├── executable/             # Executable verification bench
+│   ├── semantic/               # Semantic verification bench
+│   ├── structural/             # structural verification bench
+│   └── GenLLM/                 # benchmark dataset for LLM workflow evaluation
 │
 ├── experiments/                # Experimental results & configs
 │   └── results/
+│       ├── GenLLM_W*_rule.csv  # benchmark resuslts for GenLLM datasets (rule)
+│       ├── GenLLM_W*_.csv      # benchmark resuslts for GenLLM datasets (rule+llm)
 │       ├── report.csv          # Aggregated scores
 │       └── score_plot.png      # Visualization
 │
